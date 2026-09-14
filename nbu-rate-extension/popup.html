@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="theme.css" />
+  <style>
+    body { width: 320px; padding: 14px; }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    h1 { font-size: 15px; margin: 0; color: var(--accent); }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1;
+    }
+    .icon-btn:hover { background: var(--hover); color: var(--text); }
+
+    .rate-row {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .rate-row:last-child { border-bottom: none; }
+
+.rate-row .flag {
+  margin-right: 10px;
+  object-fit: cover;
+}
+    .rate-row .currency-code {
+      font-weight: 600;
+      width: 38px;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+    }
+    .rate-row .currency-name {
+      flex: 1;
+      margin-left: 6px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+    .rate-row .rate-value {
+      font-weight: 600;
+      color: var(--positive);
+      text-align: right;
+    }
+
+    .updated {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--text-faint);
+      text-align: center;
+    }
+    .error {
+      color: var(--negative);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .loader {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 data-i18n="popup_title">Курс НБУ до гривні</h1>
+    <button id="open-settings" class="icon-btn"
+            data-i18n-title="settings_tooltip" title="Налаштування">⚙</button>
+  </div>
+
+  <div id="content">
+    <div class="loader" data-i18n="loading">Завантаження...</div>
+  </div>
+
+  <div id="updated" class="updated"></div>
+
+  <script src="i18n.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
