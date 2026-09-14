@@ -74,7 +74,7 @@
 
 <div align="center">
 
-| Попап (світла тема) | Налаштування | Власна тема |
+| Світла тема | Налаштування | Власна тема |
 |:---:|:---:|:---:|
 | ![Popup Light](screenshots/popup-light.png) | ![Options](screenshots/options.png) | ![Custom Theme](screenshots/custom-theme.png) |
 
