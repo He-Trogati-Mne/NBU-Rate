@@ -70,8 +70,6 @@
 </tr>
 </table>
 
----
-
 ## Скріншоти
 
 <div align="center">
