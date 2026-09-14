@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://github.com/user-attachments/assets/a8529e26-860f-4556-9b64-bf594b9c6f0d" alt="Курс НБУ" width="128" height="128" />
+<img src="nbu-rate-extension/icon128.png" alt="Курс НБУ" width="128" height="128" />
 
 # Курс НБУ
 
