@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="icon128.png" alt="Курс НБУ" width="128" height="128" />
+<img src="nbu-rate-extension/icon128.png" alt="Курс НБУ" width="128" height="128" />
 
 # Курс НБУ
 
