@@ -78,7 +78,7 @@
 
 <div align="center">
 
-| Вікно з курсами (світла тема) | Сторінка налаштувань | Власна тема |
+| Світла тема | Сторінка налаштувань | Власна тема |
 |:---:|:---:|:---:|
 | ![Світла тема](screenshots/popup-light.png) | ![Налаштування](screenshots/options.png) | ![Власна тема](screenshots/custom-theme.png) |
 
@@ -191,9 +191,9 @@
 
 ```
 NBU-Rate/
-├── manifest.firefox.json       Маніфест для Firefox (з gecko.id)
-├── manifest.chrome.json        Маніфест для Chrome (з key)
-├── manifest.edge.json          Маніфест для Edge (без key)
+├── manifest.firefox.json       Маніфест для Firefox 
+├── manifest.chrome.json        Маніфест для Chrome 
+├── manifest.edge.json          Маніфест для Edge 
 ├── popup.html                  Розмітка вікна з курсами
 ├── popup.js                    Логіка вікна з курсами
 ├── options.html                Розмітка сторінки налаштувань
