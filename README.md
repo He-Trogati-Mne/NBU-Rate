@@ -83,9 +83,6 @@
 | ![Popup Light](screenshots/popup-light.png) | ![Options](screenshots/options.png) | ![Custom Theme](screenshots/custom-theme.png) |
 
 </div>
-
-> Створи папку `screenshots/` у репозиторії та додай три PNG-файли з такими іменами: `popup-light.png`, `options.png`, `custom-theme.png`.
-
 ---
 
 ## Встановлення
