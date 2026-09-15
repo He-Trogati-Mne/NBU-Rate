@@ -1,3 +1,9 @@
 name = "nbu-rate"
 main = "worker.js"
 compatibility_date = "2026-09-15"
+[observability]
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
