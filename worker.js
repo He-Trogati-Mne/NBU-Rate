@@ -9,8 +9,15 @@ export default {
     try {
       const response = await fetch(target);
       const newResponse = new Response(response.body, response);
-      // Дозволяємо запити з будь-якого домену (включно з GitHub Pages)
+
+      // Дозволяємо запити з будь-якого домену
       newResponse.headers.set('Access-Control-Allow-Origin', '*');
+
+      // ВИМИКАЄМО КЕШУВАННЯ Cloudflare
+      newResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+      newResponse.headers.set('Pragma', 'no-cache');
+      newResponse.headers.set('Expires', '0');
+
       return newResponse;
     } catch (err) {
       return new Response('Proxy error: ' + err.message, { status: 500 });
