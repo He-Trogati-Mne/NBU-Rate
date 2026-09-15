@@ -10,13 +10,12 @@ export default {
       const response = await fetch(target);
       const newResponse = new Response(response.body, response);
 
-      // Дозволяємо запити з будь-якого домену
       newResponse.headers.set('Access-Control-Allow-Origin', '*');
-
-      // ВИМИКАЄМО КЕШУВАННЯ Cloudflare
       newResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
       newResponse.headers.set('Pragma', 'no-cache');
       newResponse.headers.set('Expires', '0');
+      newResponse.headers.set('CDN-Cache-Control', 'no-store');
+      newResponse.headers.set('Cloudflare-CDN-Cache-Control', 'no-store');
 
       return newResponse;
     } catch (err) {
