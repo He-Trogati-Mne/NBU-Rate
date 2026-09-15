@@ -157,7 +157,7 @@
         </h2>
 
         <div class="rate-grid" id="current-rates">
-            <div class="loading-msg">Завантаження історії з НБУ (2020–2026)...<br><small>Це може зайняти до 30 секунд</small></div>
+            <div class="loading-msg">Завантаження історії з НБУ (2020–2026)...<br><small>Це може зайняти до 60 секунд</small></div>
         </div>
 
         <div class="period-switcher" id="period-switcher">
@@ -210,26 +210,38 @@
         const CORS_PROXY = 'https://nbu-rate.nightmod.workers.dev/?url=';
         const NBU_HISTORY_API = 'https://bank.gov.ua/NBU_Exchange/exchange_site';
 
-        const CACHE_KEY = 'nbu_history_cache_v5';
+        const CACHE_KEY = 'nbu_history_cache_v6';
         const CACHE_TTL = 12 * 60 * 60 * 1000;
-        const START_DATE = '20200101'; // 2020 рік — безпечний діапазон
-        const REQUEST_DELAY = 500;      // пауза між запитами, мс
-        const REQUEST_TIMEOUT = 25000;  // таймаут на запит, мс
+        const START_DATE = '20200101';
+        const REQUEST_DELAY = 500;
+        const REQUEST_TIMEOUT = 25000;
 
-        const CURRENCIES = ['USD', 'EUR', 'GBP', 'PLN', 'CNY'];
+        const CURRENCIES = ['USD', 'EUR', 'GBP', 'PLN', 'CNY', 'CHF', 'JPY', 'CAD', 'AUD', 'TRY'];
+
         const CURRENCY_NAMES = {
             USD: 'Долар США',
             EUR: 'Євро',
             GBP: 'Фунт стерлінгів',
             PLN: 'Польський злотий',
-            CNY: 'Китайський юань'
+            CNY: 'Китайський юань',
+            CHF: 'Швейцарський франк',
+            JPY: 'Японська єна',
+            CAD: 'Канадський долар',
+            AUD: 'Австралійський долар',
+            TRY: 'Турецька ліра'
         };
+
         const CURRENCY_COLORS = {
             USD: '#1a73e8',
             EUR: '#34a853',
             GBP: '#ea4335',
             PLN: '#fbbc04',
-            CNY: '#ff6d01'
+            CNY: '#ff6d01',
+            CHF: '#d93025',
+            JPY: '#bc002d',
+            CAD: '#d80621',
+            AUD: '#00008b',
+            TRY: '#e30a17'
         };
 
         let currentCurrency = 'USD';
@@ -296,12 +308,12 @@
 
             const history = {};
             data.forEach(item => {
-              const date = item.exchangedate;
-              const [day, month, year] = date.split('.');
-              const isoDate = `${year}-${month}-${day}`;
-              if (!history[isoDate]) history[isoDate] = {};
-              history[isoDate][valcode.toUpperCase()] = item.rate;  // ← ВЕРХНІЙ РЕГІСТР
-           });
+                const date = item.exchangedate;
+                const [day, month, year] = date.split('.');
+                const isoDate = `${year}-${month}-${day}`;
+                if (!history[isoDate]) history[isoDate] = {};
+                history[isoDate][valcode.toUpperCase()] = item.rate;
+            });
 
             return history;
         }
@@ -309,7 +321,6 @@
         async function loadAllHistory() {
             const container = document.getElementById('current-rates');
 
-            // Спробувати кеш
             const cached = loadCache();
             if (cached && Object.keys(cached).length > 0) {
                 console.log('[NBU] Використовую кеш');
@@ -324,14 +335,12 @@
             }
 
             try {
-                // Завантажуємо ПОСЛІДОВНО, з паузами — не б'ємо в ліміти
                 for (const code of CURRENCIES) {
                     const history = await fetchHistoryForCurrency(code.toLowerCase());
                     Object.keys(history).forEach(date => {
                         if (!historicalRates[date]) historicalRates[date] = {};
                         Object.assign(historicalRates[date], history[date]);
                     });
-                    // Пауза між запитами
                     if (code !== CURRENCIES[CURRENCIES.length - 1]) {
                         await delay(REQUEST_DELAY);
                     }
