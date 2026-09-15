@@ -319,8 +319,8 @@
 
         async function fetchHistoryForCurrency(valcode) {
             const end = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-            const apiUrl = `${NBU_HISTORY_API}?start=${START_DATE}&end=${end}&valcode=${valcode}&sort=exchangedate&order=desc&json`;
-            const url = CORS_PROXY + encodeURIComponent(apiUrl);
+            const apiUrl = `${NBU_HISTORY_API}?start=${START_DATE}&end=${end}&valcode=${valcode}&sort=exchangedate&order=desc&json&_=${Date.now()}`;
+            const url = CORS_PROXY + encodeURIComponent(apiUrl) + '&_=' + Date.now();
 
             console.log(`[NBU] Завантаження ${valcode}...`);
             const response = await fetchWithTimeout(url, REQUEST_TIMEOUT);
