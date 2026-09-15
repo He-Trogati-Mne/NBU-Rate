@@ -1,42 +1,518 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <title>Політика конфіденційності — Курс НБУ</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 720px;
-           margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #222; }
-    h1 { color: #1a73e8; }
-    h2 { margin-top: 28px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курс НБУ — Аналітика та Політика конфіденційності</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --bg-elev: #ffffff;
+            --text: #202124;
+            --text-muted: #5f6368;
+            --accent: #1a73e8;
+            --positive: #188038;
+            --negative: #d93025;
+            --border: #dadce0;
+            --hover: #f1f3f4;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1a1a1a;
+                --bg-elev: #2a2a2a;
+                --text: #f5f5f5;
+                --text-muted: #c0c0c0;
+                --accent: #8ab4f8;
+                --positive: #7ee2a8;
+                --negative: #f28b82;
+                --border: #4a4a4a;
+                --hover: #3a3a3a;
+            }
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 40px 24px 60px;
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.6;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+        header { text-align: center; margin-bottom: 40px; }
+        .logo { font-size: 48px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+        h1 { font-size: 32px; margin: 0 0 8px; color: var(--text); }
+        .subtitle { font-size: 16px; color: var(--text-muted); }
+        section {
+            background: var(--bg-elev);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        section:hover {
+            border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .section-title svg { width: 24px; height: 24px; stroke: var(--accent); stroke-width: 2.2; fill: none; }
+
+        .rate-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .rate-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .rate-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .rate-card.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--bg)); }
+        .rate-card .currency { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .rate-card .value { font-size: 20px; font-weight: 700; color: var(--accent); font-family: ui-monospace, Menlo, Consolas, monospace; }
+        .rate-card .change { font-size: 12px; font-weight: 600; margin-top: 6px; }
+        .rate-card .change.up { color: var(--positive); }
+        .rate-card .change.down { color: var(--negative); }
+        .rate-card .change.flat { color: var(--text-muted); }
+
+        .period-switcher {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+            background: var(--bg);
+            padding: 5px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            width: fit-content;
+            flex-wrap: wrap;
+        }
+        .period-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .period-btn:hover { background: var(--hover); color: var(--text); }
+        .period-btn.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 40%, transparent);
+        }
+
+        .chart-container { position: relative; height: 380px; width: 100%; margin-bottom: 24px; }
+
+        .privacy-content h2 { font-size: 20px; margin: 24px 0 12px; color: var(--accent); }
+        .privacy-content p, .privacy-content li { color: var(--text-muted); font-size: 15px; }
+        .privacy-content ul { padding-left: 20px; }
+        .privacy-content code { background: var(--hover); padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; color: var(--text); }
+        a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        a:hover { text-decoration: underline; }
+        footer { text-align: center; margin-top: 48px; font-size: 14px; color: var(--text-muted); }
+        .updated { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; text-align: center; }
+
+        .loading-msg {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--text-muted);
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Політика конфіденційності — Курс НБУ</h1>
-  <p>Останнє оновлення: 14 вересня 2026</p>
+    <header>
+        <div class="logo">₴</div>
+        <h1>Курс НБУ</h1>
+        <p class="subtitle">Офіційний курс валют та аналітика</p>
+    </header>
 
-  <h2>Які дані ми збираємо</h2>
-  <p>Розширення «Курс НБУ» <strong>не збирає</strong> жодних персональних даних
-     користувача: ні ім'я, ні email, ні історію, ні місцезнаходження.</p>
+    <section id="analytics">
+        <h2 class="section-title">
+            <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <span>Аналітика курсу</span>
+        </h2>
 
-  <h2>Що зберігається</h2>
-  <p>Усі налаштування (тема, мова, вибір валют, власні кольори) зберігаються
-     локально в браузері користувача через API <code>chrome.storage</code>
-     і, за бажанням користувача, синхронізуються між його пристроями через
-     акаунт Microsoft.</p>
+        <div class="rate-grid" id="current-rates">
+            <div class="loading-msg">Завантаження історії з НБУ (2020–2026)...<br><small>Це може зайняти до 30 секунд</small></div>
+        </div>
 
-  <h2>Зовнішні запити</h2>
-  <p>Єдиний зовнішній запит — до офіційного API Національного банку України
-     (<a href="https://bank.gov.ua">bank.gov.ua</a>) для отримання курсів валют.
-     Жодна інформація про користувача при цьому не передається.</p>
+        <div class="period-switcher" id="period-switcher">
+            <button class="period-btn" data-period="1D">1 День</button>
+            <button class="period-btn" data-period="5D">5 Днів</button>
+            <button class="period-btn" data-period="1M">1 Місяць</button>
+            <button class="period-btn" data-period="1Y">1 Рік</button>
+            <button class="period-btn" data-period="5Y">5 Років</button>
+            <button class="period-btn active" data-period="MAX">Макс.</button>
+        </div>
 
-  <h2>Дозволи</h2>
-  <ul>
-    <li><code>storage</code> — для збереження налаштувань.</li>
-    <li><code>alarms</code> — для періодичного оновлення курсів.</li>
-    <li><code>https://bank.gov.ua/*</code> — для запиту курсів.</li>
-  </ul>
+        <div class="chart-container">
+            <canvas id="rateChart"></canvas>
+        </div>
+    </section>
 
-  <h2>Контакти</h2>
-  <p>Discord: https://discord.gg/DQHpbet36W</p>
+    <section id="privacy">
+        <h2 class="section-title">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span>Політика конфіденційності</span>
+        </h2>
+        <div class="privacy-content">
+            <p class="updated">Останнє оновлення: 15 вересня 2026</p>
+            <h2>Які дані ми збираємо</h2>
+            <p>Розширення «Курс НБУ» не збирає жодних персональних даних користувача: ні ім'я, ні email, ні історію, ні місцезнаходження.</p>
+            <h2>Що зберігається</h2>
+            <p>Усі налаштування (тема, мова, вибір валют, власні кольори) зберігаються локально в браузері користувача через API <code>chrome.storage</code> і, за бажанням користувача, синхронізуються між його пристроями через акаунт Google або Microsoft.</p>
+            <h2>Зовнішні запити</h2>
+            <p>Єдиний зовнішній запит — до офіційного API Національного банку України (<a href="https://bank.gov.ua">bank.gov.ua</a>) для отримання курсів валют. Жодна інформація про користувача при цьому не передається.</p>
+            <h2>Дозволи</h2>
+            <ul>
+                <li><code>storage</code> — для збереження налаштувань.</li>
+                <li><code>alarms</code> — для періодичного оновлення курсів.</li>
+                <li><code>https://bank.gov.ua/*</code> — для запиту курсів.</li>
+            </ul>
+            <h2>Контакти</h2>
+            <p>Discord: <a href="https://discord.gg/DQHpbet36W">https://discord.gg/DQHpbet36W</a></p>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 Курс НБУ. Зроблено в Україні 🇺🇦</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // ============================================================
+        // 1. КОНФІГУРАЦІЯ
+        // ============================================================
+        const CORS_PROXY = 'https://nbu-rate.nightmod.workers.dev/?url=';
+        const NBU_HISTORY_API = 'https://bank.gov.ua/NBU_Exchange/exchange_site';
+
+        const CACHE_KEY = 'nbu_history_cache_v5';
+        const CACHE_TTL = 12 * 60 * 60 * 1000;
+        const START_DATE = '20200101'; // 2020 рік — безпечний діапазон
+        const REQUEST_DELAY = 500;      // пауза між запитами, мс
+        const REQUEST_TIMEOUT = 25000;  // таймаут на запит, мс
+
+        const CURRENCIES = ['USD', 'EUR', 'GBP', 'PLN', 'CNY'];
+        const CURRENCY_NAMES = {
+            USD: 'Долар США',
+            EUR: 'Євро',
+            GBP: 'Фунт стерлінгів',
+            PLN: 'Польський злотий',
+            CNY: 'Китайський юань'
+        };
+        const CURRENCY_COLORS = {
+            USD: '#1a73e8',
+            EUR: '#34a853',
+            GBP: '#ea4335',
+            PLN: '#fbbc04',
+            CNY: '#ff6d01'
+        };
+
+        let currentCurrency = 'USD';
+        let currentPeriod = 'MAX';
+        let chartInstance = null;
+        let historicalRates = {};
+
+        // ============================================================
+        // 2. КЕШУВАННЯ
+        // ============================================================
+        function loadCache() {
+            try {
+                const raw = localStorage.getItem(CACHE_KEY);
+                if (!raw) return null;
+                const cache = JSON.parse(raw);
+                if (Date.now() - cache.timestamp > CACHE_TTL) return null;
+                return cache.data;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function saveCache(data) {
+            try {
+                localStorage.setItem(CACHE_KEY, JSON.stringify({
+                    timestamp: Date.now(),
+                    data: data
+                }));
+            } catch (e) {
+                console.warn('Не вдалося зберегти кеш:', e);
+            }
+        }
+
+        // ============================================================
+        // 3. ЗАВАНТАЖЕННЯ
+        // ============================================================
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function fetchWithTimeout(url, timeout) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeout);
+            try {
+                const response = await fetch(url, { signal: controller.signal });
+                clearTimeout(timer);
+                return response;
+            } catch (e) {
+                clearTimeout(timer);
+                throw e;
+            }
+        }
+
+        async function fetchHistoryForCurrency(valcode) {
+            const end = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            const apiUrl = `${NBU_HISTORY_API}?start=${START_DATE}&end=${end}&valcode=${valcode}&sort=exchangedate&order=desc&json`;
+            const url = CORS_PROXY + encodeURIComponent(apiUrl);
+
+            console.log(`[NBU] Завантаження ${valcode}...`);
+            const response = await fetchWithTimeout(url, REQUEST_TIMEOUT);
+            if (!response.ok) throw new Error(`HTTP ${response.status} для ${valcode}`);
+            const data = await response.json();
+            console.log(`[NBU] ${valcode}: отримано ${data.length} записів`);
+
+            const history = {};
+            data.forEach(item => {
+                const date = item.exchangedate; // "02.01.2020"
+                const [day, month, year] = date.split('.');
+                const isoDate = `${year}-${month}-${day}`;
+                if (!history[isoDate]) history[isoDate] = {};
+                history[isoDate][valcode] = item.rate;
+            });
+
+            return history;
+        }
+
+        async function loadAllHistory() {
+            const container = document.getElementById('current-rates');
+
+            // Спробувати кеш
+            const cached = loadCache();
+            if (cached && Object.keys(cached).length > 0) {
+                console.log('[NBU] Використовую кеш');
+                historicalRates = cached;
+                const dates = Object.keys(historicalRates).sort();
+                const latestDate = dates[dates.length - 1];
+                const todayRates = historicalRates[latestDate];
+
+                renderCards(todayRates);
+                renderChart();
+                return;
+            }
+
+            try {
+                // Завантажуємо ПОСЛІДОВНО, з паузами — не б'ємо в ліміти
+                for (const code of CURRENCIES) {
+                    const history = await fetchHistoryForCurrency(code.toLowerCase());
+                    Object.keys(history).forEach(date => {
+                        if (!historicalRates[date]) historicalRates[date] = {};
+                        Object.assign(historicalRates[date], history[date]);
+                    });
+                    // Пауза між запитами
+                    if (code !== CURRENCIES[CURRENCIES.length - 1]) {
+                        await delay(REQUEST_DELAY);
+                    }
+                }
+
+                saveCache(historicalRates);
+
+                const dates = Object.keys(historicalRates).sort();
+                const latestDate = dates[dates.length - 1];
+                const todayRates = historicalRates[latestDate];
+
+                console.log(`[NBU] Готово. Днів: ${dates.length}, останній: ${latestDate}`);
+                renderCards(todayRates);
+                renderChart();
+
+            } catch (err) {
+                console.error('[NBU] Помилка:', err);
+                container.innerHTML = `
+                    <p style="color:var(--negative);grid-column:1/-1;text-align:center;">
+                        Не вдалося завантажити історію.<br>
+                        <small>${err.message}</small><br>
+                        <small>Спробуйте оновити сторінку.</small>
+                    </p>
+                `;
+            }
+        }
+
+        // ============================================================
+        // 4. РЕНДЕРИНГ
+        // ============================================================
+        function renderCards(todayRates) {
+            const sorted = Object.keys(historicalRates).sort();
+            const prevDay = sorted[sorted.length - 2];
+            const prevRates = prevDay ? historicalRates[prevDay] : null;
+
+            const container = document.getElementById('current-rates');
+            let html = '';
+
+            CURRENCIES.forEach(code => {
+                const current = todayRates[code];
+                if (!current) return;
+
+                const previous = prevRates && prevRates[code] ? prevRates[code] : current;
+                const diff = current - previous;
+                const diffFixed = diff.toFixed(4);
+                let changeClass = 'flat', changeText = '→ 0.0000';
+
+                if (diff > 0.0001) { changeClass = 'up'; changeText = `↑ +${diffFixed}`; }
+                else if (diff < -0.0001) { changeClass = 'down'; changeText = `↓ ${diffFixed}`; }
+
+                html += `
+                    <div class="rate-card ${code === currentCurrency ? 'active' : ''}" data-currency="${code}">
+                        <div class="currency">${CURRENCY_NAMES[code]} (${code})</div>
+                        <div class="value">${current.toFixed(4)} ₴</div>
+                        <div class="change ${changeClass}">${changeText}</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            container.querySelectorAll('.rate-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    currentCurrency = card.dataset.currency;
+                    container.querySelectorAll('.rate-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    renderChart();
+                });
+            });
+        }
+
+        function getFilteredData(period) {
+            const dates = Object.keys(historicalRates).sort();
+            if (dates.length === 0) return dates;
+
+            const now = new Date();
+            let startDate = new Date(now);
+
+            switch (period) {
+                case '1D': startDate.setDate(now.getDate() - 1); break;
+                case '5D': startDate.setDate(now.getDate() - 5); break;
+                case '1M': startDate.setMonth(now.getMonth() - 1); break;
+                case '1Y': startDate.setFullYear(now.getFullYear() - 1); break;
+                case '5Y': startDate.setFullYear(now.getFullYear() - 5); break;
+                case 'MAX':
+                default: return dates;
+            }
+
+            const startStr = startDate.toISOString().slice(0, 10);
+            return dates.filter(d => d >= startStr);
+        }
+
+        function renderChart() {
+            const dates = getFilteredData(currentPeriod);
+            const ctx = document.getElementById('rateChart').getContext('2d');
+
+            if (dates.length === 0) {
+                if (chartInstance) chartInstance.destroy();
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.font = '16px system-ui';
+                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim();
+                ctx.textAlign = 'center';
+                ctx.fillText('Недостатньо даних для вибраного періоду', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+
+            const labels = dates.map(d => {
+                const [year, m, day] = d.split('-');
+                if (currentPeriod === 'MAX' || currentPeriod === '5Y') {
+                    return `${m}.${year}`;
+                }
+                return `${day}.${m}`;
+            });
+            const data = dates.map(d => historicalRates[d][currentCurrency]);
+
+            if (chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `${currentCurrency} / UAH`,
+                        data: data,
+                        borderColor: CURRENCY_COLORS[currentCurrency],
+                        backgroundColor: CURRENCY_COLORS[currentCurrency] + '20',
+                        tension: 0.3,
+                        fill: true,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(4)} ₴`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim(),
+                                callback: (value) => value.toFixed(2) + ' ₴'
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim(),
+                                maxTicksLimit: 12
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================================
+        // 5. ЗАПУСК
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadAllHistory();
+
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentPeriod = btn.dataset.period;
+                    renderChart();
+                });
+            });
+        });
+    </script>
 </body>
 </html>
