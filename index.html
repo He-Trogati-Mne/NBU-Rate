@@ -296,12 +296,12 @@
 
             const history = {};
             data.forEach(item => {
-                const date = item.exchangedate; // "02.01.2020"
-                const [day, month, year] = date.split('.');
-                const isoDate = `${year}-${month}-${day}`;
-                if (!history[isoDate]) history[isoDate] = {};
-                history[isoDate][valcode] = item.rate;
-            });
+              const date = item.exchangedate;
+              const [day, month, year] = date.split('.');
+              const isoDate = `${year}-${month}-${day}`;
+              if (!history[isoDate]) history[isoDate] = {};
+              history[isoDate][valcode.toUpperCase()] = item.rate;  // ← ВЕРХНІЙ РЕГІСТР
+           });
 
             return history;
         }
