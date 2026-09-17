@@ -566,7 +566,7 @@
             top: calc(100% + 4px);
             left: 0;
             right: 0;
-            max-height: 300px;
+            max-height: 340px;
             overflow-y: auto;
             background: var(--bg-elev);
             border: 1px solid var(--border);
@@ -688,7 +688,6 @@
             padding: 20px;
         }
 
-        /* ===== ФУТЕР ===== */
         .page-footer {
             text-align: center;
             margin-top: 48px;
@@ -745,7 +744,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* ===== ПАЛІТРИ ДЛЯ ДАЛЬТОНІКІВ ===== */
         :root[data-a11y-cvd="true"][data-a11y-palette="universal"] {
             --a11y-up: #0072B2;
             --a11y-down: #D55E00;
@@ -918,7 +916,6 @@
         </div>
     </section>
 
-    <!-- ФУТЕР -->
     <footer class="page-footer">
         <div class="footer-title">Контакти</div>
         <div class="footer-links">
@@ -1096,34 +1093,52 @@
         const CORS_PROXY = 'https://nbu-rate.nightmod.workers.dev/?url=';
         const NBU_HISTORY_API = 'https://bank.gov.ua/NBU_Exchange/exchange_site';
 
-        const CACHE_KEY = 'nbu_history_cache_v9';
+        const CACHE_KEY = 'nbu_history_cache_v10';
         const CACHE_TTL = 30 * 60 * 1000;
         const START_DATE = '20200101';
-        const REQUEST_DELAY = 500;
-        const REQUEST_TIMEOUT = 25000;
+        const REQUEST_DELAY = 300;
+        const REQUEST_TIMEOUT = 30000;
 
         const THEME_KEY = 'nbu_theme_v1';
         const CUSTOM_COLORS_KEY = 'nbu_custom_colors_v1';
         const A11Y_KEY = 'nbu_a11y_v1';
 
-        const CURRENCIES = ['USD', 'EUR', 'GBP', 'PLN', 'CNY', 'CHF', 'JPY', 'CAD', 'AUD', 'TRY'];
+        // ===== 25 валют =====
+        const CURRENCIES = [
+            'USD', 'EUR', 'GBP', 'PLN', 'CNY', 'CHF', 'JPY', 'CAD', 'AUD', 'TRY',
+            'SEK', 'NOK', 'DKK', 'CZK', 'HUF', 'RON', 'BGN', 'ILS', 'KRW', 'SGD',
+            'HKD', 'NZD', 'MXN', 'INR', 'XAU'
+        ];
 
         const FLAGS = {
             UAH: 'ua', USD: 'us', EUR: 'eu', GBP: 'gb', PLN: 'pl',
-            CNY: 'cn', CHF: 'ch', JPY: 'jp', CAD: 'ca', AUD: 'au', TRY: 'tr'
+            CNY: 'cn', CHF: 'ch', JPY: 'jp', CAD: 'ca', AUD: 'au', TRY: 'tr',
+            SEK: 'se', NOK: 'no', DKK: 'dk', CZK: 'cz', HUF: 'hu',
+            RON: 'ro', BGN: 'bg', ILS: 'il', KRW: 'kr', SGD: 'sg',
+            HKD: 'hk', NZD: 'nz', MXN: 'mx', INR: 'in',
+            XAU: 'xa' // золото — можна додати окремий PNG або емодзі
         };
 
         const CURRENCY_NAMES = {
             USD: 'Долар США', EUR: 'Євро', GBP: 'Фунт стерлінгів', PLN: 'Польський злотий',
             CNY: 'Китайський юань', CHF: 'Швейцарський франк', JPY: 'Японська єна',
             CAD: 'Канадський долар', AUD: 'Австралійський долар', TRY: 'Турецька ліра',
+            SEK: 'Шведська крона', NOK: 'Норвезька крона', DKK: 'Данська крона',
+            CZK: 'Чеська крона', HUF: 'Угорський форинт', RON: 'Румунський лей',
+            BGN: 'Болгарський лев', ILS: 'Ізраїльський шекель', KRW: 'Південнокорейська вона',
+            SGD: 'Сінгапурський долар', HKD: 'Гонконгський долар', NZD: 'Новозеландський долар',
+            MXN: 'Мексиканське песо', INR: 'Індійська рупія', XAU: 'Золото (тройська унція)',
             UAH: 'Українська гривня'
         };
 
         const CURRENCY_COLORS = {
             USD: '#1a73e8', EUR: '#34a853', GBP: '#ea4335', PLN: '#fbbc04',
             CNY: '#ff6d01', CHF: '#d93025', JPY: '#bc002d', CAD: '#d80621',
-            AUD: '#00008b', TRY: '#e30a17'
+            AUD: '#00008b', TRY: '#e30a17', SEK: '#006AA7', NOK: '#BA0C2F',
+            DKK: '#C60C30', CZK: '#11457E', HUF: '#477050', RON: '#002B7F',
+            BGN: '#00966E', ILS: '#0038B8', KRW: '#CD2E3A', SGD: '#EF3340',
+            HKD: '#DE2910', NZD: '#000000', MXN: '#006847', INR: '#FF9933',
+            XAU: '#D4AF37'
         };
 
         const PRESETS = {
