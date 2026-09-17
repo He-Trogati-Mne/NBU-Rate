@@ -86,7 +86,7 @@
 
 <div align="center">
 
-| Світла тема | Сторінка налаштувань | Власна тема |
+| Світла тема | Сторінка налаштувань | Темна тема |
 |:---:|:---:|:---:|
 | ![Світла тема](screenshots/popup-light.png) | ![Налаштування](screenshots/options.png) | ![Власна тема](screenshots/custom-theme.png) |
 
