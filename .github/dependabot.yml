@@ -1,0 +1,34 @@
+version: 2
+
+updates:
+  # GitHub Actions — оновлення workflow-файлів
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # npm — якщо додаси package.json у майбутньому
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+    labels:
+      - "dependencies"
+      - "npm"
+    ignore:
+      # Ігнорувати major-оновлення (щоб не ламати розширення)
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
