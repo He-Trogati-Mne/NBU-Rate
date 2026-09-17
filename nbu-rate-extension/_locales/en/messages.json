@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Курс НБУ",
+    "description": "Extension name"
+  },
+  "extensionDescription": {
+    "message": "Офіційний курс валют НБУ до гривні: USD, EUR, GBP, PLN, CNY, CHF, JPY, CAD, AUD, TRY. Темна тема, прапори, 2 мови інтерфейсу.",
+    "description": "Extension description"
+  }
+}
