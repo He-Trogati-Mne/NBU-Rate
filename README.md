@@ -33,7 +33,7 @@
 <img src="https://img.shields.io/badge/-Валюти-1a73e8?style=flat-square" alt="" />
 </h3>
 
-- **10 валют** — USD, EUR, GBP, PLN, CNY, CHF, JPY, CAD, AUD, TRY
+- **24 валюти** — USD, EUR, GBP, PLN, CNY, CHF, JPY, CAD, AUD, TRY, SEK, NOK, DKK, CZK, HUF, RON, ILS, KRW, SGD, HKD, NZD, MXN, INR, XAU
 - **Офіційні курси НБУ** з публічного API
 - **Прапори країн** для кожної валюти
 - **Вибір валют** — показуй лише те, що потрібно
@@ -68,6 +68,14 @@
 - **Жодної реклами**
 - **Єдиний запит** — до API НБУ
 
+<h3>
+<img src="https://img.shields.io/badge/-Доступність-7c4dff?style=flat-square" alt="" />
+</h3>
+
+- **Режим для дальтоніків** — 4 палітри (Okabe-Ito, для червоно-зеленого, синьо-жовтого, чорно-біла)
+- **Символи ▲▼●** замість кольору
+- **Великий шрифт** — +15% до розміру тексту
+
 </td>
 </tr>
 </table>
@@ -81,6 +89,10 @@
 | Світла тема | Сторінка налаштувань | Власна тема |
 |:---:|:---:|:---:|
 | ![Світла тема](screenshots/popup-light.png) | ![Налаштування](screenshots/options.png) | ![Власна тема](screenshots/custom-theme.png) |
+
+| Темна тема | Аналітика курсу | Доступність |
+|:---:|:---:|:---:|
+| ![Темна тема](screenshots/popup-dark.png) | ![Аналітика](screenshots/analytics.png) | ![Доступність](screenshots/accessibility.png) |
 
 </div>
 
@@ -178,7 +190,8 @@
 | **Тема оформлення** | Світла / Темна / Системна / Власна |
 | **Власні кольори** | Фон, текст, акцент (HEX + піпетка + пресети) |
 | **Мова** | Українська / English |
-| **Валюти** | Обрати з 10 доступних |
+| **Валюти** | Обрати з 24 доступних |
+| **Доступність** | Режим для дальтоніків, символи, великий шрифт, підкреслення |
 
 ### Значок на іконці
 
@@ -190,6 +203,19 @@
 | 30–45 ₴ | Синій |
 | 45–60 ₴ | Жовтий |
 | > 60 ₴ | Червоний |
+
+### Доступність
+
+Розширення підтримує 4 режими для людей з дальтонізмом:
+
+| Палітра | Призначення |
+|---|---|
+| **Універсальна (Okabe-Ito)** | Для всіх типів дальтонізму |
+| **Для червоно-зеленого** | Протанопія, дейтеранопія — найпоширеніші |
+| **Для синьо-жовтого** | Трітанопія — рожеве/бірюзове |
+| **Чорно-біла** | Ахроматопсія — тільки форма і текст |
+
+Додатково можна увімкнути **символи ▲▼●** замість кольору, **підкреслення** зміни курсу та **великий шрифт** (+15%).
 
 ---
 
@@ -207,9 +233,10 @@ NBU-Rate/
 ├── background.js               Фоновий service worker
 ├── i18n.js                     Словники + прапори + утиліти
 ├── theme.css                   Глобальні стилі та CSS-змінні
-├── icon16.png                  Іконка 16×16
-├── icon48.png                  Іконка 48×48
-├── icon128.png                 Іконка 128×128
+├── index.html                  Сайт + аналітика + політика конфіденційності
+├── chart.umd.min.js            Chart.js для графіків
+├── flags/                      PNG-прапори країн
+├── favicon/                    Іконки для сайту
 ├── screenshots/                Скріншоти для README
 ├── LICENSE                     GPL-3.0
 └── README.md
@@ -224,6 +251,7 @@ NBU-Rate/
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white)
 ![Chrome](https://img.shields.io/badge/Chrome-Extension-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)
 ![Firefox](https://img.shields.io/badge/Firefox-Add--on-FF7139?style=for-the-badge&logo=firefox-browser&logoColor=white)
 ![Edge](https://img.shields.io/badge/Edge-Add--on-0078D7?style=for-the-badge&logo=microsoftedge&logoColor=white)
@@ -235,7 +263,9 @@ NBU-Rate/
 - **Vanilla JS** — без фреймворків, бандлерів та збірників
 - **CSS-змінні** — для динамічної теми
 - **chrome.storage.sync** — синхронізація налаштувань між пристроями
-- **Inline SVG** — прапори країн вбудовані прямо в код, без зовнішніх запитів
+- **PNG-прапори** — локальні зображення без зовнішніх запитів
+- **Chart.js** — графіки історії курсів на сайті
+- **Okabe-Ito** — науково обґрунтована палітра для дальтоніків
 
 ---
 
@@ -268,6 +298,8 @@ NBU-Rate/
 https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json
 ```
 
+Детальніше — на [сторінці політики конфіденційності](https://he-trogati-mne.github.io/NBU-Rate/#privacy).
+
 ---
 
 ## Roadmap
@@ -276,8 +308,11 @@ https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json
 - [x] Темна / світла / системна тема
 - [x] Власна тема з HEX-піпеткою
 - [x] Українська та англійська мови
-- [x] Прапори країн (inline SVG)
+- [x] Прапори країн (PNG)
 - [x] Значок на іконці з курсом USD
+- [x] Режим для дальтоніків (4 палітри)
+- [x] Символи ▲▼● та великий шрифт
+- [x] Аналітика курсу з графіками (2020–2026)
 - [x] Публікація в Firefox Add-ons
 - [x] Публікація в Edge Add-ons
 - [ ] Публікація в Chrome Web Store
