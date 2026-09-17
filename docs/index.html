@@ -3,29 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Favicon для браузерів -->
+
     <link rel="icon" type="image/x-icon" href="favicon/favicon.ico" />
     <link rel="icon" type="image/png" sizes="96x96" href="favicon/favicon-96x96.png" />
     <link rel="icon" type="image/svg+xml" href="favicon/favicon.svg" />
-
-    <!-- Apple Touch Icon (iOS, iPadOS) -->
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
-
-    <!-- Android / PWA -->
     <link rel="manifest" href="favicon/site.webmanifest" />
     <meta name="theme-color" content="#1a73e8" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Курс НБУ" />
-
-    <!-- Microsoft Tile -->
     <meta name="msapplication-TileColor" content="#1a73e8" />
     <meta name="msapplication-config" content="favicon/browserconfig.xml" />
 
-    <title>Курс НБУ — Аналітика та Політика конфіденційності</title>
-    
+    <title>Курс НБУ</title>
+
     <style>
         :root {
             --bg: #f8f9fa;
@@ -33,23 +26,38 @@
             --text: #202124;
             --text-muted: #5f6368;
             --accent: #1a73e8;
+            --accent-text: #ffffff;
             --positive: #188038;
             --negative: #d93025;
             --border: #dadce0;
             --hover: #f1f3f4;
+            color-scheme: light dark;
         }
         @media (prefers-color-scheme: dark) {
-            :root {
+            :root[data-theme="system"] {
                 --bg: #1a1a1a;
                 --bg-elev: #2a2a2a;
                 --text: #f5f5f5;
                 --text-muted: #c0c0c0;
                 --accent: #8ab4f8;
+                --accent-text: #0a0a0a;
                 --positive: #7ee2a8;
                 --negative: #f28b82;
                 --border: #4a4a4a;
                 --hover: #3a3a3a;
             }
+        }
+        :root[data-theme="dark"] {
+            --bg: #1a1a1a;
+            --bg-elev: #2a2a2a;
+            --text: #f5f5f5;
+            --text-muted: #c0c0c0;
+            --accent: #8ab4f8;
+            --accent-text: #0a0a0a;
+            --positive: #7ee2a8;
+            --negative: #f28b82;
+            --border: #4a4a4a;
+            --hover: #3a3a3a;
         }
         * { box-sizing: border-box; }
         body {
@@ -62,18 +70,327 @@
             background: var(--bg);
             color: var(--text);
             -webkit-font-smoothing: antialiased;
+            transition: background 0.2s, color 0.2s;
         }
-        header { text-align: center; margin-bottom: 40px; }
+        header { text-align: center; margin-bottom: 32px; position: relative; }
         .logo { font-size: 48px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
         h1 { font-size: 32px; margin: 0 0 8px; color: var(--text); }
         .subtitle { font-size: 16px; color: var(--text-muted); }
+
+        .icon-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--bg-elev);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+        .icon-btn:hover {
+            background: var(--hover);
+            color: var(--text);
+            border-color: var(--accent);
+        }
+        .icon-btn svg { display: block; width: 22px; height: 22px; }
+
+        .settings-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 16px;
+            overflow-y: auto;
+        }
+        .settings-overlay.visible {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .settings-panel {
+            background: var(--bg-elev);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 620px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .settings-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 0;
+        }
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+        .close-btn:hover { background: var(--hover); color: var(--text); }
+
+        .settings-section { margin-bottom: 22px; }
+        .settings-section:last-child { margin-bottom: 0; }
+        .settings-section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .settings-section-title svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--accent);
+            stroke-width: 2.2;
+            fill: none;
+        }
+
+        .segmented {
+            display: inline-flex;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 5px;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+        .segmented button {
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 9px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .segmented button:hover { background: var(--hover); color: var(--text); }
+        .segmented button.active {
+            background: var(--accent);
+            color: var(--accent-text);
+            box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 40%, transparent);
+        }
+
+        #custom-colors-panel {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px dashed var(--border);
+            display: none;
+        }
+        #custom-colors-panel.visible { display: block; }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .color-row label {
+            width: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .color-row input[type="color"] {
+            width: 46px;
+            height: 36px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            background: var(--bg);
+            padding: 2px;
+        }
+        .color-row input[type="text"] {
+            width: 110px;
+            padding: 8px 12px;
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            font-size: 13px;
+            font-weight: 600;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+        .color-row input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+            align-items: center;
+        }
+        .preset-swatch {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        .preset-swatch:hover {
+            transform: translateY(-2px) scale(1.08);
+            border-color: var(--accent);
+        }
+        .reset-btn {
+            margin-left: auto;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .reset-btn:hover { background: var(--hover); color: var(--text); }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: var(--bg);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-bottom: 10px;
+            user-select: none;
+        }
+        .toggle-row:last-of-type { margin-bottom: 0; }
+        .toggle-row:hover { background: var(--hover); border-color: var(--border); }
+        .toggle-row:has(input:checked) {
+            background: color-mix(in srgb, var(--accent) 10%, var(--bg));
+            border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+        }
+        .toggle-text { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .toggle-title { font-size: 14px; font-weight: 600; color: var(--text); }
+        .toggle-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: var(--border);
+            border-radius: 30px;
+            transition: background 0.25s;
+            cursor: pointer;
+        }
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            top: 4px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.25s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        .palette-list {
+            margin: 4px 0 14px 0;
+            padding: 0 0 0 12px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            border-left: 3px solid var(--border);
+        }
+        .palette-list.visible { display: flex; }
+        .palette-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: var(--bg);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .palette-item:hover { background: var(--hover); border-color: var(--border); }
+        .palette-item:has(input:checked) {
+            background: color-mix(in srgb, var(--accent) 10%, var(--bg));
+            border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+        }
+        .palette-item input {
+            cursor: pointer;
+            accent-color: var(--accent);
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .palette-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+        .palette-title { font-size: 13px; font-weight: 600; color: var(--text); }
+        .palette-desc { font-size: 11px; color: var(--text-muted); }
+        .palette-swatches {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .palette-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+        }
+
         section {
             background: var(--bg-elev);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 24px 28px;
             margin-bottom: 24px;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         }
         section:hover {
             border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
@@ -115,17 +432,20 @@
         .rate-card .change.up { color: var(--positive); }
         .rate-card .change.down { color: var(--negative); }
         .rate-card .change.flat { color: var(--text-muted); }
+        .rate-card .change-label { display: none; }
 
         .period-switcher {
             display: flex;
             gap: 6px;
-            margin-bottom: 20px;
+            margin: 0 auto 20px;
             background: var(--bg);
             padding: 5px;
             border-radius: 12px;
             border: 1px solid var(--border);
             width: fit-content;
+            max-width: 100%;
             flex-wrap: wrap;
+            justify-content: center;
         }
         .period-btn {
             border: none;
@@ -138,15 +458,220 @@
             border-radius: 8px;
             transition: all 0.15s;
             font-family: inherit;
+            white-space: nowrap;
         }
         .period-btn:hover { background: var(--hover); color: var(--text); }
         .period-btn.active {
             background: var(--accent);
-            color: #fff;
+            color: var(--accent-text);
             box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 40%, transparent);
         }
 
         .chart-container { position: relative; height: 380px; width: 100%; margin-bottom: 24px; }
+
+        .converter-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+        .converter-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+        .converter-field label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .converter-input-row {
+            display: flex;
+            gap: 6px;
+            align-items: stretch;
+        }
+        .converter-input-row input {
+            flex: 0 0 80px;
+            min-width: 0;
+            padding: 12px 10px;
+            font-size: 16px;
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            font-weight: 600;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-align: center;
+        }
+        .converter-input-row input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+        }
+        .converter-input-row input[type="number"]::-webkit-outer-spin-button,
+        .converter-input-row input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .converter-input-row input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .custom-select { position: relative; flex: 1; min-width: 0; }
+        .custom-select-trigger {
+            width: 100%;
+            height: 46px;
+            padding: 0 14px;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            text-align: left;
+        }
+        .custom-select-trigger:hover { border-color: var(--accent); }
+        .custom-select.open .custom-select-trigger {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+        }
+        .custom-select-value {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            min-width: 0;
+        }
+        .custom-select-arrow {
+            width: 16px;
+            height: 16px;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+        .custom-select.open .custom-select-arrow { transform: rotate(180deg); }
+
+        .custom-select-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            max-height: 300px;
+            overflow-y: auto;
+            background: var(--bg-elev);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            z-index: 100;
+            padding: 4px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+        .custom-select.open .custom-select-dropdown {
+            display: block;
+            animation: dropdownFade 0.15s ease;
+        }
+        @keyframes dropdownFade {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .custom-select-dropdown::-webkit-scrollbar { width: 6px; }
+        .custom-select-dropdown::-webkit-scrollbar-track { background: transparent; }
+        .custom-select-dropdown::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px;
+        }
+        .custom-select-dropdown::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        .custom-select-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            transition: background 0.1s;
+        }
+        .custom-select-option:hover { background: var(--hover); }
+        .custom-select-option.selected {
+            background: color-mix(in srgb, var(--accent) 12%, transparent);
+            color: var(--accent);
+            font-weight: 700;
+        }
+        .custom-select-option .flag-img {
+            width: 22px;
+            height: 15px;
+            border-radius: 3px;
+            object-fit: cover;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
+        }
+        .custom-select-option .opt-code {
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            font-weight: 700;
+            min-width: 42px;
+            color: var(--accent);
+        }
+        .custom-select-option .opt-name {
+            color: var(--text-muted);
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .swap-btn {
+            background: var(--accent);
+            color: var(--accent-text);
+            border: none;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s, box-shadow 0.2s;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 40%, transparent);
+        }
+        .swap-btn:hover { transform: rotate(180deg) scale(1.08); }
+        .swap-btn:active { transform: rotate(180deg) scale(0.95); }
+
+        .converter-result {
+            margin-top: 18px;
+            padding: 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .converter-result .result-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            word-break: break-all;
+        }
+        .converter-result .result-detail {
+            margin-top: 6px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
 
         .privacy-content h2 { font-size: 20px; margin: 24px 0 12px; color: var(--accent); }
         .privacy-content p, .privacy-content li { color: var(--text-muted); font-size: 15px; }
@@ -154,7 +679,6 @@
         .privacy-content code { background: var(--hover); padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; color: var(--text); }
         a { color: var(--accent); text-decoration: none; font-weight: 600; }
         a:hover { text-decoration: underline; }
-        footer { text-align: center; margin-top: 48px; font-size: 14px; color: var(--text-muted); }
         .updated { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; text-align: center; }
 
         .loading-msg {
@@ -163,14 +687,190 @@
             color: var(--text-muted);
             padding: 20px;
         }
+
+        /* ===== ФУТЕР ===== */
+        .page-footer {
+            text-align: center;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .footer-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 14px;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .footer-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-elev);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.15s;
+        }
+        .footer-links a:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+        .footer-links a svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+        .footer-nick {
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== ПАЛІТРИ ДЛЯ ДАЛЬТОНІКІВ ===== */
+        :root[data-a11y-cvd="true"][data-a11y-palette="universal"] {
+            --a11y-up: #0072B2;
+            --a11y-down: #D55E00;
+        }
+        :root[data-theme="dark"][data-a11y-cvd="true"][data-a11y-palette="universal"] {
+            --a11y-up: #56B4E9;
+            --a11y-down: #E69F00;
+        }
+        :root[data-a11y-cvd="true"][data-a11y-palette="red-green"] {
+            --a11y-up: #004488;
+            --a11y-down: #BB5566;
+        }
+        :root[data-theme="dark"][data-a11y-cvd="true"][data-a11y-palette="red-green"] {
+            --a11y-up: #6699CC;
+            --a11y-down: #DD7788;
+        }
+        :root[data-a11y-cvd="true"][data-a11y-palette="blue-yellow"] {
+            --a11y-up: #CC79A7;
+            --a11y-down: #009E73;
+        }
+        :root[data-theme="dark"][data-a11y-cvd="true"][data-a11y-palette="blue-yellow"] {
+            --a11y-up: #E8A6C0;
+            --a11y-down: #4DD4AC;
+        }
+        :root[data-a11y-cvd="true"][data-a11y-palette="mono"] {
+            --a11y-up: #1a1a1a;
+            --a11y-down: #888888;
+        }
+        :root[data-theme="dark"][data-a11y-cvd="true"][data-a11y-palette="mono"] {
+            --a11y-up: #ffffff;
+            --a11y-down: #888888;
+        }
+
+        :root[data-a11y-cvd="true"] {
+            --positive: var(--a11y-up) !important;
+            --negative: var(--a11y-down) !important;
+        }
+        :root[data-a11y-cvd="true"] .rate-card .value { color: var(--a11y-up) !important; }
+        :root[data-a11y-cvd="true"] .rate-card .change.up { color: var(--a11y-up) !important; }
+        :root[data-a11y-cvd="true"] .rate-card .change.down { color: var(--a11y-down) !important; }
+
+        :root[data-a11y-symbols="true"] .rate-card .change-label {
+            display: inline;
+            font-size: 11px;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+
+        :root[data-a11y-font="true"] body {
+            font-size: 17px;
+            line-height: 1.8;
+        }
+        :root[data-a11y-font="true"] h1 { font-size: 36px; }
+        :root[data-a11y-font="true"] .section-title { font-size: 20px; }
+        :root[data-a11y-font="true"] .rate-card .value { font-size: 22px; }
+
+        :root[data-a11y-underline="true"] .rate-card .change {
+            text-decoration: underline;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 3px;
+        }
+
+        @media (max-width: 640px) {
+            .converter-grid { grid-template-columns: 1fr; }
+            .swap-btn { transform: rotate(90deg); margin: 0 auto; }
+            .swap-btn:hover { transform: rotate(270deg) scale(1.1); }
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="logo">₴</div>
         <h1>Курс НБУ</h1>
-        <p class="subtitle">Офіційний курс валют та аналітика</p>
+        <p class="subtitle">Офіційний курс валют, конвертер та аналітика</p>
+
+        <button class="icon-btn" id="open-settings" title="Налаштування" aria-label="Налаштування">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+            </svg>
+        </button>
     </header>
+
+    <section id="converter">
+        <h2 class="section-title">
+            <svg viewBox="0 0 24 24"><path d="M7 16V4M7 4L3 8M7 4l4 4M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
+            <span>Конвертер валют</span>
+        </h2>
+
+        <div class="converter-grid">
+            <div class="converter-field">
+                <label>З валюти</label>
+                <div class="converter-input-row">
+                    <input type="number" id="conv-from" value="1" min="0" step="any" />
+                    <div class="custom-select" id="conv-from-currency" data-value="USD">
+                        <button type="button" class="custom-select-trigger">
+                            <span class="custom-select-value">USD — Долар США</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="custom-select-dropdown"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="swap-btn" id="conv-swap" title="Поміняти місцями">⇄</button>
+
+            <div class="converter-field">
+                <label>У валюту</label>
+                <div class="converter-input-row">
+                    <input type="number" id="conv-to" value="0" min="0" step="any" readonly />
+                    <div class="custom-select" id="conv-to-currency" data-value="UAH">
+                        <button type="button" class="custom-select-trigger">
+                            <span class="custom-select-value">UAH — Українська гривня</span>
+                            <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="custom-select-dropdown"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="converter-result">
+            <div class="result-value" id="conv-result">—</div>
+            <div class="result-detail" id="conv-detail"></div>
+        </div>
+    </section>
 
     <section id="analytics">
         <h2 class="section-title">
@@ -202,7 +902,7 @@
             <span>Політика конфіденційності</span>
         </h2>
         <div class="privacy-content">
-            <p class="updated">Останнє оновлення: 15 вересня 2026</p>
+            <p class="updated">Останнє оновлення: 17 вересня 2026</p>
             <h2>Які дані ми збираємо</h2>
             <p>Розширення «Курс НБУ» не збирає жодних персональних даних користувача: ні ім'я, ні email, ні історію, ні місцезнаходження.</p>
             <h2>Що зберігається</h2>
@@ -215,65 +915,423 @@
                 <li><code>alarms</code> — для періодичного оновлення курсів.</li>
                 <li><code>https://bank.gov.ua/*</code> — для запиту курсів.</li>
             </ul>
-            <h2>Контакти</h2>
-            <p>Discord: <a href="https://discord.gg/DQHpbet36W">https://discord.gg/DQHpbet36W</a></p>
         </div>
     </section>
 
-    <footer>
-        <p>© 2026 Курс НБУ. Зроблено в Україні 🇺🇦</p>
+    <!-- ФУТЕР -->
+    <footer class="page-footer">
+        <div class="footer-title">Контакти</div>
+        <div class="footer-links">
+            <a href="https://discord.gg/DQHpbet36W" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+                Discord
+            </a>
+            <a href="https://github.com/He-Trogati-Mne/NBU-Rate" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.78 0 12.292c0 5.211 3.438 9.63 8.205 11.188.6.111.82-.254.82-.567 0-.28-.01-1.022-.015-2.005-3.338.711-4.042-1.582-4.042-1.582-.546-1.361-1.335-1.725-1.335-1.725-1.087-.731.084-.716.084-.716 1.205.082 1.838 1.215 1.838 1.215 1.07 1.803 2.809 1.282 3.495.981.108-.763.417-1.282.76-1.577-2.665-.295-5.466-1.309-5.466-5.827 0-1.287.465-2.339 1.235-3.164-.135-.298-.54-1.497.105-3.121 0 0 1.005-.316 3.3 1.209.96-.262 1.98-.392 3-.398 1.02.006 2.04.136 3 .398 2.28-1.525 3.285-1.209 3.285-1.209.645 1.624.24 2.823.12 3.121.765.825 1.23 1.877 1.23 3.164 0 4.53-2.805 5.527-5.475 5.817.42.354.81 1.077.81 2.182 0 1.578-.015 2.846-.015 3.229 0 .309.21.678.825.561C20.565 21.917 24 17.495 24 12.292 24 5.78 18.627.5 12 .5z"/></svg>
+                GitHub
+            </a>
+        </div>
+        <div class="footer-nick">he_trogati_mne</div>
     </footer>
+
+    <div class="settings-overlay" id="settings-overlay">
+        <div class="settings-panel">
+            <div class="settings-header">
+                <h2 class="settings-title">⚙ Налаштування</h2>
+                <button class="close-btn" id="close-settings" aria-label="Закрити">×</button>
+            </div>
+
+            <div class="settings-section">
+                <h3 class="settings-section-title">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></svg>
+                    <span>Тема оформлення</span>
+                </h3>
+                <div class="segmented" id="theme-switch">
+                    <button data-theme="light">Світла</button>
+                    <button data-theme="dark">Темна</button>
+                    <button data-theme="system">Системна</button>
+                    <button data-theme="custom">Власна</button>
+                </div>
+
+                <div id="custom-colors-panel">
+                    <div class="color-row">
+                        <label>Фон</label>
+                        <input type="color" id="color-bg" value="#1a1a1a" />
+                        <input type="text" id="hex-bg" value="#1A1A1A" maxlength="7" />
+                    </div>
+                    <div class="color-row">
+                        <label>Текст</label>
+                        <input type="color" id="color-text" value="#e8eaed" />
+                        <input type="text" id="hex-text" value="#E8EAED" maxlength="7" />
+                    </div>
+                    <div class="color-row">
+                        <label>Акцент</label>
+                        <input type="color" id="color-accent" value="#8ab4f8" />
+                        <input type="text" id="hex-accent" value="#8AB4F8" maxlength="7" />
+                    </div>
+
+                    <div class="presets">
+                        <button class="preset-swatch" data-preset="midnight" title="Midnight"
+                                style="background: linear-gradient(135deg,#0f172a 50%,#38bdf8 50%);"></button>
+                        <button class="preset-swatch" data-preset="nord" title="Nord"
+                                style="background: linear-gradient(135deg,#2e3440 50%,#88c0d0 50%);"></button>
+                        <button class="preset-swatch" data-preset="dracula" title="Dracula"
+                                style="background: linear-gradient(135deg,#282a36 50%,#bd93f9 50%);"></button>
+                        <button class="preset-swatch" data-preset="sepia" title="Sepia"
+                                style="background: linear-gradient(135deg,#f4ecd8 50%,#8b5a2b 50%);"></button>
+                        <button class="preset-swatch" data-preset="forest" title="Forest"
+                                style="background: linear-gradient(135deg,#0f2417 50%,#4ade80 50%);"></button>
+                        <button class="preset-swatch" data-preset="rose" title="Rose"
+                                style="background: linear-gradient(135deg,#fff1f2 50%,#e11d48 50%);"></button>
+                        <button class="reset-btn" id="reset-colors">↻ Скинути</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3 class="settings-section-title">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M19 8H5M12 8v6M9 22l3-8 3 8"/></svg>
+                    <span>Доступність</span>
+                </h3>
+
+                <label class="toggle-row" for="a11y-cvd-toggle">
+                    <span class="toggle-text">
+                        <span class="toggle-title">Режим для дальтоніків</span>
+                        <span class="toggle-desc">Замінює кольори та додає символи до курсів</span>
+                    </span>
+                    <span class="toggle-switch">
+                        <input type="checkbox" id="a11y-cvd-toggle" />
+                        <span class="toggle-slider"></span>
+                    </span>
+                </label>
+
+                <div class="palette-list" id="palette-list">
+                    <label class="palette-item">
+                        <input type="radio" name="palette" value="universal" />
+                        <span class="palette-info">
+                            <span class="palette-title">Універсальна</span>
+                            <span class="palette-desc">Okabe-Ito — для всіх типів дальтонізму</span>
+                        </span>
+                        <span class="palette-swatches">
+                            <span class="palette-swatch" style="background:#0072B2;"></span>
+                            <span class="palette-swatch" style="background:#D55E00;"></span>
+                        </span>
+                    </label>
+
+                    <label class="palette-item">
+                        <input type="radio" name="palette" value="red-green" />
+                        <span class="palette-info">
+                            <span class="palette-title">Для червоно-зеленого</span>
+                            <span class="palette-desc">Протанопія, дейтеранопія — найпоширеніші</span>
+                        </span>
+                        <span class="palette-swatches">
+                            <span class="palette-swatch" style="background:#004488;"></span>
+                            <span class="palette-swatch" style="background:#BB5566;"></span>
+                        </span>
+                    </label>
+
+                    <label class="palette-item">
+                        <input type="radio" name="palette" value="blue-yellow" />
+                        <span class="palette-info">
+                            <span class="palette-title">Для синьо-жовтого</span>
+                            <span class="palette-desc">Трітанопія — рожеве/бірюзове</span>
+                        </span>
+                        <span class="palette-swatches">
+                            <span class="palette-swatch" style="background:#CC79A7;"></span>
+                            <span class="palette-swatch" style="background:#009E73;"></span>
+                        </span>
+                    </label>
+
+                    <label class="palette-item">
+                        <input type="radio" name="palette" value="mono" />
+                        <span class="palette-info">
+                            <span class="palette-title">Чорно-біла</span>
+                            <span class="palette-desc">Ахроматопсія — тільки форма і текст</span>
+                        </span>
+                        <span class="palette-swatches">
+                            <span class="palette-swatch" style="background:#1a1a1a;"></span>
+                            <span class="palette-swatch" style="background:#888888;"></span>
+                        </span>
+                    </label>
+                </div>
+
+                <label class="toggle-row" for="a11y-symbols-toggle">
+                    <span class="toggle-text">
+                        <span class="toggle-title">Символи замість кольору</span>
+                        <span class="toggle-desc">Додає ▲▼● та текстові мітки до курсів</span>
+                    </span>
+                    <span class="toggle-switch">
+                        <input type="checkbox" id="a11y-symbols-toggle" />
+                        <span class="toggle-slider"></span>
+                    </span>
+                </label>
+
+                <label class="toggle-row" for="a11y-underline-toggle">
+                    <span class="toggle-text">
+                        <span class="toggle-title">Підкреслювати зміну курсу</span>
+                        <span class="toggle-desc">Стрілки ↑↓→ підкреслені — видно без кольору</span>
+                    </span>
+                    <span class="toggle-switch">
+                        <input type="checkbox" id="a11y-underline-toggle" />
+                        <span class="toggle-slider"></span>
+                    </span>
+                </label>
+
+                <label class="toggle-row" for="a11y-font-toggle">
+                    <span class="toggle-text">
+                        <span class="toggle-title">Великий шрифт</span>
+                        <span class="toggle-desc">Збільшує розмір тексту на 15%</span>
+                    </span>
+                    <span class="toggle-switch">
+                        <input type="checkbox" id="a11y-font-toggle" />
+                        <span class="toggle-slider"></span>
+                    </span>
+                </label>
+            </div>
+        </div>
+    </div>
 
     <script src="chart.umd.min.js"></script>
     <script>
-        // ============================================================
-        // 1. КОНФІГУРАЦІЯ
-        // ============================================================
         const CORS_PROXY = 'https://nbu-rate.nightmod.workers.dev/?url=';
         const NBU_HISTORY_API = 'https://bank.gov.ua/NBU_Exchange/exchange_site';
 
-        const CACHE_KEY = 'nbu_history_cache_v8';
+        const CACHE_KEY = 'nbu_history_cache_v9';
         const CACHE_TTL = 30 * 60 * 1000;
         const START_DATE = '20200101';
         const REQUEST_DELAY = 500;
         const REQUEST_TIMEOUT = 25000;
 
+        const THEME_KEY = 'nbu_theme_v1';
+        const CUSTOM_COLORS_KEY = 'nbu_custom_colors_v1';
+        const A11Y_KEY = 'nbu_a11y_v1';
+
         const CURRENCIES = ['USD', 'EUR', 'GBP', 'PLN', 'CNY', 'CHF', 'JPY', 'CAD', 'AUD', 'TRY'];
 
+        const FLAGS = {
+            UAH: 'ua', USD: 'us', EUR: 'eu', GBP: 'gb', PLN: 'pl',
+            CNY: 'cn', CHF: 'ch', JPY: 'jp', CAD: 'ca', AUD: 'au', TRY: 'tr'
+        };
+
         const CURRENCY_NAMES = {
-            USD: 'Долар США',
-            EUR: 'Євро',
-            GBP: 'Фунт стерлінгів',
-            PLN: 'Польський злотий',
-            CNY: 'Китайський юань',
-            CHF: 'Швейцарський франк',
-            JPY: 'Японська єна',
-            CAD: 'Канадський долар',
-            AUD: 'Австралійський долар',
-            TRY: 'Турецька ліра'
+            USD: 'Долар США', EUR: 'Євро', GBP: 'Фунт стерлінгів', PLN: 'Польський злотий',
+            CNY: 'Китайський юань', CHF: 'Швейцарський франк', JPY: 'Японська єна',
+            CAD: 'Канадський долар', AUD: 'Австралійський долар', TRY: 'Турецька ліра',
+            UAH: 'Українська гривня'
         };
 
         const CURRENCY_COLORS = {
-            USD: '#1a73e8',
-            EUR: '#34a853',
-            GBP: '#ea4335',
-            PLN: '#fbbc04',
-            CNY: '#ff6d01',
-            CHF: '#d93025',
-            JPY: '#bc002d',
-            CAD: '#d80621',
-            AUD: '#00008b',
-            TRY: '#e30a17'
+            USD: '#1a73e8', EUR: '#34a853', GBP: '#ea4335', PLN: '#fbbc04',
+            CNY: '#ff6d01', CHF: '#d93025', JPY: '#bc002d', CAD: '#d80621',
+            AUD: '#00008b', TRY: '#e30a17'
         };
+
+        const PRESETS = {
+            midnight: { bg: '#0f172a', text: '#e2e8f0', accent: '#38bdf8' },
+            nord:     { bg: '#2e3440', text: '#eceff4', accent: '#88c0d0' },
+            dracula:  { bg: '#282a36', text: '#f8f8f2', accent: '#bd93f9' },
+            sepia:    { bg: '#f4ecd8', text: '#3b2f1e', accent: '#8b5a2b' },
+            forest:   { bg: '#0f2417', text: '#d1fae5', accent: '#4ade80' },
+            rose:     { bg: '#fff1f2', text: '#4c0519', accent: '#e11d48' }
+        };
+
+        const DEFAULT_CUSTOM = { bg: '#1a1a1a', text: '#e8eaed', accent: '#8ab4f8' };
+        const DEFAULT_A11Y = { cvd: false, palette: 'universal', font: false, symbols: true, underline: false };
 
         let currentCurrency = 'USD';
         let currentPeriod = 'MAX';
         let chartInstance = null;
         let historicalRates = {};
 
-        // ============================================================
-        // 2. КЕШУВАННЯ
-        // ============================================================
+        function hexToRgb(hex) {
+            if (!hex) return null;
+            hex = String(hex).replace('#', '').trim();
+            if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+            if (hex.length !== 6 || !/^[0-9a-f]{6}$/i.test(hex)) return null;
+            const num = parseInt(hex, 16);
+            return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+        }
+        function rgbToHex({ r, g, b }) {
+            return '#' + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
+        }
+        function mixHex(a, b, t) {
+            const A = hexToRgb(a), B = hexToRgb(b);
+            if (!A || !B) return a;
+            return rgbToHex({ r: A.r + (B.r - A.r) * t, g: A.g + (B.g - A.g) * t, b: A.b + (B.b - A.b) * t });
+        }
+        function luminance(hex) {
+            const c = hexToRgb(hex);
+            if (!c) return 0.5;
+            return (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) / 255;
+        }
+
+        function applyTheme(theme, customColors) {
+            const root = document.documentElement;
+            root.setAttribute('data-theme', theme);
+
+            if (theme === 'custom' && customColors) {
+                const bg = hexToRgb(customColors.bg) ? customColors.bg : DEFAULT_CUSTOM.bg;
+                const text = hexToRgb(customColors.text) ? customColors.text : DEFAULT_CUSTOM.text;
+                const accent = hexToRgb(customColors.accent) ? customColors.accent : DEFAULT_CUSTOM.accent;
+                const isDark = luminance(bg) < 0.5;
+                root.style.setProperty('--bg', bg);
+                root.style.setProperty('--bg-elev', isDark ? mixHex(bg, '#ffffff', 0.07) : mixHex(bg, '#000000', 0.04));
+                root.style.setProperty('--text', text);
+                root.style.setProperty('--text-muted', mixHex(text, bg, 0.45));
+                root.style.setProperty('--accent', accent);
+                root.style.setProperty('--accent-text', luminance(accent) < 0.5 ? '#ffffff' : '#0a0a0a');
+                root.style.setProperty('--border', isDark ? mixHex(bg, '#ffffff', 0.18) : mixHex(bg, '#000000', 0.14));
+                root.style.setProperty('--hover', isDark ? mixHex(bg, '#ffffff', 0.12) : mixHex(bg, '#000000', 0.06));
+            } else {
+                ['--bg', '--bg-elev', '--text', '--text-muted', '--accent', '--accent-text', '--border', '--hover']
+                    .forEach(v => root.style.removeProperty(v));
+            }
+
+            document.querySelectorAll('#theme-switch button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.theme === theme);
+            });
+
+            document.getElementById('custom-colors-panel')
+                .classList.toggle('visible', theme === 'custom');
+        }
+
+        function initTheme() {
+            const theme = localStorage.getItem(THEME_KEY) || 'system';
+            const custom = JSON.parse(localStorage.getItem(CUSTOM_COLORS_KEY) || 'null') || DEFAULT_CUSTOM;
+            applyTheme(theme, custom);
+
+            document.getElementById('color-bg').value = custom.bg;
+            document.getElementById('hex-bg').value = custom.bg.toUpperCase();
+            document.getElementById('color-text').value = custom.text;
+            document.getElementById('hex-text').value = custom.text.toUpperCase();
+            document.getElementById('color-accent').value = custom.accent;
+            document.getElementById('hex-accent').value = custom.accent.toUpperCase();
+
+            document.querySelectorAll('#theme-switch button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const theme = btn.dataset.theme;
+                    localStorage.setItem(THEME_KEY, theme);
+                    const custom = JSON.parse(localStorage.getItem(CUSTOM_COLORS_KEY) || 'null') || DEFAULT_CUSTOM;
+                    applyTheme(theme, custom);
+                });
+            });
+
+            ['bg', 'text', 'accent'].forEach(name => {
+                const picker = document.getElementById(`color-${name}`);
+                const text = document.getElementById(`hex-${name}`);
+                picker.addEventListener('input', () => {
+                    text.value = picker.value.toUpperCase();
+                    saveCustomColors();
+                });
+                text.addEventListener('input', () => {
+                    let v = text.value.trim();
+                    if (!v.startsWith('#')) v = '#' + v;
+                    if (hexToRgb(v)) {
+                        picker.value = v.toLowerCase();
+                        saveCustomColors();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.preset-swatch').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const preset = PRESETS[btn.dataset.preset];
+                    if (!preset) return;
+                    document.getElementById('color-bg').value = preset.bg;
+                    document.getElementById('hex-bg').value = preset.bg.toUpperCase();
+                    document.getElementById('color-text').value = preset.text;
+                    document.getElementById('hex-text').value = preset.text.toUpperCase();
+                    document.getElementById('color-accent').value = preset.accent;
+                    document.getElementById('hex-accent').value = preset.accent.toUpperCase();
+                    saveCustomColors();
+                });
+            });
+
+            document.getElementById('reset-colors').addEventListener('click', () => {
+                document.getElementById('color-bg').value = DEFAULT_CUSTOM.bg;
+                document.getElementById('hex-bg').value = DEFAULT_CUSTOM.bg.toUpperCase();
+                document.getElementById('color-text').value = DEFAULT_CUSTOM.text;
+                document.getElementById('hex-text').value = DEFAULT_CUSTOM.text.toUpperCase();
+                document.getElementById('color-accent').value = DEFAULT_CUSTOM.accent;
+                document.getElementById('hex-accent').value = DEFAULT_CUSTOM.accent.toUpperCase();
+                saveCustomColors();
+            });
+        }
+
+        function saveCustomColors() {
+            const colors = {
+                bg: document.getElementById('color-bg').value,
+                text: document.getElementById('color-text').value,
+                accent: document.getElementById('color-accent').value
+            };
+            localStorage.setItem(CUSTOM_COLORS_KEY, JSON.stringify(colors));
+            const theme = localStorage.getItem(THEME_KEY) || 'system';
+            if (theme === 'custom') applyTheme('custom', colors);
+        }
+
+        function getA11y() {
+            try {
+                const stored = JSON.parse(localStorage.getItem(A11Y_KEY) || 'null');
+                return { ...DEFAULT_A11Y, ...(stored || {}) };
+            } catch (e) {
+                return { ...DEFAULT_A11Y };
+            }
+        }
+
+        function applyA11y(a) {
+            const root = document.documentElement;
+            const value = { ...DEFAULT_A11Y, ...a };
+            root.setAttribute('data-a11y-cvd', value.cvd ? 'true' : 'false');
+            root.setAttribute('data-a11y-palette', value.palette);
+            root.setAttribute('data-a11y-font', value.font ? 'true' : 'false');
+            root.setAttribute('data-a11y-symbols', value.symbols ? 'true' : 'false');
+            root.setAttribute('data-a11y-underline', value.underline ? 'true' : 'false');
+
+            const cvdToggle = document.getElementById('a11y-cvd-toggle');
+            const fontToggle = document.getElementById('a11y-font-toggle');
+            const symbolsToggle = document.getElementById('a11y-symbols-toggle');
+            const underlineToggle = document.getElementById('a11y-underline-toggle');
+            const paletteList = document.getElementById('palette-list');
+            const paletteRadios = document.querySelectorAll('input[name="palette"]');
+
+            if (cvdToggle) cvdToggle.checked = value.cvd;
+            if (fontToggle) fontToggle.checked = value.font;
+            if (symbolsToggle) symbolsToggle.checked = value.symbols;
+            if (underlineToggle) underlineToggle.checked = value.underline;
+            paletteRadios.forEach(r => r.checked = (r.value === value.palette));
+            if (paletteList) paletteList.classList.toggle('visible', value.cvd);
+        }
+
+        function initA11y() {
+            const a11y = getA11y();
+            applyA11y(a11y);
+
+            const cvdToggle = document.getElementById('a11y-cvd-toggle');
+            const fontToggle = document.getElementById('a11y-font-toggle');
+            const symbolsToggle = document.getElementById('a11y-symbols-toggle');
+            const underlineToggle = document.getElementById('a11y-underline-toggle');
+            const paletteRadios = document.querySelectorAll('input[name="palette"]');
+
+            function save() {
+                const palette = document.querySelector('input[name="palette"]:checked')?.value || 'universal';
+                const value = {
+                    cvd: cvdToggle.checked,
+                    palette,
+                    font: fontToggle.checked,
+                    symbols: symbolsToggle.checked,
+                    underline: underlineToggle.checked
+                };
+                localStorage.setItem(A11Y_KEY, JSON.stringify(value));
+                applyA11y(value);
+            }
+
+            cvdToggle.addEventListener('change', save);
+            fontToggle.addEventListener('change', save);
+            symbolsToggle.addEventListener('change', save);
+            underlineToggle.addEventListener('change', save);
+            paletteRadios.forEach(r => r.addEventListener('change', save));
+        }
+
         function loadCache() {
             try {
                 const raw = localStorage.getItem(CACHE_KEY);
@@ -281,28 +1339,15 @@
                 const cache = JSON.parse(raw);
                 if (Date.now() - cache.timestamp > CACHE_TTL) return null;
                 return cache.data;
-            } catch (e) {
-                return null;
-            }
+            } catch (e) { return null; }
         }
-
         function saveCache(data) {
             try {
-                localStorage.setItem(CACHE_KEY, JSON.stringify({
-                    timestamp: Date.now(),
-                    data: data
-                }));
-            } catch (e) {
-                console.warn('Не вдалося зберегти кеш:', e);
-            }
+                localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data }));
+            } catch (e) { console.warn('Не вдалося зберегти кеш:', e); }
         }
 
-        // ============================================================
-        // 3. ЗАВАНТАЖЕННЯ
-        // ============================================================
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+        function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
         async function fetchWithTimeout(url, timeout) {
             const controller = new AbortController();
@@ -311,10 +1356,7 @@
                 const response = await fetch(url, { signal: controller.signal });
                 clearTimeout(timer);
                 return response;
-            } catch (e) {
-                clearTimeout(timer);
-                throw e;
-            }
+            } catch (e) { clearTimeout(timer); throw e; }
         }
 
         async function fetchHistoryForCurrency(valcode) {
@@ -330,13 +1372,11 @@
 
             const history = {};
             data.forEach(item => {
-                const date = item.exchangedate;
-                const [day, month, year] = date.split('.');
+                const [day, month, year] = item.exchangedate.split('.');
                 const isoDate = `${year}-${month}-${day}`;
                 if (!history[isoDate]) history[isoDate] = {};
                 history[isoDate][valcode.toUpperCase()] = item.rate;
             });
-
             return history;
         }
 
@@ -348,11 +1388,10 @@
                 console.log('[NBU] Використовую кеш');
                 historicalRates = cached;
                 const dates = Object.keys(historicalRates).sort();
-                const latestDate = dates[dates.length - 1];
-                const todayRates = historicalRates[latestDate];
-
+                const todayRates = historicalRates[dates[dates.length - 1]];
                 renderCards(todayRates);
                 renderChart();
+                initConverter(todayRates);
                 return;
             }
 
@@ -363,20 +1402,18 @@
                         if (!historicalRates[date]) historicalRates[date] = {};
                         Object.assign(historicalRates[date], history[date]);
                     });
-                    if (code !== CURRENCIES[CURRENCIES.length - 1]) {
-                        await delay(REQUEST_DELAY);
-                    }
+                    if (code !== CURRENCIES[CURRENCIES.length - 1]) await delay(REQUEST_DELAY);
                 }
 
                 saveCache(historicalRates);
 
                 const dates = Object.keys(historicalRates).sort();
-                const latestDate = dates[dates.length - 1];
-                const todayRates = historicalRates[latestDate];
+                const todayRates = historicalRates[dates[dates.length - 1]];
 
-                console.log(`[NBU] Готово. Днів: ${dates.length}, останній: ${latestDate}`);
+                console.log(`[NBU] Готово. Днів: ${dates.length}, останній: ${dates[dates.length - 1]}`);
                 renderCards(todayRates);
                 renderChart();
+                initConverter(todayRates);
 
             } catch (err) {
                 console.error('[NBU] Помилка:', err);
@@ -390,13 +1427,9 @@
             }
         }
 
-        // ============================================================
-        // 4. РЕНДЕРИНГ
-        // ============================================================
         function renderCards(todayRates) {
             const sorted = Object.keys(historicalRates).sort();
-            const prevDay = sorted[sorted.length - 2];
-            const prevRates = prevDay ? historicalRates[prevDay] : null;
+            const prevRates = sorted.length > 1 ? historicalRates[sorted[sorted.length - 2]] : null;
 
             const container = document.getElementById('current-rates');
             let html = '';
@@ -409,15 +1442,26 @@
                 const diff = current - previous;
                 const diffFixed = diff.toFixed(4);
                 let changeClass = 'flat', changeText = '→ 0.0000';
+                let symbol = '●';
+                let label = 'Без змін';
 
-                if (diff > 0.0001) { changeClass = 'up'; changeText = `↑ +${diffFixed}`; }
-                else if (diff < -0.0001) { changeClass = 'down'; changeText = `↓ ${diffFixed}`; }
+                if (diff > 0.0001) {
+                    changeClass = 'up'; changeText = `↑ +${diffFixed}`;
+                    symbol = '▲'; label = 'Зростання';
+                } else if (diff < -0.0001) {
+                    changeClass = 'down'; changeText = `↓ ${diffFixed}`;
+                    symbol = '▼'; label = 'Падіння';
+                }
 
                 html += `
                     <div class="rate-card ${code === currentCurrency ? 'active' : ''}" data-currency="${code}">
                         <div class="currency">${CURRENCY_NAMES[code]} (${code})</div>
                         <div class="value">${current.toFixed(4)} ₴</div>
-                        <div class="change ${changeClass}">${changeText}</div>
+                        <div class="change ${changeClass}">
+                            <span class="change-symbol">${symbol}</span>
+                            <span class="change-text">${changeText}</span>
+                            <span class="change-label">${label}</span>
+                        </div>
                     </div>
                 `;
             });
@@ -440,7 +1484,6 @@
 
             const now = new Date();
             let startDate = new Date(now);
-
             switch (period) {
                 case '1D': startDate.setDate(now.getDate() - 1); break;
                 case '5D': startDate.setDate(now.getDate() - 5); break;
@@ -450,7 +1493,6 @@
                 case 'MAX':
                 default: return dates;
             }
-
             const startStr = startDate.toISOString().slice(0, 10);
             return dates.filter(d => d >= startStr);
         }
@@ -471,9 +1513,7 @@
 
             const labels = dates.map(d => {
                 const [year, m, day] = d.split('-');
-                if (currentPeriod === 'MAX' || currentPeriod === '5Y') {
-                    return `${m}.${year}`;
-                }
+                if (currentPeriod === 'MAX' || currentPeriod === '5Y') return `${m}.${year}`;
                 return `${day}.${m}`;
             });
             const data = dates.map(d => historicalRates[d][currentCurrency]);
@@ -483,10 +1523,10 @@
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
+                    labels,
                     datasets: [{
                         label: `${currentCurrency} / UAH`,
-                        data: data,
+                        data,
                         borderColor: CURRENCY_COLORS[currentCurrency],
                         backgroundColor: CURRENCY_COLORS[currentCurrency] + '20',
                         tension: 0.3,
@@ -529,11 +1569,118 @@
             });
         }
 
-        // ============================================================
-        // 5. ЗАПУСК
-        // ============================================================
+        function createCustomSelect(container, options, initialValue, onChange) {
+            const trigger = container.querySelector('.custom-select-trigger');
+            const valueEl = container.querySelector('.custom-select-value');
+            const dropdown = container.querySelector('.custom-select-dropdown');
+
+            dropdown.innerHTML = options.map(opt => {
+                const flag = FLAGS[opt.code]
+                    ? `<img class="flag-img" src="flags/${FLAGS[opt.code]}.png" alt="${opt.code}" onerror="this.style.display='none'" />`
+                    : '';
+                return `
+                    <div class="custom-select-option ${opt.code === initialValue ? 'selected' : ''}" data-value="${opt.code}">
+                        ${flag}
+                        <span class="opt-code">${opt.code}</span>
+                        <span class="opt-name">${opt.name}</span>
+                    </div>
+                `;
+            }).join('');
+
+            function updateTrigger(code) {
+                const opt = options.find(o => o.code === code);
+                if (opt) valueEl.textContent = `${opt.code} — ${opt.name}`;
+                container.dataset.value = code;
+                dropdown.querySelectorAll('.custom-select-option').forEach(el => {
+                    el.classList.toggle('selected', el.dataset.value === code);
+                });
+            }
+            updateTrigger(initialValue);
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.custom-select.open').forEach(el => {
+                    if (el !== container) el.classList.remove('open');
+                });
+                container.classList.toggle('open');
+            });
+
+            dropdown.querySelectorAll('.custom-select-option').forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const code = opt.dataset.value;
+                    updateTrigger(code);
+                    container.classList.remove('open');
+                    if (onChange) onChange(code);
+                });
+            });
+
+            return {
+                setValue: (code) => updateTrigger(code),
+                getValue: () => container.dataset.value
+            };
+        }
+
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.custom-select.open').forEach(el => el.classList.remove('open'));
+        });
+
+        function initConverter(rates) {
+            const fromEl = document.getElementById('conv-from-currency');
+            const toEl = document.getElementById('conv-to-currency');
+
+            const options = [
+                { code: 'UAH', name: 'Українська гривня' },
+                ...CURRENCIES.map(c => ({ code: c, name: CURRENCY_NAMES[c] }))
+            ];
+
+            const fromInput = document.getElementById('conv-from');
+            const toInput = document.getElementById('conv-to');
+
+            function convert() {
+                const from = fromEl.dataset.value;
+                const to = toEl.dataset.value;
+                const amount = parseFloat(fromInput.value) || 0;
+
+                const rateFrom = from === 'UAH' ? 1 : (rates[from] || 0);
+                const rateTo = to === 'UAH' ? 1 : (rates[to] || 0);
+
+                const result = (amount * rateFrom) / rateTo;
+                toInput.value = result.toFixed(4);
+
+                document.getElementById('conv-result').textContent =
+                    `${amount.toFixed(2)} ${from} = ${result.toFixed(4)} ${to}`;
+
+                let detail = '';
+                if (from !== 'UAH' && to !== 'UAH') {
+                    detail = `1 ${from} = ${(rateFrom / rateTo).toFixed(4)} ${to} · 1 ${to} = ${(rateTo / rateFrom).toFixed(4)} ${from}`;
+                } else if (from === 'UAH' && to !== 'UAH') {
+                    detail = `1 ${to} = ${rateTo.toFixed(4)} ₴`;
+                } else if (from !== 'UAH' && to === 'UAH') {
+                    detail = `1 ${from} = ${rateFrom.toFixed(4)} ₴`;
+                }
+                document.getElementById('conv-detail').textContent = detail;
+            }
+
+            const fromSelect = createCustomSelect(fromEl, options, 'USD', convert);
+            const toSelect = createCustomSelect(toEl, options, 'UAH', convert);
+
+            fromInput.addEventListener('input', convert);
+
+            document.getElementById('conv-swap').addEventListener('click', () => {
+                const f = fromSelect.getValue();
+                const t = toSelect.getValue();
+                fromSelect.setValue(t);
+                toSelect.setValue(f);
+                convert();
+            });
+
+            convert();
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
-            await loadAllHistory();
+            initTheme();
+            initA11y();
 
             document.querySelectorAll('.period-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -543,6 +1690,18 @@
                     renderChart();
                 });
             });
+
+            const overlay = document.getElementById('settings-overlay');
+            document.getElementById('open-settings').addEventListener('click', () => overlay.classList.add('visible'));
+            document.getElementById('close-settings').addEventListener('click', () => overlay.classList.remove('visible'));
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.remove('visible');
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') overlay.classList.remove('visible');
+            });
+
+            await loadAllHistory();
         });
     </script>
 </body>
