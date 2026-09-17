@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Курс НБУ",
-  "version": "2.1",
-  "description": "Показує офіційний курс валют НБУ. Налаштовувана тема, мова та список валют.",
+  "name": "__MSG_extensionName__",
+  "version": "2.2",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
 
   "browser_specific_settings": {
     "gecko": {
@@ -21,7 +22,7 @@
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Курс НБУ",
+    "default_title": "__MSG_extensionName__",
     "default_icon": {
       "16": "icon16.png",
       "48": "icon48.png",
