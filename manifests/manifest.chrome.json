@@ -1,9 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Курс НБУ",
-  "version": "2.5",
+  "version": "2.6",
   "description": "Офіційний курс валют НБУ до гривні: USD, EUR, GBP, PLN, CNY, CHF, JPY, CAD, AUD, TRY. Темна тема, прапори, 2 мови інтерфейсу.",
-  "key": "---",
   "icons": {
     "16": "icon16.png",
     "48": "icon48.png",
