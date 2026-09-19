@@ -785,6 +785,7 @@
         .privacy-card {
             padding: 0;
             overflow: hidden;
+            scroll-margin-top: 20px;
         }
 
         .privacy-card summary {
@@ -1458,7 +1459,7 @@
             </div>
         </section>
 
-        <details class="card privacy-card">
+        <details class="card privacy-card" id="privacy">
             <summary>
                 <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 <span data-i18n="privacy_title">Політика конфіденційності</span>
@@ -2572,12 +2573,31 @@
             convert();
         }
 
+        // ============================================================
+        // PRIVACY ANCHOR — автооткрытие при переходе по #privacy
+        // ============================================================
+        function handlePrivacyAnchor() {
+            if (window.location.hash !== '#privacy') return;
+            const privacyBlock = document.getElementById('privacy');
+            if (!privacyBlock) return;
+            privacyBlock.open = true;
+            // Прокрутка с небольшой задержкой, чтобы раскрытие успело примениться
+            setTimeout(() => {
+                privacyBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 120);
+        }
+
         // INIT
         document.addEventListener('DOMContentLoaded', async () => {
             initTheme();
             initA11y();
             initLanguage();
             applyTranslations();
+
+            // Открыть блок политики при загрузке с якорем #privacy
+            handlePrivacyAnchor();
+            // Реагировать на изменение хеша (клики по ссылкам вида #privacy)
+            window.addEventListener('hashchange', handlePrivacyAnchor);
 
             $$('.period-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
