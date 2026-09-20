@@ -10,7 +10,7 @@
 
 [![Firefox](https://img.shields.io/badge/Firefox-FF7139?style=for-the-badge&logo=firefox-browser&logoColor=white)](https://addons.mozilla.org/ru/firefox/addon/nbu-rate/)
 [![Edge](https://img.shields.io/badge/Edge-0078D7?style=for-the-badge&logo=microsoftedge&logoColor=white)](https://microsoftedge.microsoft.com/addons/detail/nbu-rate/hjndboldkmconodmenmccdekhmnnlhbp)
-[![Chrome](https://img.shields.io/badge/Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)](#)
+[![Chrome](https://img.shields.io/badge/Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/%D0%BA%D1%83%D1%80%D1%81-%D0%BD%D0%B1%D1%83/llhcdbfoebdcmlfiojpjkbejdbopoggo)
 
 <br>
 
