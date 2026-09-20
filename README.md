@@ -49,7 +49,7 @@
 
 **Edge** · [microsoftedge.microsoft.com/nbu-rate](https://microsoftedge.microsoft.com/addons/detail/nbu-rate/hjndboldkmconodmenmccdekhmnnlhbp)
 
-**Chrome** · Скоро в Chrome Web Store
+**Chrome** · [chromewebstore.google.com](https://chromewebstore.google.com/detail/%D0%BA%D1%83%D1%80%D1%81-%D0%BD%D0%B1%D1%83/llhcdbfoebdcmlfiojpjkbejdbopoggo)
 
 <details>
 <summary>Встановлення вручну</summary>
