@@ -8,12 +8,31 @@
     <title>Курс НБУ</title>
 
     <script>
+    /* Безопасный localStorage — обёртка на случай, если браузер его блокирует
+       (Edge/Brave Tracking Prevention, приватный режим и т.п.).
+       Объявлена один раз здесь — доступна в главном скрипте ниже. */
+    var safeLS = (function() {
+        var ok = true;
+        try {
+            localStorage.setItem('__test__', '1');
+            localStorage.removeItem('__test__');
+        } catch (e) {
+            ok = false;
+            try { console.warn('[storage] localStorage заблокирован браузером — кэш и настройки работать не будут.'); } catch(_) {}
+        }
+        return {
+            getItem: function(k)    { try { return ok ? localStorage.getItem(k) : null; } catch(_) { return null; } },
+            setItem: function(k, v) { try { if (ok) localStorage.setItem(k, v); } catch(_) {} },
+            removeItem: function(k) { try { if (ok) localStorage.removeItem(k); } catch(_) {} }
+        };
+    })();
+
     (function() {
         try {
             var THEME_KEY = 'nbu_site_theme_v2';
             var CUSTOM_KEY = 'nbu_site_custom_colors_v2';
             var PRESET_KEY = 'nbu_site_preset_v1';
-            var t = localStorage.getItem(THEME_KEY) || 'system';
+            var t = safeLS.getItem(THEME_KEY) || 'system';
             var r = t;
 
             if (t === 'system') {
@@ -23,7 +42,7 @@
             var scheme = r;
 
             if (t === 'custom') {
-                var raw = localStorage.getItem(CUSTOM_KEY);
+                var raw = safeLS.getItem(CUSTOM_KEY);
                 var c = {};
                 try { c = raw ? JSON.parse(raw) : {}; } catch (e) {}
 
@@ -85,7 +104,7 @@
             document.documentElement.setAttribute('data-theme', r);
             document.documentElement.setAttribute('data-scheme', scheme);
 
-            var preset = localStorage.getItem(PRESET_KEY);
+            var preset = safeLS.getItem(PRESET_KEY);
             var icons = {
                 midnight: 'color-fvcn/blue.ico',
                 nord: 'color-fvcn/lightblue.ico',
@@ -509,7 +528,6 @@
             filter: grayscale(0) opacity(1);
             transform: scale(1.25) rotate(-8deg);
         }
-        /* Інверсія іконок для будь-якої темної схеми (light/dark/custom/system-dark) */
         :root[data-scheme="dark"] .footer-icon {
             filter: grayscale(1) invert(1) opacity(0.55);
         }
@@ -1137,20 +1155,22 @@
         </div>
     </div>
 
-<script src="chart.umd.min.js"></script>
-<script>
-(function() {
-    'use strict';
+    <script src="chart.umd.min.js"></script>
+    <script>
+    (function() {
+        'use strict';
 
-    if (typeof Chart === 'undefined') {
-        console.warn('[Chart.js] не загрузился — графики будут недоступны');
-        window.Chart = class {
-            constructor() { this.destroy = () => {}; }
-            update() {}
-        };
-    }
+        /* Если Chart.js не загрузился (сеть/CDN) — не даём всему скрипту упасть */
+        if (typeof Chart === 'undefined') {
+            console.warn('[Chart.js] не загрузился — графики будут недоступны');
+            window.Chart = class {
+                constructor() { this.destroy = () => {}; }
+                update() {}
+            };
+        }
 
-    const DATA = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@main/data';
+        /* Данные через jsDelivr — без rate-limit GitHub и без cold-start 404 */
+        const DATA = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@main/data';
         const CRYPTO_ICONS = 'https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color';
 
         const URLS = {
@@ -1206,9 +1226,10 @@
         const CARD_RATE_ORDER = ['USD', 'EUR', 'GBP', 'PLN'];
         const CARD_RATE_ORDER_IDX = Object.fromEntries(CARD_RATE_ORDER.map((c, i) => [c, i]));
 
+        /* Логотипы банков — папка bank/ */
         const BANK_LOGOS = {
-            privat: `<img src="privat.png" class="bank-logo" alt="PrivatBank">`,
-            mono: `<img src="mono.png" class="bank-logo" alt="MonoBank">`
+            privat: `<img src="bank/privat.png" class="bank-logo" alt="PrivatBank" onerror="this.style.display='none'">`,
+            mono:   `<img src="bank/mono.png" class="bank-logo" alt="MonoBank" onerror="this.style.display='none'">`
         };
 
         const TRANSLATIONS = {
@@ -1376,7 +1397,7 @@
         const REQUEST_TIMEOUT = 30000;
         const CONCURRENCY = 4;
 
-        let currentLang = localStorage.getItem(LANG_KEY) || 'uk';
+        let currentLang = safeLS.getItem(LANG_KEY) || 'uk';
         let showPreciseRate = true;
         let currentCurrency = 'USD';
         let currentPeriod = 'MAX';
@@ -1482,7 +1503,7 @@
 
         function setFavicon(presetName) {
             document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]').forEach(l => l.remove());
-            const theme = localStorage.getItem(THEME_KEY) || 'system';
+            const theme = safeLS.getItem(THEME_KEY) || 'system';
             const useIcon = (theme === 'custom' && presetName && PRESET_ICONS[presetName])
                 ? PRESET_ICONS[presetName]
                 : DEFAULT_FAVICON;
@@ -1494,30 +1515,33 @@
             document.head.appendChild(link);
         }
 
-async function fetchWithTimeout(url, timeout, retries = 2) {
-    let lastErr;
-    for (let attempt = 0; attempt <= retries; attempt++) {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), timeout);
-        try {
-            const res = await fetch(url, {
-                signal: controller.signal,
-                cache: attempt === 0 ? 'default' : 'reload'
-            });
-            clearTimeout(timer);
-            
-            if (!res.ok && res.status >= 500) throw new Error('HTTP ' + res.status);
-            return res;
-        } catch (e) {
-            clearTimeout(timer);
-            lastErr = e;
-            if (attempt < retries) {
-                await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
+        /* ============================================================
+           СЕТЬ: retry + таймаут
+           ============================================================ */
+        async function fetchWithTimeout(url, timeout, retries = 2) {
+            let lastErr;
+            for (let attempt = 0; attempt <= retries; attempt++) {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), timeout);
+                try {
+                    const res = await fetch(url, {
+                        signal: controller.signal,
+                        cache: attempt === 0 ? 'default' : 'reload'
+                    });
+                    clearTimeout(timer);
+                    // 5xx — повторяем, 4xx — нет смысла
+                    if (!res.ok && res.status >= 500) throw new Error('HTTP ' + res.status);
+                    return res;
+                } catch (e) {
+                    clearTimeout(timer);
+                    lastErr = e;
+                    if (attempt < retries) {
+                        await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
+                    }
+                }
             }
+            throw lastErr;
         }
-    }
-    throw lastErr;
-}
         async function fetchFromRepo(name) {
             const res = await fetchWithTimeout(URLS[name], REQUEST_TIMEOUT);
             if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -1537,24 +1561,27 @@ async function fetchWithTimeout(url, timeout, retries = 2) {
             }));
         }
 
+        /* ============================================================
+           КЭШ: свежий + stale (на случай падения сети)
+           ============================================================ */
         function cacheKey(source) { return CACHE_KEY_PREFIX + source; }
-function loadLiveCache(source, allowStale = false) {
-    try {
-        const raw = localStorage.getItem(cacheKey(source));
-        if (!raw) return null;
-        const c = JSON.parse(raw);
-        const age = Date.now() - c.timestamp;
-        
-        if (!allowStale && age > CACHE_TTL) return null;
-        return c.data;
-    } catch { return null; }
-}
+        function loadLiveCache(source, allowStale = false) {
+            try {
+                const raw = safeLS.getItem(cacheKey(source));
+                if (!raw) return null;
+                const c = JSON.parse(raw);
+                const age = Date.now() - c.timestamp;
+                // allowStale=true → отдаём даже устаревшие данные
+                if (!allowStale && age > CACHE_TTL) return null;
+                return c.data;
+            } catch { return null; }
+        }
         function saveLiveCache(source, data) {
-            try { localStorage.setItem(cacheKey(source), JSON.stringify({ timestamp: Date.now(), data })); } catch (e) {}
+            try { safeLS.setItem(cacheKey(source), JSON.stringify({ timestamp: Date.now(), data })); } catch (e) {}
         }
         function loadHistoryCache() {
             try {
-                const raw = localStorage.getItem(HISTORY_CACHE_KEY);
+                const raw = safeLS.getItem(HISTORY_CACHE_KEY);
                 if (!raw) return null;
                 const c = JSON.parse(raw);
                 if (Date.now() - c.timestamp > CACHE_TTL) return null;
@@ -1562,7 +1589,7 @@ function loadLiveCache(source, allowStale = false) {
             } catch { return null; }
         }
         function saveHistoryCache(data) {
-            try { localStorage.setItem(HISTORY_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data })); } catch (e) {}
+            try { safeLS.setItem(HISTORY_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data })); } catch (e) {}
         }
 
         function applyTheme(theme, customColors) {
@@ -1603,7 +1630,6 @@ function loadLiveCache(source, allowStale = false) {
                 }
             }
 
-            // Завжди вказуємо поточну схему (light/dark) незалежно від теми
             root.setAttribute('data-scheme', scheme);
 
             $$('#theme-switch button').forEach(btn => {
@@ -1614,8 +1640,8 @@ function loadLiveCache(source, allowStale = false) {
         }
 
         function initTheme() {
-            const theme = localStorage.getItem(THEME_KEY) || 'system';
-            const custom = JSON.parse(localStorage.getItem(CUSTOM_COLORS_KEY) || 'null') || DEFAULT_CUSTOM;
+            const theme = safeLS.getItem(THEME_KEY) || 'system';
+            const custom = JSON.parse(safeLS.getItem(CUSTOM_COLORS_KEY) || 'null') || DEFAULT_CUSTOM;
             applyTheme(theme, custom);
             $('#color-bg').value = custom.bg; $('#hex-bg').value = custom.bg.toUpperCase();
             $('#color-text').value = custom.text; $('#hex-text').value = custom.text.toUpperCase();
@@ -1624,10 +1650,10 @@ function loadLiveCache(source, allowStale = false) {
             $$('#theme-switch button').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const th = btn.dataset.theme;
-                    localStorage.setItem(THEME_KEY, th);
-                    const c = JSON.parse(localStorage.getItem(CUSTOM_COLORS_KEY) || 'null') || DEFAULT_CUSTOM;
+                    safeLS.setItem(THEME_KEY, th);
+                    const c = JSON.parse(safeLS.getItem(CUSTOM_COLORS_KEY) || 'null') || DEFAULT_CUSTOM;
                     applyTheme(th, c);
-                    const preset = localStorage.getItem(PRESET_KEY);
+                    const preset = safeLS.getItem(PRESET_KEY);
                     setFavicon(preset);
                     renderChart();
                     renderCryptoCards();
@@ -1652,9 +1678,9 @@ function loadLiveCache(source, allowStale = false) {
                     $('#color-accent').value = p.accent; $('#hex-accent').value = p.accent.toUpperCase();
 
                     const colors = { bg: p.bg, text: p.text, accent: p.accent };
-                    localStorage.setItem(CUSTOM_COLORS_KEY, JSON.stringify(colors));
-                    localStorage.setItem(THEME_KEY, 'custom');
-                    localStorage.setItem(PRESET_KEY, presetName);
+                    safeLS.setItem(CUSTOM_COLORS_KEY, JSON.stringify(colors));
+                    safeLS.setItem(THEME_KEY, 'custom');
+                    safeLS.setItem(PRESET_KEY, presetName);
                     applyTheme('custom', colors);
 
                     $$('#theme-switch button').forEach(b => {
@@ -1674,21 +1700,21 @@ function loadLiveCache(source, allowStale = false) {
                 $('#color-bg').value = DEFAULT_CUSTOM.bg; $('#hex-bg').value = DEFAULT_CUSTOM.bg.toUpperCase();
                 $('#color-text').value = DEFAULT_CUSTOM.text; $('#hex-text').value = DEFAULT_CUSTOM.text.toUpperCase();
                 $('#color-accent').value = DEFAULT_CUSTOM.accent; $('#hex-accent').value = DEFAULT_CUSTOM.accent.toUpperCase();
-                localStorage.removeItem(PRESET_KEY);
+                safeLS.removeItem(PRESET_KEY);
                 saveCustomColors();
                 setFavicon(null);
             });
         }
         function saveCustomColors() {
             const colors = { bg: $('#color-bg').value, text: $('#color-text').value, accent: $('#color-accent').value };
-            localStorage.setItem(CUSTOM_COLORS_KEY, JSON.stringify(colors));
-            const theme = localStorage.getItem(THEME_KEY) || 'system';
+            safeLS.setItem(CUSTOM_COLORS_KEY, JSON.stringify(colors));
+            const theme = safeLS.getItem(THEME_KEY) || 'system';
             if (theme === 'custom') { applyTheme('custom', colors); renderChart(); renderCryptoCards(); }
         }
 
         function getA11y() {
             try {
-                const stored = JSON.parse(localStorage.getItem(A11Y_KEY) || 'null') || {};
+                const stored = JSON.parse(safeLS.getItem(A11Y_KEY) || 'null') || {};
                 if (typeof stored.font === 'boolean') stored.font = stored.font ? 125 : 100;
                 return { ...DEFAULT_A11Y, ...stored };
             } catch {
@@ -1730,7 +1756,7 @@ function loadLiveCache(source, allowStale = false) {
                     symbols: $('#a11y-symbols-toggle')?.checked || false,
                     underline: $('#a11y-underline-toggle')?.checked || false
                 };
-                localStorage.setItem(A11Y_KEY, JSON.stringify(v));
+                safeLS.setItem(A11Y_KEY, JSON.stringify(v));
                 applyA11y(v);
             }
 
@@ -1759,14 +1785,14 @@ function loadLiveCache(source, allowStale = false) {
         }
 
         function initPreciseRate() {
-            const stored = localStorage.getItem(PRECISE_KEY);
+            const stored = safeLS.getItem(PRECISE_KEY);
             showPreciseRate = stored === null ? true : stored === 'true';
             const toggle = $('#precise-rate-toggle');
             if (toggle) {
                 toggle.checked = showPreciseRate;
                 toggle.addEventListener('change', () => {
                     showPreciseRate = toggle.checked;
-                    localStorage.setItem(PRECISE_KEY, showPreciseRate ? 'true' : 'false');
+                    safeLS.setItem(PRECISE_KEY, showPreciseRate ? 'true' : 'false');
                     if (Object.keys(liveRates).length > 0) renderCards(liveRates);
                     loadCardRates();
                     convert();
@@ -1795,7 +1821,7 @@ function loadLiveCache(source, allowStale = false) {
             $$('#lang-switch button').forEach(btn => {
                 btn.addEventListener('click', () => {
                     currentLang = btn.dataset.lang;
-                    localStorage.setItem(LANG_KEY, currentLang);
+                    safeLS.setItem(LANG_KEY, currentLang);
                     applyTranslations();
                     renderChart();
                     renderCryptoCards();
@@ -1822,32 +1848,38 @@ function loadLiveCache(source, allowStale = false) {
             return num.toLocaleString('uk-UA', { minimumFractionDigits: d, maximumFractionDigits: d });
         }
 
-async function loadLiveRates(source) {
-    const fresh = loadLiveCache(source, false);   
-    const stale = loadLiveCache(source, true);    
+        /* ============================================================
+           Загрузка live-курсов: сначала stale-кэш, потом сеть
+           ============================================================ */
+        async function loadLiveRates(source) {
+            const fresh = loadLiveCache(source, false);
+            const stale = loadLiveCache(source, true);
 
-    if (fresh || stale) {
-        const use = fresh || stale;
-        liveRates = {};
-        use.forEach(r => { liveRates[r.cc] = r; });
-        saveLiveCache(source, use); 
-    }
+            // Если есть хоть какой-то кэш — сразу заполняем liveRates
+            if (fresh || stale) {
+                const use = fresh || stale;
+                liveRates = {};
+                use.forEach(r => { liveRates[r.cc] = r; });
+                saveLiveCache(source, use); // не даём кэшу "застыть" навсегда
+            }
 
-    if (fresh) return liveRates;
+            // Свежий кэш — сеть не дёргаем вообще
+            if (fresh) return liveRates;
 
-    try {
-        const rates = await fetchNBU(currentLang);
-        if (!Array.isArray(rates) || rates.length === 0) throw new Error('Empty');
-        liveRates = {};
-        rates.forEach(r => { liveRates[r.cc] = r; });
-        saveLiveCache(source, rates);
-        return liveRates;
-    } catch (e) {
-        console.warn('[LiveRates] сеть упала, использую stale-кэш:', e.message);
-        if (Object.keys(liveRates).length === 0) throw e;
-        return liveRates;
-    }
-}
+            // Пробуем сеть. Если упало — остаёмся на stale-данных
+            try {
+                const rates = await fetchNBU(currentLang);
+                if (!Array.isArray(rates) || rates.length === 0) throw new Error('Empty');
+                liveRates = {};
+                rates.forEach(r => { liveRates[r.cc] = r; });
+                saveLiveCache(source, rates);
+                return liveRates;
+            } catch (e) {
+                console.warn('[LiveRates] сеть упала, использую stale-кэш:', e.message);
+                if (Object.keys(liveRates).length === 0) throw e;
+                return liveRates;
+            }
+        }
 
         async function fetchHistoryForCurrency(valcode) {
             const end = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -1904,46 +1936,49 @@ async function loadLiveRates(source) {
             latestDate = dates[dates.length - 1] || '';
         }
 
-async function loadAll() {
-    const container = $('#current-rates');
-    setStatus(t('status_loading'), 'loading');
+        async function loadAll() {
+            const container = $('#current-rates');
+            setStatus(t('status_loading'), 'loading');
 
-    const stale = loadLiveCache('nbu', true);
-    if (stale && Array.isArray(stale)) {
-        stale.forEach(r => { liveRates[r.cc] = r; });
-        if (Object.keys(liveRates).length > 0) {
-            renderCards(liveRates);
-            initConverter(liveRates);
-            setStatus(t('status_updated', {date: new Date().toLocaleDateString('uk-UA')}), '');
+            // ⚡ Ранний рендер из stale-кэша: покажем что-то сразу
+            const stale = loadLiveCache('nbu', true);
+            if (stale && Array.isArray(stale)) {
+                stale.forEach(r => { liveRates[r.cc] = r; });
+                if (Object.keys(liveRates).length > 0) {
+                    renderCards(liveRates);
+                    initConverter(liveRates);
+                    setStatus(t('status_updated', {date: new Date().toLocaleDateString('uk-UA')}), '');
+                }
+            }
+
+            try {
+                await loadLiveRates('nbu');
+                if (Object.keys(liveRates).length === 0) throw new Error('Empty');
+
+                // Если stale не было — рисуем сейчас
+                if (!container.querySelector('.rate-card:not(.skeleton)')) {
+                    renderCards(liveRates);
+                    initConverter(liveRates);
+                }
+
+                // История НБУ подгружается в фоне
+                if (Object.keys(historicalRates).length === 0) {
+                    loadHistoryNBU().then(() => renderChart()).catch(e => console.warn(e));
+                }
+                renderChart();
+                setStatus(t('status_updated', {date: new Date().toLocaleDateString('uk-UA')}), '');
+                loadCardRates();
+                loadCrypto();
+            } catch (err) {
+                console.error('[Сайт] Помилка:', err);
+                // Если stale что-то показал — не затираем ошибкой
+                if (Object.keys(liveRates).length > 0) return;
+                if (err && err.rateLimited) setStatus(t('status_rate_limited'), 'error');
+                else if (err && (err.name === 'TypeError' || /Failed to fetch/i.test(err.message))) setStatus(t('status_cors'), 'error');
+                else setStatus(t('status_error'), 'error');
+                container.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('status_error')}<br><small style="opacity:0.7;">${err.message}</small></p>`;
+            }
         }
-    }
-
-    try {
-        await loadLiveRates('nbu');
-        if (Object.keys(liveRates).length === 0) throw new Error('Empty');
-
-        if (!container.querySelector('.rate-card:not(.skeleton)')) {
-            renderCards(liveRates);
-            initConverter(liveRates);
-        }
-
-        if (Object.keys(historicalRates).length === 0) {
-            loadHistoryNBU().then(() => renderChart()).catch(e => console.warn(e));
-        }
-        renderChart();
-        setStatus(t('status_updated', {date: new Date().toLocaleDateString('uk-UA')}), '');
-        loadCardRates();
-        loadCrypto();
-    } catch (err) {
-        console.error('[Сайт] Помилка:', err);
-        
-        if (Object.keys(liveRates).length > 0) return;
-        if (err && err.rateLimited) setStatus(t('status_rate_limited'), 'error');
-        else if (err && (err.name === 'TypeError' || /Failed to fetch/i.test(err.message))) setStatus(t('status_cors'), 'error');
-        else setStatus(t('status_error'), 'error');
-        container.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('status_error')}<br><small style="opacity:0.7;">${err.message}</small></p>`;
-    }
-}
 
         function renderCards(rates) {
             const container = $('#current-rates');
@@ -2451,11 +2486,10 @@ async function loadAll() {
                 }
             });
 
-            // Слухаємо зміну системної теми, щоб оновлювати data-scheme
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                const theme = localStorage.getItem(THEME_KEY) || 'system';
+                const theme = safeLS.getItem(THEME_KEY) || 'system';
                 if (theme === 'system') {
-                    const c = JSON.parse(localStorage.getItem(CUSTOM_COLORS_KEY) || 'null') || DEFAULT_CUSTOM;
+                    const c = JSON.parse(safeLS.getItem(CUSTOM_COLORS_KEY) || 'null') || DEFAULT_CUSTOM;
                     applyTheme('system', c);
                 }
             });
