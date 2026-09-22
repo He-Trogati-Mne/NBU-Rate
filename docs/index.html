@@ -1137,12 +1137,20 @@
         </div>
     </div>
 
-    <script src="chart.umd.min.js"></script>
-    <script>
-    (function() {
-        'use strict';
+<script src="chart.umd.min.js"></script>
+<script>
+(function() {
+    'use strict';
 
-        const DATA = 'https://raw.githubusercontent.com/He-Trogati-Mne/nbu-rate-data/main/data';
+    if (typeof Chart === 'undefined') {
+        console.warn('[Chart.js] не загрузился — графики будут недоступны');
+        window.Chart = class {
+            constructor() { this.destroy = () => {}; }
+            update() {}
+        };
+    }
+
+    const DATA = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@main/data';
         const CRYPTO_ICONS = 'https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color';
 
         const URLS = {
@@ -1486,15 +1494,30 @@
             document.head.appendChild(link);
         }
 
-        async function fetchWithTimeout(url, timeout) {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), timeout);
-            try {
-                const res = await fetch(url, { signal: controller.signal });
-                clearTimeout(timer);
-                return res;
-            } catch (e) { clearTimeout(timer); throw e; }
+async function fetchWithTimeout(url, timeout, retries = 2) {
+    let lastErr;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeout);
+        try {
+            const res = await fetch(url, {
+                signal: controller.signal,
+                cache: attempt === 0 ? 'default' : 'reload'
+            });
+            clearTimeout(timer);
+            
+            if (!res.ok && res.status >= 500) throw new Error('HTTP ' + res.status);
+            return res;
+        } catch (e) {
+            clearTimeout(timer);
+            lastErr = e;
+            if (attempt < retries) {
+                await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
+            }
         }
+    }
+    throw lastErr;
+}
         async function fetchFromRepo(name) {
             const res = await fetchWithTimeout(URLS[name], REQUEST_TIMEOUT);
             if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -1515,15 +1538,17 @@
         }
 
         function cacheKey(source) { return CACHE_KEY_PREFIX + source; }
-        function loadLiveCache(source) {
-            try {
-                const raw = localStorage.getItem(cacheKey(source));
-                if (!raw) return null;
-                const c = JSON.parse(raw);
-                if (Date.now() - c.timestamp > CACHE_TTL) return null;
-                return c.data;
-            } catch { return null; }
-        }
+function loadLiveCache(source, allowStale = false) {
+    try {
+        const raw = localStorage.getItem(cacheKey(source));
+        if (!raw) return null;
+        const c = JSON.parse(raw);
+        const age = Date.now() - c.timestamp;
+        
+        if (!allowStale && age > CACHE_TTL) return null;
+        return c.data;
+    } catch { return null; }
+}
         function saveLiveCache(source, data) {
             try { localStorage.setItem(cacheKey(source), JSON.stringify({ timestamp: Date.now(), data })); } catch (e) {}
         }
@@ -1797,17 +1822,32 @@
             return num.toLocaleString('uk-UA', { minimumFractionDigits: d, maximumFractionDigits: d });
         }
 
-        async function loadLiveRates(source) {
-            const cached = loadLiveCache(source);
-            if (cached && Array.isArray(cached)) {
-                liveRates = {}; cached.forEach(r => { liveRates[r.cc] = r; });
-                return liveRates;
-            }
-            const rates = await fetchNBU(currentLang);
-            liveRates = {}; rates.forEach(r => { liveRates[r.cc] = r; });
-            saveLiveCache(source, rates);
-            return liveRates;
-        }
+async function loadLiveRates(source) {
+    const fresh = loadLiveCache(source, false);   
+    const stale = loadLiveCache(source, true);    
+
+    if (fresh || stale) {
+        const use = fresh || stale;
+        liveRates = {};
+        use.forEach(r => { liveRates[r.cc] = r; });
+        saveLiveCache(source, use); 
+    }
+
+    if (fresh) return liveRates;
+
+    try {
+        const rates = await fetchNBU(currentLang);
+        if (!Array.isArray(rates) || rates.length === 0) throw new Error('Empty');
+        liveRates = {};
+        rates.forEach(r => { liveRates[r.cc] = r; });
+        saveLiveCache(source, rates);
+        return liveRates;
+    } catch (e) {
+        console.warn('[LiveRates] сеть упала, использую stale-кэш:', e.message);
+        if (Object.keys(liveRates).length === 0) throw e;
+        return liveRates;
+    }
+}
 
         async function fetchHistoryForCurrency(valcode) {
             const end = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -1864,29 +1904,46 @@
             latestDate = dates[dates.length - 1] || '';
         }
 
-        async function loadAll() {
-            const container = $('#current-rates');
-            setStatus(t('status_loading'), 'loading');
-            try {
-                await loadLiveRates('nbu');
-                if (Object.keys(liveRates).length === 0) throw new Error('Empty');
-                if (Object.keys(historicalRates).length === 0) {
-                    loadHistoryNBU().then(() => renderChart()).catch(e => console.warn(e));
-                }
-                renderCards(liveRates);
-                initConverter(liveRates);
-                renderChart();
-                setStatus(t('status_updated', {date: new Date().toLocaleDateString('uk-UA')}), '');
-                loadCardRates();
-                loadCrypto();
-            } catch (err) {
-                console.error('[Сайт] Помилка:', err);
-                if (err && err.rateLimited) setStatus(t('status_rate_limited'), 'error');
-                else if (err && (err.name === 'TypeError' || /Failed to fetch/i.test(err.message))) setStatus(t('status_cors'), 'error');
-                else setStatus(t('status_error'), 'error');
-                container.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('status_error')}<br><small style="opacity:0.7;">${err.message}</small></p>`;
-            }
+async function loadAll() {
+    const container = $('#current-rates');
+    setStatus(t('status_loading'), 'loading');
+
+    const stale = loadLiveCache('nbu', true);
+    if (stale && Array.isArray(stale)) {
+        stale.forEach(r => { liveRates[r.cc] = r; });
+        if (Object.keys(liveRates).length > 0) {
+            renderCards(liveRates);
+            initConverter(liveRates);
+            setStatus(t('status_updated', {date: new Date().toLocaleDateString('uk-UA')}), '');
         }
+    }
+
+    try {
+        await loadLiveRates('nbu');
+        if (Object.keys(liveRates).length === 0) throw new Error('Empty');
+
+        if (!container.querySelector('.rate-card:not(.skeleton)')) {
+            renderCards(liveRates);
+            initConverter(liveRates);
+        }
+
+        if (Object.keys(historicalRates).length === 0) {
+            loadHistoryNBU().then(() => renderChart()).catch(e => console.warn(e));
+        }
+        renderChart();
+        setStatus(t('status_updated', {date: new Date().toLocaleDateString('uk-UA')}), '');
+        loadCardRates();
+        loadCrypto();
+    } catch (err) {
+        console.error('[Сайт] Помилка:', err);
+        
+        if (Object.keys(liveRates).length > 0) return;
+        if (err && err.rateLimited) setStatus(t('status_rate_limited'), 'error');
+        else if (err && (err.name === 'TypeError' || /Failed to fetch/i.test(err.message))) setStatus(t('status_cors'), 'error');
+        else setStatus(t('status_error'), 'error');
+        container.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('status_error')}<br><small style="opacity:0.7;">${err.message}</small></p>`;
+    }
+}
 
         function renderCards(rates) {
             const container = $('#current-rates');
