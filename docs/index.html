@@ -9,8 +9,7 @@
 
     <script>
     /* Безопасный localStorage — обёртка на случай, если браузер его блокирует
-       (Edge/Brave Tracking Prevention, приватный режим и т.п.).
-       Объявлена один раз здесь — доступна в главном скрипте ниже. */
+       (Edge/Brave Tracking Prevention, приватный режим и т.п.). */
     var safeLS = (function() {
         var ok = true;
         try {
@@ -1160,7 +1159,7 @@
     (function() {
         'use strict';
 
-        /* Если Chart.js не загрузился (сеть/CDN) — не даём всему скрипту упасть */
+        /* Если Chart.js не загрузился — не даём всему скрипту упасть */
         if (typeof Chart === 'undefined') {
             console.warn('[Chart.js] не загрузился — графики будут недоступны');
             window.Chart = class {
@@ -1169,7 +1168,7 @@
             };
         }
 
-        /* Данные через jsDelivr — без rate-limit GitHub и без cold-start 404 */
+        /* Данные через jsDelivr */
         const DATA = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@main/data';
         const CRYPTO_ICONS = 'https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color';
 
@@ -1529,7 +1528,6 @@
                         cache: attempt === 0 ? 'default' : 'reload'
                     });
                     clearTimeout(timer);
-                    // 5xx — повторяем, 4xx — нет смысла
                     if (!res.ok && res.status >= 500) throw new Error('HTTP ' + res.status);
                     return res;
                 } catch (e) {
@@ -1562,7 +1560,7 @@
         }
 
         /* ============================================================
-           КЭШ: свежий + stale (на случай падения сети)
+           КЭШ
            ============================================================ */
         function cacheKey(source) { return CACHE_KEY_PREFIX + source; }
         function loadLiveCache(source, allowStale = false) {
@@ -1571,7 +1569,6 @@
                 if (!raw) return null;
                 const c = JSON.parse(raw);
                 const age = Date.now() - c.timestamp;
-                // allowStale=true → отдаём даже устаревшие данные
                 if (!allowStale && age > CACHE_TTL) return null;
                 return c.data;
             } catch { return null; }
@@ -1855,18 +1852,15 @@
             const fresh = loadLiveCache(source, false);
             const stale = loadLiveCache(source, true);
 
-            // Если есть хоть какой-то кэш — сразу заполняем liveRates
             if (fresh || stale) {
                 const use = fresh || stale;
                 liveRates = {};
                 use.forEach(r => { liveRates[r.cc] = r; });
-                saveLiveCache(source, use); // не даём кэшу "застыть" навсегда
+                saveLiveCache(source, use);
             }
 
-            // Свежий кэш — сеть не дёргаем вообще
             if (fresh) return liveRates;
 
-            // Пробуем сеть. Если упало — остаёмся на stale-данных
             try {
                 const rates = await fetchNBU(currentLang);
                 if (!Array.isArray(rates) || rates.length === 0) throw new Error('Empty');
@@ -1955,23 +1949,30 @@
                 await loadLiveRates('nbu');
                 if (Object.keys(liveRates).length === 0) throw new Error('Empty');
 
-                // Если stale не было — рисуем сейчас
                 if (!container.querySelector('.rate-card:not(.skeleton)')) {
                     renderCards(liveRates);
                     initConverter(liveRates);
                 }
 
-                // История НБУ подгружается в фоне
+                // 🔧 ФИКС №1: после загрузки истории ПЕРЕРИСОВЫВАЕМ карточки,
+                // чтобы появились бейджи ▲/▼ (раньше вызывался только renderChart)
                 if (Object.keys(historicalRates).length === 0) {
-                    loadHistoryNBU().then(() => renderChart()).catch(e => console.warn(e));
+                    loadHistoryNBU()
+                        .then(() => {
+                            renderChart();
+                            renderCards(liveRates);
+                        })
+                        .catch(e => console.warn(e));
+                } else {
+                    renderChart();
+                    renderCards(liveRates);
                 }
-                renderChart();
+
                 setStatus(t('status_updated', {date: new Date().toLocaleDateString('uk-UA')}), '');
                 loadCardRates();
                 loadCrypto();
             } catch (err) {
                 console.error('[Сайт] Помилка:', err);
-                // Если stale что-то показал — не затираем ошибкой
                 if (Object.keys(liveRates).length > 0) return;
                 if (err && err.rateLimited) setStatus(t('status_rate_limited'), 'error');
                 else if (err && (err.name === 'TypeError' || /Failed to fetch/i.test(err.message))) setStatus(t('status_cors'), 'error');
@@ -1982,8 +1983,20 @@
 
         function renderCards(rates) {
             const container = $('#current-rates');
-            const sorted = Object.keys(historicalRates).sort();
-            const prevRates = sorted.length > 1 ? historicalRates[sorted[sorted.length - 2]] : null;
+
+            // 🔧 ФИКС №2: правильный выбор "вчерашней" даты.
+            // Берём самую свежую дату, которая СТРОГО меньше сегодняшней.
+            // Раньше бралась вторая-с-конца — из-за этого дельты были
+            // неверные (например JPY ▼ -2.5451 при курсе 0.2850).
+            const todayIso = new Date().toISOString().slice(0, 10);
+            const allDates = Object.keys(historicalRates).sort();
+            let prevDate = null;
+            for (let i = allDates.length - 1; i >= 0; i--) {
+                if (allDates[i] < todayIso) { prevDate = allDates[i]; break; }
+            }
+            if (!prevDate && allDates.length > 1) prevDate = allDates[allDates.length - 2];
+            const prevRates = prevDate ? historicalRates[prevDate] : null;
+
             let html = '';
             const dec = currentDecimals();
             CURRENCIES.forEach(code => {
