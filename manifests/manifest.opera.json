@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
-  "version": "2.6",
+  "version": "2.7.0",
   "description": "__MSG_extensionDescription__",
   "default_locale": "uk",
   "author": "He-Trogati-Mne",
@@ -29,7 +29,10 @@
     "alarms"
   ],
   "host_permissions": [
-    "https://bank.gov.ua/*"
+    "https://bank.gov.ua/*",
+    "https://api.privatbank.ua/*",
+    "https://api.monobank.ua/*",
+    "https://api.github.com/*"
   ],
   "minimum_chrome_version": "88"
 }
