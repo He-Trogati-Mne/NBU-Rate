@@ -7,6 +7,24 @@
     <meta name="theme-color" content="#1a73e8" />
     <title>Курс НБУ</title>
 
+    <!-- SEO / social -->
+    <meta name="description" content="Офіційні курси валют НБУ, конвертер, історія з 2020 року. Курси ПриватБанку, МоноБанку, криптовалют." />
+    <meta name="color-scheme" content="light dark" />
+    <meta property="og:title" content="Курс НБУ" />
+    <meta property="og:description" content="Офіційні курси валют НБУ, конвертер, історія з 2020 року" />
+    <meta property="og:type" content="website" />
+
+    <!-- Ускорение: preconnect к внешним CDN -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://flagcdn.com" crossorigin>
+    <link rel="preconnect" href="https://nbu-rate.nightmod.workers.dev" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://flagcdn.com">
+    <link rel="dns-prefetch" href="https://bank.gov.ua">
+
+    <!-- Chart.js нужен всегда — просим скачать его раньше -->
+    <link rel="preload" href="chart.umd.min.js" as="script">
+
     <script>
     var safeLS = (function() {
         var ok = true;
@@ -111,22 +129,17 @@
                 rose: 'color-fvcn/red.ico'
             };
 
-            var oldLinks = document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]');
-            for (var i = 0; i < oldLinks.length; i++) oldLinks[i].remove();
-
-            var useIcon;
-            if (t === 'custom' && preset && icons[preset]) {
-                useIcon = icons[preset];
-            } else {
-                useIcon = 'favicon.ico';
+            // Ускорение: не пересоздаём <link>, не подставляем cache-buster — браузер берёт из кэша
+            var useIcon = (t === 'custom' && preset && icons[preset]) ? icons[preset] : 'favicon.ico';
+            var link = document.getElementById('favicon-link');
+            if (!link) {
+                link = document.createElement('link');
+                link.id = 'favicon-link';
+                link.rel = 'icon';
+                link.type = 'image/x-icon';
+                document.head.appendChild(link);
             }
-
-            var newLink = document.createElement('link');
-            newLink.id = 'favicon-link';
-            newLink.rel = 'icon';
-            newLink.type = 'image/x-icon';
-            newLink.href = useIcon + '?v=' + Date.now();
-            document.head.appendChild(newLink);
+            if (link.getAttribute('href') !== useIcon) link.href = useIcon;
 
         } catch (e) {}
     })();
@@ -233,6 +246,7 @@
             background:var(--bg-elev); border:1px solid var(--border);
             border-radius:var(--radius-xl); padding:28px; margin-bottom:24px;
             box-shadow:var(--shadow-sm);
+            contain: layout style;
         }
         .section-head { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
         .section-title { display:flex; align-items:center; justify-content:center; gap:12px; font-size:15px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; text-align:center; }
@@ -313,6 +327,7 @@
             transition:all 0.2s cubic-bezier(0.4,0,0.2,1);
             position:relative; overflow:hidden;
             min-height:118px; display:flex; flex-direction:column; gap:10px;
+            contain: layout style paint;
         }
         @media (hover:hover) {
             .rate-card:hover { border-color:var(--accent); background:var(--bg-elev); transform:translateY(-2px); box-shadow:0 4px 12px rgba(15,20,25,0.08); }
@@ -786,7 +801,7 @@
                     <div class="converter-input-wrap">
                         <input type="number" id="conv-from" value="1" min="0" step="any" inputmode="decimal" />
                         <div class="currency-picker" id="conv-from-picker" data-value="USD">
-                            <img class="flag-mini" src="https://flagcdn.com/w80/us.png" alt="" onerror="this.style.display='none'">
+                            <img class="flag-mini" src="https://flagcdn.com/w40/us.png" alt="" width="28" height="20" loading="lazy" decoding="async" onerror="this.style.display='none'">
                             <span class="code">USD</span>
                             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                         </div>
@@ -802,7 +817,7 @@
                     <div class="converter-input-wrap">
                         <input type="number" id="conv-to" value="0" readonly />
                         <div class="currency-picker" id="conv-to-picker" data-value="UAH">
-                            <img class="flag-mini" src="https://flagcdn.com/w80/ua.png" alt="" onerror="this.style.display='none'">
+                            <img class="flag-mini" src="https://flagcdn.com/w40/ua.png" alt="" width="28" height="20" loading="lazy" decoding="async" onerror="this.style.display='none'">
                             <span class="code">UAH</span>
                             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                         </div>
@@ -902,35 +917,35 @@
                 <span data-i18n="privacy_title">Політика конфіденційності</span>
             </summary>
             <div class="privacy-body">
-                <h3>Які дані ми збираємо</h3>
-                <p>Сайт «Курс НБУ» не збирає жодних персональних даних: ні ім'я, ні email, ні історію, ні місцезнаходження.</p>
-                <h3>Що зберігається</h3>
-                <p>Усі налаштування (тема, мова, вибір валют) зберігаються локально у браузері через <code>localStorage</code>.</p>
-                <h3>Зовнішні запити</h3>
-                <p>Курси валют читаються з публічного репозиторію на GitHub, який оновлюється з офіційних API: <code>bank.gov.ua</code>, <code>api.privatbank.ua</code>, <code>api.monobank.ua</code>, <code>api.coingecko.com</code>. Іконки криптовалют — <code>cdn.jsdelivr.net</code>. Прапори — <code>flagcdn.com</code>.</p>
+                <h3 data-i18n="privacy_h_what">Які дані ми збираємо</h3>
+                <p data-i18n="privacy_p_what">Сайт «Курс НБУ» не збирає жодних персональних даних: ні ім'я, ні email, ні історію, ні місцезнаходження.</p>
+                <h3 data-i18n="privacy_h_stored">Що зберігається</h3>
+                <p data-i18n-html="privacy_p_stored">Усі налаштування (тема, мова, вибір валют) зберігаються локально у браузері через <code>localStorage</code>.</p>
+                <h3 data-i18n="privacy_h_external">Зовнішні запити</h3>
+                <p data-i18n-html="privacy_p_external">Курси валют читаються з публічного репозиторію на GitHub, який оновлюється з офіційних API: <code>bank.gov.ua</code>, <code>api.privatbank.ua</code>, <code>api.monobank.ua</code>, <code>api.coingecko.com</code>. Іконки криптовалют — <code>cdn.jsdelivr.net</code>. Прапори — <code>flagcdn.com</code>.</p>
             </div>
         </details>
 
         <footer class="page-footer">
             <a href="https://github.com/He-Trogati-Mne/NBU-Rate" target="_blank" rel="noopener" class="footer-item">
-                <img class="footer-icon" src="svg/github.svg" alt="GitHub" onerror="this.style.display='none'">
+                <img class="footer-icon" src="svg/github.svg" alt="GitHub" width="16" height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
                 <span>GitHub</span>
             </a>
             <span class="footer-sep">·</span>
             <a href="https://addons.mozilla.org/ru/firefox/addon/nbu-rate/" target="_blank" rel="noopener" class="footer-item">
-                <img class="footer-icon" src="svg/firefox.svg" alt="Firefox" onerror="this.style.display='none'">
+                <img class="footer-icon" src="svg/firefox.svg" alt="Firefox" width="16" height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
                 <span>Firefox</span>
             </a>
             <span class="footer-sep">·</span>
             <a href="https://microsoftedge.microsoft.com/addons/detail/%D0%BA%D1%83%D1%80%D1%81-%D0%BD%D0%B1%D1%83/hjndboldkmconodmenmccdekhmnnlhbp"
                target="_blank" rel="noopener" class="footer-item">
-                <img class="footer-icon" src="svg/edge.svg" alt="Edge" onerror="this.style.display='none'">
+                <img class="footer-icon" src="svg/edge.svg" alt="Edge" width="16" height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
                 <span>Edge</span>
             </a>
             <span class="footer-sep">·</span>
             <a href="https://chromewebstore.google.com/detail/%D0%BA%D1%83%D1%80%D1%81-%D0%BD%D0%B1%D1%83/llhcdbfoebdcmlfiojpjkbejdbopoggo"
                target="_blank" rel="noopener" class="footer-item">
-                <img class="footer-icon" src="svg/chrome.svg" alt="Chrome" onerror="this.style.display='none'">
+                <img class="footer-icon" src="svg/chrome.svg" alt="Chrome" width="16" height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
                 <span>Chrome</span>
             </a>
         </footer>
@@ -998,22 +1013,22 @@
                     <div class="presets">
                         <span class="label" data-i18n="color_preset_label">Швидкі пресети:</span>
                         <button class="preset-swatch" data-preset="midnight" title="Midnight">
-                            <img src="color-fvcn/blue128.png" alt="Midnight" onerror="this.src='color-fvcn/blue32.png'">
+                            <img src="color-fvcn/blue128.png" alt="Midnight" width="40" height="40" loading="lazy" decoding="async" onerror="this.src='color-fvcn/blue32.png'">
                         </button>
                         <button class="preset-swatch" data-preset="nord" title="Nord">
-                            <img src="color-fvcn/lightblue128.png" alt="Nord" onerror="this.src='color-fvcn/lightblue32.png'">
+                            <img src="color-fvcn/lightblue128.png" alt="Nord" width="40" height="40" loading="lazy" decoding="async" onerror="this.src='color-fvcn/lightblue32.png'">
                         </button>
                         <button class="preset-swatch" data-preset="dracula" title="Dracula">
-                            <img src="color-fvcn/purple128.png" alt="Dracula" onerror="this.src='color-fvcn/purple32.png'">
+                            <img src="color-fvcn/purple128.png" alt="Dracula" width="40" height="40" loading="lazy" decoding="async" onerror="this.src='color-fvcn/purple32.png'">
                         </button>
                         <button class="preset-swatch" data-preset="sepia" title="Sepia">
-                            <img src="color-fvcn/brown128.png" alt="Sepia" onerror="this.src='color-fvcn/brown32.png'">
+                            <img src="color-fvcn/brown128.png" alt="Sepia" width="40" height="40" loading="lazy" decoding="async" onerror="this.src='color-fvcn/brown32.png'">
                         </button>
                         <button class="preset-swatch" data-preset="forest" title="Forest">
-                            <img src="color-fvcn/green128.png" alt="Forest" onerror="this.src='color-fvcn/green32.png'">
+                            <img src="color-fvcn/green128.png" alt="Forest" width="40" height="40" loading="lazy" decoding="async" onerror="this.src='color-fvcn/green32.png'">
                         </button>
                         <button class="preset-swatch" data-preset="rose" title="Rose">
-                            <img src="color-fvcn/red128.png" alt="Rose" onerror="this.src='color-fvcn/red32.png'">
+                            <img src="color-fvcn/red128.png" alt="Rose" width="40" height="40" loading="lazy" decoding="async" onerror="this.src='color-fvcn/red32.png'">
                         </button>
                         <button class="reset-btn" id="reset-colors">
                             <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
@@ -1222,8 +1237,8 @@
         const CARD_RATE_ORDER_IDX = Object.fromEntries(CARD_RATE_ORDER.map((c, i) => [c, i]));
 
         const BANK_LOGOS = {
-            privat: `<img src="bank/privat.png" class="bank-logo" alt="PrivatBank" onerror="this.style.display='none'">`,
-            mono:   `<img src="bank/mono.png" class="bank-logo" alt="MonoBank" onerror="this.style.display='none'">`
+            privat: `<img src="bank/privat.png" class="bank-logo" alt="PrivatBank" width="32" height="32" loading="lazy" decoding="async" onerror="this.style.display='none'">`,
+            mono:   `<img src="bank/mono.png" class="bank-logo" alt="MonoBank" width="32" height="32" loading="lazy" decoding="async" onerror="this.style.display='none'">`
         };
 
         const TRANSLATIONS = {
@@ -1235,6 +1250,12 @@
                 section_card_rates: 'Курс Валют по картам',
                 section_crypto: 'Криптовалюта',
                 privacy_title: 'Політика конфіденційності',
+                privacy_h_what: 'Які дані ми збираємо',
+                privacy_p_what: 'Сайт «Курс НБУ» не збирає жодних персональних даних: ні ім\'я, ні email, ні історію, ні місцезнаходження.',
+                privacy_h_stored: 'Що зберігається',
+                privacy_p_stored: 'Усі налаштування (тема, мова, вибір валют) зберігаються локально у браузері через <code>localStorage</code>.',
+                privacy_h_external: 'Зовнішні запити',
+                privacy_p_external: 'Курси валют читаються з публічного репозиторію на GitHub, який оновлюється з офіційних API: <code>bank.gov.ua</code>, <code>api.privatbank.ua</code>, <code>api.monobank.ua</code>, <code>api.coingecko.com</code>. Іконки криптовалют — <code>cdn.jsdelivr.net</code>. Прапори — <code>flagcdn.com</code>.',
                 label_from: 'З валюти', label_to: 'У валюту',
                 settings_title: 'Налаштування',
                 settings_language: 'Мова', settings_theme: 'Тема', settings_a11y: 'Доступність',
@@ -1292,6 +1313,12 @@
                 section_card_rates: 'Card Rates',
                 section_crypto: 'Cryptocurrency',
                 privacy_title: 'Privacy Policy',
+                privacy_h_what: 'What data we collect',
+                privacy_p_what: 'The "NBU Rate" site does not collect any personal data: no name, no email, no browsing history, no location.',
+                privacy_h_stored: 'What is stored',
+                privacy_p_stored: 'All settings (theme, language, currency selection) are stored locally in your browser via <code>localStorage</code>.',
+                privacy_h_external: 'External requests',
+                privacy_p_external: 'Exchange rates are read from a public GitHub repository that is updated from official APIs: <code>bank.gov.ua</code>, <code>api.privatbank.ua</code>, <code>api.monobank.ua</code>, <code>api.coingecko.com</code>. Cryptocurrency icons — <code>cdn.jsdelivr.net</code>. Flags — <code>flagcdn.com</code>.',
                 label_from: 'From', label_to: 'To',
                 settings_title: 'Settings',
                 settings_language: 'Language', settings_theme: 'Theme', settings_a11y: 'Accessibility',
@@ -1421,7 +1448,8 @@
         function flagUrl(code) {
             const f = FLAG_CODES[code];
             if (!f) return null;
-            return `https://flagcdn.com/w80/${f}.png`;
+            // w40 хватает для 26×18 px даже на Retina — экономия ~50% трафика
+            return `https://flagcdn.com/w40/${f}.png`;
         }
         function flagHtml(code, cssClass = 'rate-flag') {
             if (code in METAL_COLORS) {
@@ -1429,7 +1457,7 @@
             }
             const url = flagUrl(code);
             if (!url) return `<span class="${cssClass}-fallback">${code}</span>`;
-            return `<img class="${cssClass}" src="${url}" alt="${code}" onerror="this.style.display='none'">`;
+            return `<img class="${cssClass}" src="${url}" alt="${code}" width="26" height="18" loading="lazy" decoding="async" onerror="this.style.display='none'">`;
         }
 
         function cryptoIcon(symbol) {
@@ -1437,7 +1465,7 @@
             const url = `${CRYPTO_ICONS}/${lower}.svg`;
             const fallbackColor = CRYPTO_COLORS[symbol] || '#666';
             const letter = String(symbol).charAt(0);
-            return `<img class="crypto-icon" src="${url}" alt="${symbol}" loading="lazy"
+            return `<img class="crypto-icon" src="${url}" alt="${symbol}" loading="lazy" decoding="async"
                         onerror="var s=document.createElement('span');s.className='crypto-icon-fallback';s.style.background='${fallbackColor}';s.textContent='${letter}';this.replaceWith(s);">`;
         }
 
@@ -1495,23 +1523,23 @@
             return (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) / 255;
         }
 
+        // Ускорение: обновляем href, не пересоздаём <link>, без cache-buster
         function setFavicon(presetName) {
-            document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]').forEach(l => l.remove());
             const theme = safeLS.getItem(THEME_KEY) || 'system';
             const useIcon = (theme === 'custom' && presetName && PRESET_ICONS[presetName])
                 ? PRESET_ICONS[presetName]
                 : DEFAULT_FAVICON;
-            const link = document.createElement('link');
-            link.id = 'favicon-link';
-            link.rel = 'icon';
-            link.type = 'image/x-icon';
-            link.href = useIcon + '?v=' + Date.now();
-            document.head.appendChild(link);
+            let link = document.getElementById('favicon-link');
+            if (!link) {
+                link = document.createElement('link');
+                link.id = 'favicon-link';
+                link.rel = 'icon';
+                link.type = 'image/x-icon';
+                document.head.appendChild(link);
+            }
+            if (link.getAttribute('href') !== useIcon) link.href = useIcon;
         }
 
-        /* ============================================================
-           СЕТЬ: retry + таймаут
-           ============================================================ */
         async function fetchWithTimeout(url, timeout, retries = 2) {
             let lastErr;
             for (let attempt = 0; attempt <= retries; attempt++) {
@@ -1554,9 +1582,6 @@
             }));
         }
 
-        /* ============================================================
-           КЭШ
-           ============================================================ */
         function cacheKey(source) { return CACHE_KEY_PREFIX + source; }
         function loadLiveCache(source, allowStale = false) {
             try {
@@ -1797,6 +1822,7 @@
         function applyTranslations() {
             document.documentElement.setAttribute('lang', currentLang);
             document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+            document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
             const si = $('#picker-search'); if (si) si.placeholder = t('picker_search');
             $$('.period-btn').forEach(btn => { btn.textContent = t('period_' + btn.dataset.period.toLowerCase()); });
             $$('#theme-switch button').forEach(btn => { btn.textContent = t('theme_' + btn.dataset.theme); });
@@ -1840,9 +1866,6 @@
             return num.toLocaleString('uk-UA', { minimumFractionDigits: d, maximumFractionDigits: d });
         }
 
-        /* ============================================================
-           Загрузка live-курсов: сначала stale-кэш, потом сеть
-           ============================================================ */
         async function loadLiveRates(source) {
             const fresh = loadLiveCache(source, false);
             const stale = loadLiveCache(source, true);
@@ -1929,7 +1952,6 @@
             const container = $('#current-rates');
             setStatus(t('status_loading'), 'loading');
 
-            // ⚡ Ранний рендер из stale-кэша: покажем что-то сразу
             const stale = loadLiveCache('nbu', true);
             if (stale && Array.isArray(stale)) {
                 stale.forEach(r => { liveRates[r.cc] = r; });
@@ -2290,7 +2312,20 @@
             gradient.addColorStop(0, hexToRgba(color, 0.28));
             gradient.addColorStop(1, hexToRgba(color, 0));
             const dec = currentDecimals();
-            if (chartInstance) chartInstance.destroy();
+
+            // Ускорение: если график уже есть — просто обновляем данные, без destroy/create
+            if (chartInstance && chartInstance.data && chartInstance.data.datasets.length) {
+                chartInstance.data.labels = labels;
+                chartInstance.data.datasets[0].data = data;
+                chartInstance.data.datasets[0].label = `${currentCurrency} / UAH`;
+                chartInstance.data.datasets[0].borderColor = color;
+                chartInstance.data.datasets[0].backgroundColor = gradient;
+                chartInstance.options.scales.y.ticks.callback = (v) => v.toFixed(dec) + ' ₴';
+                chartInstance.options.plugins.tooltip.callbacks.label = (c) => `${c.parsed.y.toFixed(dec)} ₴`;
+                chartInstance.update('none');
+                return;
+            }
+
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: { labels, datasets: [{ label: `${currentCurrency} / UAH`, data, borderColor: color, backgroundColor: gradient, tension: 0.35, fill: true, pointRadius: 0, pointHoverRadius: 6, pointHoverBackgroundColor: color, pointHoverBorderColor: '#fff', pointHoverBorderWidth: 3, borderWidth: 2.5 }] },
@@ -2317,7 +2352,7 @@
                     flag = `<span class="flag-metal-wrap" style="width:32px;height:22px;background:${METAL_COLORS[opt.code]};"></span>`;
                 } else {
                     const url = flagUrl(opt.code);
-                    flag = url ? `<img class="rate-flag" src="${url}" alt="" onerror="this.style.display='none'">` : '';
+                    flag = url ? `<img class="rate-flag" src="${url}" alt="" width="26" height="18" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '';
                 }
                 return `<div class="picker-item" data-value="${opt.code}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;">${flag}<span style="font-weight:800;font-family:ui-monospace,monospace;font-size:14px;color:var(--accent);min-width:46px;">${opt.code}</span><span style="font-size:14px;color:var(--text-muted);">${opt.name}</span></div>`;
             }).join('');
@@ -2347,6 +2382,9 @@
                     const img = document.createElement('img');
                     img.className = 'flag-mini';
                     img.src = url;
+                    img.width = 28; img.height = 20;
+                    img.loading = 'lazy';
+                    img.decoding = 'async';
                     img.onerror = function() { this.style.display = 'none'; };
                     picker.insertBefore(img, picker.firstChild);
                 }
