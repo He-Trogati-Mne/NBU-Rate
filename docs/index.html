@@ -129,7 +129,7 @@
                 rose: 'color-fvcn/red.ico'
             };
 
-            // Ускорение: не пересоздаём <link>, не подставляем cache-buster — браузер берёт из кэша
+            // Ускорение: не пересоздаём <link>, не подставляем cache-buster
             var useIcon = (t === 'custom' && preset && icons[preset]) ? icons[preset] : 'favicon.ico';
             var link = document.getElementById('favicon-link');
             if (!link) {
@@ -1416,7 +1416,7 @@
         const HISTORY_CACHE_KEY = 'nbu_site_history_v11';
         const START_DATE = '20200101';
         const REQUEST_TIMEOUT = 30000;
-        const CONCURRENCY = 4;
+        const CONCURRENCY = 6;
 
         let currentLang = safeLS.getItem(LANG_KEY) || 'uk';
         let showPreciseRate = true;
@@ -1432,6 +1432,7 @@
         let cryptoDataMap = {};
         let latestDate = '';
         let pickerTarget = null;
+        let historyLoading = false;
 
         const $ = (s) => document.querySelector(s);
         const $$ = (s) => document.querySelectorAll(s);
@@ -1448,7 +1449,6 @@
         function flagUrl(code) {
             const f = FLAG_CODES[code];
             if (!f) return null;
-            // w40 хватает для 26×18 px даже на Retina — экономия ~50% трафика
             return `https://flagcdn.com/w40/${f}.png`;
         }
         function flagHtml(code, cssClass = 'rate-flag') {
@@ -1523,7 +1523,6 @@
             return (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) / 255;
         }
 
-        // Ускорение: обновляем href, не пересоздаём <link>, без cache-buster
         function setFavicon(presetName) {
             const theme = safeLS.getItem(THEME_KEY) || 'system';
             const useIcon = (theme === 'custom' && presetName && PRESET_ICONS[presetName])
@@ -1813,7 +1812,7 @@
                     if (Object.keys(liveRates).length > 0) renderCards(liveRates);
                     loadCardRates();
                     convert();
-                    renderChart();
+                    if (Object.keys(historicalRates).length > 0) renderChart();
                     renderCryptoCards();
                 });
             }
@@ -1925,7 +1924,7 @@
             await Promise.all(workers);
         }
 
-        async function loadHistoryNBU() {
+        async function loadHistoryNBU(silent = false) {
             const cached = loadHistoryCache();
             if (cached && Object.keys(cached).length > 0) {
                 historicalRates = cached;
@@ -1940,7 +1939,7 @@
                     if (!historicalRates[date]) historicalRates[date] = {};
                     Object.assign(historicalRates[date], history[date]);
                 });
-            }, (done, total) => {
+            }, silent ? null : (done, total) => {
                 setStatus(t('status_loading_n', {n: done, total}), 'loading');
             });
             saveHistoryCache(historicalRates);
@@ -1952,13 +1951,13 @@
             const container = $('#current-rates');
             setStatus(t('status_loading'), 'loading');
 
+            // ⚡ Ранний рендер из stale-кэша
             const stale = loadLiveCache('nbu', true);
             if (stale && Array.isArray(stale)) {
                 stale.forEach(r => { liveRates[r.cc] = r; });
                 if (Object.keys(liveRates).length > 0) {
                     renderCards(liveRates);
                     initConverter(liveRates);
-                    setStatus(t('status_updated', {date: new Date().toLocaleDateString('uk-UA')}), '');
                 }
             }
 
@@ -1971,19 +1970,29 @@
                     initConverter(liveRates);
                 }
 
+                // ✅ Данные уже на экране — сразу говорим "Оновлено"
+                const dateNow = formatDate(latestDate) || new Date().toLocaleDateString('uk-UA');
+                setStatus(t('status_updated', {date: dateNow}), '');
+
                 if (Object.keys(historicalRates).length === 0) {
-                    loadHistoryNBU()
-                        .then(() => {
-                            renderChart();
-                            renderCards(liveRates);
-                        })
-                        .catch(e => console.warn(e));
+                    if (!historyLoading) {
+                        historyLoading = true;
+                        // Історія вантажиться у фоні — БЕЗ зміни статусу
+                        loadHistoryNBU(true)
+                            .then(() => {
+                                renderChart();
+                                renderCards(liveRates);
+                                const d = formatDate(latestDate) || new Date().toLocaleDateString('uk-UA');
+                                setStatus(t('status_updated', {date: d}), '');
+                            })
+                            .catch(e => console.warn('[History]', e))
+                            .finally(() => { historyLoading = false; });
+                    }
                 } else {
                     renderChart();
                     renderCards(liveRates);
                 }
 
-                setStatus(t('status_updated', {date: new Date().toLocaleDateString('uk-UA')}), '');
                 loadCardRates();
                 loadCrypto();
             } catch (err) {
@@ -2313,7 +2322,7 @@
             gradient.addColorStop(1, hexToRgba(color, 0));
             const dec = currentDecimals();
 
-            // Ускорение: если график уже есть — просто обновляем данные, без destroy/create
+            // Ускорение: если график уже есть — просто обновляем данные
             if (chartInstance && chartInstance.data && chartInstance.data.datasets.length) {
                 chartInstance.data.labels = labels;
                 chartInstance.data.datasets[0].data = data;
