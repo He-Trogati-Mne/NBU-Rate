@@ -7,14 +7,12 @@
     <meta name="theme-color" content="#1a73e8" />
     <title>Курс НБУ</title>
 
-    <!-- SEO / social -->
     <meta name="description" content="Офіційні курси валют НБУ, конвертер, історія з 2020 року. Курси ПриватБанку, МоноБанку, криптовалют." />
     <meta name="color-scheme" content="light dark" />
     <meta property="og:title" content="Курс НБУ" />
     <meta property="og:description" content="Офіційні курси валют НБУ, конвертер, історія з 2020 року" />
     <meta property="og:type" content="website" />
 
-    <!-- Ускорение: preconnect к внешним CDN -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://flagcdn.com" crossorigin>
     <link rel="preconnect" href="https://nbu-rate.nightmod.workers.dev" crossorigin>
@@ -22,7 +20,6 @@
     <link rel="dns-prefetch" href="https://flagcdn.com">
     <link rel="dns-prefetch" href="https://bank.gov.ua">
 
-    <!-- Chart.js нужен всегда — просим скачать его раньше -->
     <link rel="preload" href="chart.umd.min.js" as="script">
 
     <script>
@@ -33,7 +30,6 @@
             localStorage.removeItem('__test__');
         } catch (e) {
             ok = false;
-            try { console.warn('[storage] localStorage заблокирован браузером — кэш и настройки работать не будут.'); } catch(_) {}
         }
         return {
             getItem: function(k)    { try { return ok ? localStorage.getItem(k) : null; } catch(_) { return null; } },
@@ -129,7 +125,6 @@
                 rose: 'color-fvcn/red.ico'
             };
 
-            // Ускорение: не пересоздаём <link>, не подставляем cache-buster
             var useIcon = (t === 'custom' && preset && icons[preset]) ? icons[preset] : 'favicon.ico';
             var link = document.getElementById('favicon-link');
             if (!link) {
@@ -232,21 +227,38 @@
             font-size:13px; font-weight:600; color:var(--text-muted); box-shadow:var(--shadow-sm);
         }
         .status-dot { width:8px; height:8px; border-radius:50%; background:var(--positive); box-shadow:0 0 0 3px color-mix(in srgb, var(--positive) 20%, transparent); }
-        .hero-status.loading .status-dot { background:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+        .hero-status.loading .status-dot { background:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); animation: pulse 1.5s ease-in-out infinite; }
         .hero-status.error   .status-dot { background:var(--negative); box-shadow:0 0 0 3px color-mix(in srgb, var(--negative) 20%, transparent); }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
         .settings-btn {
             position:absolute; top:24px; right:20px; background:var(--bg-elev);
             border:1px solid var(--border); width:44px; height:44px; border-radius:12px;
             cursor:pointer; color:var(--text-muted); display:flex; align-items:center;
-            justify-content:center; transition:all 0.15s; box-shadow:var(--shadow-sm); z-index:2;
+            justify-content:center; transition: color 0.2s, border-color 0.2s, transform 0.5s var(--ease-smooth), box-shadow 0.2s;
+            box-shadow:var(--shadow-sm); z-index:2;
         }
-        .settings-btn:hover { color:var(--accent); border-color:var(--accent); }
+        .settings-btn:hover { color:var(--accent); border-color:var(--accent); box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 25%, transparent); }
+        .settings-btn:active { transform: rotate(90deg) scale(0.92); }
+        .settings-btn.open { transform: rotate(120deg); color: var(--accent); border-color: var(--accent); }
         .settings-btn svg { width:20px; height:20px; }
         section.card {
             background:var(--bg-elev); border:1px solid var(--border);
             border-radius:var(--radius-xl); padding:28px; margin-bottom:24px;
             box-shadow:var(--shadow-sm);
             contain: layout style;
+            animation: cardFadeIn 0.5s var(--ease-smooth) backwards;
+        }
+        section.card:nth-of-type(1) { animation-delay: 0.05s; }
+        section.card:nth-of-type(2) { animation-delay: 0.1s; }
+        section.card:nth-of-type(3) { animation-delay: 0.15s; }
+        section.card:nth-of-type(4) { animation-delay: 0.2s; }
+        section.card:nth-of-type(5) { animation-delay: 0.25s; }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .section-head { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:24px; flex-wrap:wrap; }
         .section-title { display:flex; align-items:center; justify-content:center; gap:12px; font-size:15px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; text-align:center; }
@@ -279,7 +291,8 @@
             image-rendering: -webkit-optimize-contrast;
         }
         .currency-picker .code { font-weight:800; font-size:15px; }
-        .currency-picker .chev { width:14px; height:14px; color:var(--text-faint); }
+        .currency-picker .chev { width:14px; height:14px; color:var(--text-faint); transition: transform 0.25s var(--ease-smooth); }
+        .currency-picker:hover .chev { transform: translateY(2px); }
         .flag-metal-wrap {
             display:inline-flex; align-items:center; justify-content:center;
             border-radius:4px; overflow:hidden; flex-shrink:0; box-sizing:border-box;
@@ -315,7 +328,12 @@
         }
         .copy-btn:hover { color:var(--accent); border-color:var(--accent); }
         .copy-btn svg { width:16px; height:16px; }
-        .copy-btn.copied { color:var(--positive); border-color:var(--positive); }
+        .copy-btn.copied { color:var(--positive); border-color:var(--positive); animation: popIn 0.35s var(--ease-smooth); }
+        @keyframes popIn {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
 
         .rate-grid {
             display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
@@ -324,7 +342,8 @@
         .rate-card {
             background:var(--surface-1); border:1.5px solid var(--border);
             border-radius:var(--radius); padding:18px; cursor:pointer;
-            transition:all 0.2s cubic-bezier(0.4,0,0.2,1);
+            transition:border-color 0.2s var(--ease-soft), background-color 0.2s var(--ease-soft),
+                       transform 0.2s var(--ease-soft), box-shadow 0.2s var(--ease-soft);
             position:relative; overflow:hidden;
             min-height:118px; display:flex; flex-direction:column; gap:10px;
             contain: layout style paint;
@@ -350,6 +369,7 @@
             font-size:17px; font-weight:800;
             font-family: ui-monospace, Menlo, Consolas, monospace;
             letter-spacing:-0.3px;
+            transition: color 0.25s var(--ease-soft);
         }
         .rate-value.up { color:var(--positive); }
         .rate-value.down { color:var(--negative); }
@@ -390,6 +410,11 @@
             font-size:11px; font-weight:700;
             font-family: ui-monospace, monospace;
             padding:3px 8px; border-radius:6px; align-self:flex-start;
+            animation: badgeIn 0.4s var(--ease-smooth) backwards;
+        }
+        @keyframes badgeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .rate-change.up   { color:var(--positive); background:color-mix(in srgb, var(--positive) 12%, transparent); }
         .rate-change.down { color:var(--negative); background:color-mix(in srgb, var(--negative) 12%, transparent); }
@@ -469,12 +494,16 @@
         .privacy-card summary::after {
             content:''; width:8px; height:8px; border-right:2px solid var(--text-muted);
             border-bottom:2px solid var(--text-muted); transform:rotate(45deg);
-            margin-left:auto; transition:transform 0.25s;
+            margin-left:auto; transition:transform 0.3s var(--ease-smooth);
         }
         .privacy-card[open] summary::after { transform:rotate(-135deg); }
         .privacy-card summary:hover { background:var(--hover); }
         .privacy-card summary svg { width:20px; height:20px; stroke:var(--accent); stroke-width:2.2; fill:none; flex-shrink:0; }
-        .privacy-body { padding:0 28px 28px; color:var(--text-muted); font-size:14px; line-height:1.7; }
+        .privacy-body { padding:0 28px 28px; color:var(--text-muted); font-size:14px; line-height:1.7; animation: privacyReveal 0.35s var(--ease-smooth); }
+        @keyframes privacyReveal {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .privacy-body h3 { font-size:15px; color:var(--text); margin:20px 0 8px; }
         .privacy-body h3:first-child { margin-top:0; }
         .privacy-body p { margin-bottom:8px; }
@@ -568,19 +597,36 @@
             .footer-icon { width: 18px; height: 18px; }
         }
 
+        /* === MODAL with animation === */
         .modal {
             position:fixed; inset:0; background:rgba(0,0,0,0.5);
-            backdrop-filter:blur(4px); display:none; align-items:flex-start;
+            backdrop-filter:blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            display:flex; align-items:flex-start;
             justify-content:center; padding:40px 16px;
             padding-top:max(40px, calc(env(safe-area-inset-top) + 24px));
             padding-bottom:max(40px, calc(env(safe-area-inset-bottom) + 24px));
             overflow-y:auto; z-index:1500;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.28s var(--ease-soft), visibility 0s linear 0.28s, backdrop-filter 0.28s var(--ease-soft);
         }
-        .modal.visible { display:flex; }
+        .modal.visible {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.28s var(--ease-soft), visibility 0s, backdrop-filter 0.28s var(--ease-soft);
+        }
         .modal-panel {
             background:var(--bg-elev); border:1px solid var(--border);
             border-radius:var(--radius-xl); padding:26px; max-width:560px; width:100%;
             box-shadow:var(--shadow-lg);
+            transform: translateY(24px) scale(0.96);
+            opacity: 0;
+            transition: transform 0.42s var(--ease-smooth), opacity 0.32s var(--ease-smooth);
+        }
+        .modal.visible .modal-panel {
+            transform: translateY(0) scale(1);
+            opacity: 1;
         }
         .modal-head { display:flex; align-items:center; justify-content:center; margin-bottom:26px; position:relative; padding:0 40px; }
         .modal-title { font-size:19px; font-weight:800; text-align:center; }
@@ -588,7 +634,33 @@
             position:absolute; right:0; top:50%; transform:translateY(-50%);
             background:none; border:none; color:var(--text-muted); font-size:26px;
             line-height:1; cursor:pointer; padding:4px 10px; border-radius:8px;
+            transition: color 0.2s, background-color 0.2s, transform 0.35s var(--ease-smooth);
         }
+        .modal-close:hover { color: var(--negative); background: var(--hover); transform: translateY(-50%) rotate(90deg); }
+        .modal-close:active { transform: translateY(-50%) rotate(90deg) scale(0.9); }
+
+        /* Stagger-анимация секций настроек при открытии */
+        .modal.visible .settings-group {
+            animation: settingsGroupIn 0.45s var(--ease-smooth) backwards;
+        }
+        .modal.visible .settings-group:nth-child(2) { animation-delay: 0.06s; }
+        .modal.visible .settings-group:nth-child(3) { animation-delay: 0.12s; }
+        .modal.visible .settings-group:nth-child(4) { animation-delay: 0.18s; }
+        .modal.visible .settings-group:nth-child(5) { animation-delay: 0.24s; }
+        @keyframes settingsGroupIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stagger для списка палитр */
+        .palette-list.visible .palette-item {
+            animation: settingsGroupIn 0.35s var(--ease-smooth) backwards;
+        }
+        .palette-list.visible .palette-item:nth-child(1) { animation-delay: 0.02s; }
+        .palette-list.visible .palette-item:nth-child(2) { animation-delay: 0.07s; }
+        .palette-list.visible .palette-item:nth-child(3) { animation-delay: 0.12s; }
+        .palette-list.visible .palette-item:nth-child(4) { animation-delay: 0.17s; }
+
         .settings-group { margin-bottom:24px; text-align:center; }
         .settings-group:last-child { margin-bottom:0; }
         .settings-group-title {
@@ -604,17 +676,21 @@
         .segmented button {
             flex:1; min-height:40px; border:none; background:transparent;
             color:var(--text-muted); padding:9px 14px; font-size:13px; font-weight:700;
-            cursor:pointer; border-radius:8px; transition:all 0.15s; font-family:inherit;
+            cursor:pointer; border-radius:8px; transition:all 0.2s var(--ease-soft); font-family:inherit;
         }
-        .segmented button.active { background:var(--accent); color:var(--accent-text); }
+        .segmented button:hover { color: var(--text); background: var(--hover); }
+        .segmented button.active { background:var(--accent); color:var(--accent-text); transform: scale(1.02); }
         .color-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; padding:8px 0; text-align:left; }
         .color-row label { width:80px; font-size:13px; font-weight:700; color:var(--text-muted); }
-        .color-row input[type="color"] { width:48px; height:40px; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; background:var(--surface-1); padding:3px; }
+        .color-row input[type="color"] { width:48px; height:40px; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; background:var(--surface-1); padding:3px; transition: transform 0.2s var(--ease-soft); }
+        .color-row input[type="color"]:hover { transform: scale(1.08); }
         .color-row input[type="text"] {
             flex:1; min-width:0; padding:10px 12px; font-family:ui-monospace,monospace;
             font-size:13px; font-weight:700; background:var(--surface-1); color:var(--text);
             border:1.5px solid var(--border); border-radius:10px; text-transform:uppercase; outline:none;
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
+        .color-row input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
         .presets {
             display:flex; flex-wrap:wrap; gap:10px; margin-top:14px;
@@ -631,7 +707,7 @@
             padding: 0; overflow: hidden;
             background: transparent;
             display: inline-flex; align-items: center; justify-content: center;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            transition: transform 0.25s var(--ease-smooth), box-shadow 0.25s var(--ease-soft), border-color 0.2s;
             flex-shrink: 0;
         }
         .preset-swatch img {
@@ -639,12 +715,12 @@
         }
         @media (hover: hover) {
             .preset-swatch:hover {
-                transform: scale(1.12);
+                transform: scale(1.15) rotate(-4deg);
                 border-color: var(--accent);
                 box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 30%, transparent);
             }
         }
-        .preset-swatch:active { transform: scale(0.92); }
+        .preset-swatch:active { transform: scale(0.9); }
 
         .reset-btn {
             margin-left:auto; background:transparent;
@@ -661,6 +737,7 @@
                 border-color: var(--text-muted);
             }
         }
+        .reset-btn:active { transform: scale(0.94); }
         .reset-btn svg {
             width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2;
             transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
@@ -672,7 +749,10 @@
             padding:14px 16px; border-radius:var(--radius); background:var(--surface-1);
             border:1.5px solid transparent; cursor:pointer;
             margin-bottom:8px; user-select:none; min-height:60px; text-align:left;
+            transition: background-color 0.2s var(--ease-soft), border-color 0.2s var(--ease-soft), transform 0.15s var(--ease-soft);
         }
+        .toggle-row:hover { transform: translateX(2px); }
+        .toggle-row:active { transform: scale(0.99); }
         .toggle-row:has(input:checked) { background:color-mix(in srgb, var(--accent) 8%, var(--surface-1)); border-color:color-mix(in srgb, var(--accent) 35%, transparent); }
         .toggle-text { display:flex; flex-direction:column; gap:3px; flex:1; min-width:0; }
         .toggle-title { font-size:14px; font-weight:700; }
@@ -682,7 +762,7 @@
         .toggle-slider { position:absolute; inset:0; background:var(--border-strong); border-radius:30px; transition:background 0.25s; cursor:pointer; }
         .toggle-slider::before {
             content:''; position:absolute; height:22px; width:22px; left:3px; top:3px;
-            background:#fff; border-radius:50%; transition:transform 0.25s;
+            background:#fff; border-radius:50%; transition:transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.2s;
             box-shadow:0 2px 4px rgba(0,0,0,0.25);
         }
         .toggle-switch input:checked + .toggle-slider { background:var(--accent); }
@@ -707,7 +787,9 @@
             cursor: pointer;
             box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 50%, transparent);
             border: 2px solid var(--bg-elev);
+            transition: transform 0.15s var(--ease-soft);
         }
+        input[type="range"].font-slider::-webkit-slider-thumb:active { transform: scale(1.2); }
         input[type="range"].font-slider::-moz-range-thumb {
             width: 24px; height: 24px; border-radius: 50%;
             background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 75%, #000));
@@ -718,11 +800,13 @@
             font-weight: 800; font-size: 13px; color: var(--accent);
             font-family: ui-monospace, Menlo, Consolas, monospace;
             min-width: 52px; text-align: right; flex-shrink: 0;
+            transition: transform 0.15s var(--ease-soft);
         }
 
         .palette-list { margin:4px 0 14px; padding:0 14px; display:none; flex-direction:column; gap:6px; text-align:left; }
         .palette-list.visible { display:flex; }
-        .palette-item { display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:10px; background:var(--surface-1); border:1.5px solid transparent; cursor:pointer; min-width: 0; flex-wrap: wrap; }
+        .palette-item { display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:10px; background:var(--surface-1); border:1.5px solid transparent; cursor:pointer; min-width: 0; flex-wrap: wrap; transition: background-color 0.2s, border-color 0.2s, transform 0.15s; }
+        .palette-item:hover { transform: translateX(2px); }
         .palette-item:has(input:checked) { background:color-mix(in srgb, var(--accent) 8%, var(--surface-1)); border-color:color-mix(in srgb, var(--accent) 40%, transparent); }
         .palette-item input { accent-color:var(--accent); width:18px; height:18px; flex-shrink:0; cursor:pointer; }
         .palette-info { display:flex; flex-direction:column; gap:2px; flex:1; min-width:0; }
@@ -762,6 +846,8 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
             .footer-item:hover, a.footer-item:hover { transform: none !important; }
+            .modal-panel, .modal.visible .modal-panel,
+            .modal.visible .settings-group { transform: none !important; animation: none !important; opacity: 1 !important; }
         }
     </style>
 </head>
@@ -1173,7 +1259,6 @@
         'use strict';
 
         if (typeof Chart === 'undefined') {
-            console.warn('[Chart.js] не загрузился — графики будут недоступны');
             window.Chart = class {
                 constructor() { this.destroy = () => {}; }
                 update() {}
@@ -1431,6 +1516,7 @@
         let cryptoCoins = [];
         let cryptoDataMap = {};
         let latestDate = '';
+        let liveDate = '';
         let pickerTarget = null;
         let historyLoading = false;
 
@@ -1873,6 +1959,8 @@
                 const use = fresh || stale;
                 liveRates = {};
                 use.forEach(r => { liveRates[r.cc] = r; });
+                const firstWithDate = use.find(r => r.date);
+                if (firstWithDate) liveDate = firstWithDate.date;
                 saveLiveCache(source, use);
             }
 
@@ -1883,10 +1971,11 @@
                 if (!Array.isArray(rates) || rates.length === 0) throw new Error('Empty');
                 liveRates = {};
                 rates.forEach(r => { liveRates[r.cc] = r; });
+                const firstWithDate = rates.find(r => r.date);
+                if (firstWithDate) liveDate = firstWithDate.date;
                 saveLiveCache(source, rates);
                 return liveRates;
             } catch (e) {
-                console.warn('[LiveRates] сеть упала, использую stale-кэш:', e.message);
                 if (Object.keys(liveRates).length === 0) throw e;
                 return liveRates;
             }
@@ -1916,7 +2005,7 @@
                     const i = index++;
                     if (i >= items.length) return;
                     try { await fn(items[i], i); }
-                    catch (e) { console.warn(`[NBU] ${items[i]}:`, e.message); }
+                    catch (e) {}
                     done++;
                     if (onProgress) onProgress(done, total);
                 }
@@ -1951,10 +2040,11 @@
             const container = $('#current-rates');
             setStatus(t('status_loading'), 'loading');
 
-            // ⚡ Ранний рендер из stale-кэша
             const stale = loadLiveCache('nbu', true);
             if (stale && Array.isArray(stale)) {
                 stale.forEach(r => { liveRates[r.cc] = r; });
+                const firstWithDate = stale.find(r => r.date);
+                if (firstWithDate) liveDate = firstWithDate.date;
                 if (Object.keys(liveRates).length > 0) {
                     renderCards(liveRates);
                     initConverter(liveRates);
@@ -1970,22 +2060,22 @@
                     initConverter(liveRates);
                 }
 
-                // ✅ Данные уже на экране — сразу говорим "Оновлено"
-                const dateNow = formatDate(latestDate) || new Date().toLocaleDateString('uk-UA');
+                const dateNow = liveDate
+                    || formatDate(latestDate)
+                    || new Date().toLocaleDateString('uk-UA');
                 setStatus(t('status_updated', {date: dateNow}), '');
 
                 if (Object.keys(historicalRates).length === 0) {
                     if (!historyLoading) {
                         historyLoading = true;
-                        // Історія вантажиться у фоні — БЕЗ зміни статусу
                         loadHistoryNBU(true)
                             .then(() => {
                                 renderChart();
                                 renderCards(liveRates);
-                                const d = formatDate(latestDate) || new Date().toLocaleDateString('uk-UA');
+                                const d = liveDate || formatDate(latestDate) || new Date().toLocaleDateString('uk-UA');
                                 setStatus(t('status_updated', {date: d}), '');
                             })
-                            .catch(e => console.warn('[History]', e))
+                            .catch(() => {})
                             .finally(() => { historyLoading = false; });
                     }
                 } else {
@@ -1996,7 +2086,6 @@
                 loadCardRates();
                 loadCrypto();
             } catch (err) {
-                console.error('[Сайт] Помилка:', err);
                 if (Object.keys(liveRates).length > 0) return;
                 if (err && err.rateLimited) setStatus(t('status_rate_limited'), 'error');
                 else if (err && (err.name === 'TypeError' || /Failed to fetch/i.test(err.message))) setStatus(t('status_cors'), 'error');
@@ -2168,7 +2257,6 @@
                     });
                 });
             } catch (e) {
-                console.warn('[CardRates]', e);
                 privatGrid.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('load_error')}</p>`;
                 monoGrid.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('load_error')}</p>`;
             }
@@ -2185,7 +2273,6 @@
                 cryptoCoins.forEach(c => cryptoDataMap[c.symbol] = c);
                 renderCryptoCards();
             } catch (e) {
-                console.warn('[Crypto]', e);
                 grid.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('load_error')}</p>`;
             }
         }
@@ -2322,7 +2409,6 @@
             gradient.addColorStop(1, hexToRgba(color, 0));
             const dec = currentDecimals();
 
-            // Ускорение: если график уже есть — просто обновляем данные
             if (chartInstance && chartInstance.data && chartInstance.data.datasets.length) {
                 chartInstance.data.labels = labels;
                 chartInstance.data.datasets[0].data = data;
@@ -2348,7 +2434,7 @@
             renderPickerList('');
             $('#picker-modal').classList.add('visible');
             $('#picker-search').value = '';
-            setTimeout(() => $('#picker-search').focus(), 100);
+            setTimeout(() => $('#picker-search').focus(), 200);
         }
         function renderPickerList(query) {
             const list = $('#picker-list');
@@ -2363,7 +2449,7 @@
                     const url = flagUrl(opt.code);
                     flag = url ? `<img class="rate-flag" src="${url}" alt="" width="26" height="18" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '';
                 }
-                return `<div class="picker-item" data-value="${opt.code}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;">${flag}<span style="font-weight:800;font-family:ui-monospace,monospace;font-size:14px;color:var(--accent);min-width:46px;">${opt.code}</span><span style="font-size:14px;color:var(--text-muted);">${opt.name}</span></div>`;
+                return `<div class="picker-item" data-value="${opt.code}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:background-color 0.15s;">${flag}<span style="font-weight:800;font-family:ui-monospace,monospace;font-size:14px;color:var(--accent);min-width:46px;">${opt.code}</span><span style="font-size:14px;color:var(--text-muted);">${opt.name}</span></div>`;
             }).join('');
             list.querySelectorAll('.picker-item').forEach(el => {
                 el.addEventListener('mouseenter', () => el.style.background = 'var(--hover)');
@@ -2501,12 +2587,20 @@
             $('#picker-search').addEventListener('input', (e) => renderPickerList(e.target.value));
 
             const modal = $('#settings-modal');
-            $('#open-settings').addEventListener('click', () => modal.classList.add('visible'));
-            $('#close-settings').addEventListener('click', () => modal.classList.remove('visible'));
-            modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('visible'); });
+            const settingsBtn = $('#open-settings');
+            settingsBtn.addEventListener('click', () => {
+                modal.classList.add('visible');
+                settingsBtn.classList.add('open');
+            });
+            function closeSettings() {
+                modal.classList.remove('visible');
+                settingsBtn.classList.remove('open');
+            }
+            $('#close-settings').addEventListener('click', closeSettings);
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeSettings(); });
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
-                    modal.classList.remove('visible');
+                    closeSettings();
                     $('#picker-modal').classList.remove('visible');
                     $('#card-chart-modal').classList.remove('visible');
                     $('#crypto-chart-modal').classList.remove('visible');
