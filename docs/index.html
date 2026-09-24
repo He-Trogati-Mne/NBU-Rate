@@ -15,9 +15,11 @@
 
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://flagcdn.com" crossorigin>
+    <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
     <link rel="preconnect" href="https://nbu-rate.nightmod.workers.dev" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
     <link rel="dns-prefetch" href="https://flagcdn.com">
+    <link rel="dns-prefetch" href="https://raw.githubusercontent.com">
     <link rel="dns-prefetch" href="https://bank.gov.ua">
 
     <link rel="preload" href="chart.umd.min.js" as="script">
@@ -1266,8 +1268,13 @@
             };
         }
 
-        const DATA = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@main/data';
-        const CRYPTO_ICONS = 'https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color';
+        // === ИСТОЧНИКИ ДАННЫХ ===
+        // Основной: jsDelivr @latest (обновляется быстрее чем @main)
+        // Fallback: raw.githubusercontent.com (никогда не кэшируется)
+        const DATA_JSDELIVR = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@latest/data';
+        const DATA_RAW      = 'https://raw.githubusercontent.com/He-Trogati-Mne/nbu-rate-data/main/data';
+        const DATA          = DATA_JSDELIVR;
+        const CRYPTO_ICONS  = 'https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color';
 
         const URLS = {
             nbu:     `${DATA}/nbu.json`,
@@ -1275,6 +1282,10 @@
             privat:  `${DATA}/privat.json`,
             mono:    `${DATA}/mono.json`,
             crypto:  `${DATA}/crypto.json`
+        };
+
+        const URLS_RAW = {
+            history: `${DATA_RAW}/nbu-history.json`
         };
 
         const CORS_PROXY = 'https://nbu-rate.nightmod.workers.dev/?url=';
@@ -1539,6 +1550,21 @@
         function currencyName(code) { return t(code) || code; }
         function currentDecimals() { return showPreciseRate ? 4 : 2; }
 
+        // Определяем "битые" данные: если в обычной валюте значение > 100 — это старый формат ×100
+        function isHistoryBroken(h) {
+            const check = ['USD', 'EUR', 'GBP', 'PLN', 'CNY'];
+            const dates = Object.keys(h).slice(-30); // проверяем последние 30 дат — там точно новые значения
+            for (const d of dates) {
+                const day = h[d];
+                if (!day || typeof day !== 'object') continue;
+                for (const c of check) {
+                    const v = day[c];
+                    if (typeof v === 'number' && v > 100) return true;
+                }
+            }
+            return false;
+        }
+
         function flagUrl(code) {
             const f = FLAG_CODES[code];
             if (!f) return null;
@@ -1640,7 +1666,7 @@
                 try {
                     const res = await fetch(url, {
                         signal: controller.signal,
-                        cache: attempt === 0 ? 'default' : 'reload'
+                        cache: 'no-store'
                     });
                     clearTimeout(timer);
                     if (!res.ok && res.status >= 500) throw new Error('HTTP ' + res.status);
@@ -1656,7 +1682,7 @@
             throw lastErr;
         }
         async function fetchFromRepo(name) {
-            const url = `${URLS[name]}?t=${Math.floor(Date.now() / 60000)}`;
+            const url = `${URLS[name]}?t=${Date.now()}`;
             const res = await fetchWithTimeout(url, REQUEST_TIMEOUT);
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const json = await res.json();
@@ -1695,6 +1721,12 @@
                 if (!raw) return null;
                 const c = JSON.parse(raw);
                 if (Date.now() - c.timestamp > HISTORY_CACHE_TTL) return null;
+                // Проверяем, что кэш не битый
+                if (c.data && isHistoryBroken(c.data)) {
+                    console.log('history : cache is BROKEN (×100 format) → dropping');
+                    safeLS.removeItem(HISTORY_CACHE_KEY);
+                    return null;
+                }
                 return c.data;
             } catch { return null; }
         }
@@ -1705,6 +1737,7 @@
             safeLS.removeItem(cacheKey('nbu'));
             safeLS.removeItem('nbu_site_history_v11');
             safeLS.removeItem('nbu_site_history_v12');
+            safeLS.removeItem('nbu_site_history_v13');
             loadAll();
         }
         window.refreshLiveRates = refreshLiveRates;
@@ -2046,6 +2079,7 @@
             await Promise.all(workers);
         }
 
+        // Загружает историю: jsDelivr @latest → raw.githubusercontent.com → прокси
         async function loadHistoryNBU(silent = false) {
             const cached = loadHistoryCache();
             if (cached && Object.keys(cached).length > 0) {
@@ -2057,24 +2091,49 @@
                 return;
             }
 
+            // 1) jsDelivr @latest с cache-buster
             try {
-                const url = `${URLS.history}?t=${Math.floor(Date.now() / 3600000)}`;
+                const url = `${URLS.history}?t=${Date.now()}`;
+                console.log('history : fetching jsDelivr:', url);
                 const res = await fetchWithTimeout(url, REQUEST_TIMEOUT, 1);
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const json = await res.json();
-                historicalRates = json.data || {};
-                if (Object.keys(historicalRates).length === 0) throw new Error('empty');
+                const data = json.data || {};
+                if (Object.keys(data).length === 0) throw new Error('empty');
+                if (isHistoryBroken(data)) throw new Error('broken data (×100 format)');
+                historicalRates = data;
                 saveHistoryCache(historicalRates);
                 const dates = Object.keys(historicalRates).sort();
                 latestDate = dates[dates.length - 1] || '';
                 fullHistoryReady = true;
-                console.log(`history : ${dates.length} dates from repo (last ${latestDate})`);
+                console.log(`history : ${dates.length} dates from jsDelivr (last ${latestDate})`);
                 return;
             } catch (e) {
-                console.log('history : repo file failed → fallback to per-currency fetch: ' + e.message);
+                console.log('history : jsDelivr failed → trying raw.githubusercontent.com: ' + e.message);
             }
 
-            // Fallback: старый путь через прокси
+            // 2) raw.githubusercontent.com — всегда свежий, без кэша
+            try {
+                const url = `${URLS_RAW.history}?t=${Date.now()}`;
+                console.log('history : fetching raw:', url);
+                const res = await fetchWithTimeout(url, REQUEST_TIMEOUT, 1);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const json = await res.json();
+                const data = json.data || {};
+                if (Object.keys(data).length === 0) throw new Error('empty');
+                if (isHistoryBroken(data)) throw new Error('broken data (×100 format)');
+                historicalRates = data;
+                saveHistoryCache(historicalRates);
+                const dates = Object.keys(historicalRates).sort();
+                latestDate = dates[dates.length - 1] || '';
+                fullHistoryReady = true;
+                console.log(`history : ${dates.length} dates from raw GitHub (last ${latestDate})`);
+                return;
+            } catch (e) {
+                console.log('history : raw GitHub failed → fallback to per-currency proxy fetch: ' + e.message);
+            }
+
+            // 3) Последний шанс: 40 запросов через прокси
             historicalRates = {};
             await loadWithConcurrency(CURRENCIES, CONCURRENCY, async (code) => {
                 const history = await fetchHistoryForCurrency(code.toLowerCase());
