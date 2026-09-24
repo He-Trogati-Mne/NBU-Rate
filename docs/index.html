@@ -1503,7 +1503,7 @@
         const PRESET_KEY = 'nbu_site_preset_v1';
         const CACHE_KEY_PREFIX = 'nbu_site_cache_';
         const CACHE_TTL = 15 * 60 * 1000;
-        const HISTORY_CACHE_KEY = 'nbu_site_history_v12';
+        const HISTORY_CACHE_KEY = 'nbu_site_history_v13';
         const HISTORY_CACHE_TTL = 12 * 60 * 60 * 1000;
         const START_DATE = '20030101';
         const REQUEST_TIMEOUT = 30000;
@@ -1703,6 +1703,8 @@
         }
         function refreshLiveRates() {
             safeLS.removeItem(cacheKey('nbu'));
+            safeLS.removeItem('nbu_site_history_v11');
+            safeLS.removeItem('nbu_site_history_v12');
             loadAll();
         }
         window.refreshLiveRates = refreshLiveRates;
