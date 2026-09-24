@@ -491,20 +491,32 @@
 
         .privacy-card { padding:0; overflow:hidden; scroll-margin-top:20px; }
         .privacy-card summary {
-            padding:22px 28px; cursor:pointer; list-style:none; display:flex;
-            align-items:center; gap:12px; font-size:15px; font-weight:700;
-            text-transform:uppercase; letter-spacing:1.2px; transition:background 0.15s;
+            position:relative;
+            padding:22px 60px;
+            cursor:pointer; list-style:none; display:flex;
+            align-items:center; justify-content:center; gap:12px;
+            font-size:15px; font-weight:700;
+            text-transform:uppercase; letter-spacing:1.2px;
+            transition:background 0.15s;
         }
         .privacy-card summary::-webkit-details-marker { display:none; }
         .privacy-card summary::after {
-            content:''; width:8px; height:8px; border-right:2px solid var(--text-muted);
-            border-bottom:2px solid var(--text-muted); transform:rotate(45deg);
-            margin-left:auto; transition:transform 0.3s var(--ease-smooth);
+            content:''; position:absolute; right:28px; top:50%;
+            width:8px; height:8px; border-right:2px solid var(--text-muted);
+            border-bottom:2px solid var(--text-muted);
+            transform:translateY(-50%) rotate(45deg);
+            transition:transform 0.3s var(--ease-smooth);
         }
-        .privacy-card[open] summary::after { transform:rotate(-135deg); }
+        .privacy-card[open] summary::after {
+            transform:translateY(-50%) rotate(-135deg);
+        }
         .privacy-card summary:hover { background:var(--hover); }
         .privacy-card summary svg { width:20px; height:20px; stroke:var(--accent); stroke-width:2.2; fill:none; flex-shrink:0; }
-        .privacy-body { padding:0 28px 28px; color:var(--text-muted); font-size:14px; line-height:1.7; animation: privacyReveal 0.35s var(--ease-smooth); }
+        .privacy-body {
+            padding:0 28px 28px; color:var(--text-muted); font-size:14px; line-height:1.7;
+            animation: privacyReveal 0.35s var(--ease-smooth);
+            text-align:center;
+        }
         @keyframes privacyReveal {
             from { opacity: 0; transform: translateY(-8px); }
             to { opacity: 1; transform: translateY(0); }
@@ -842,6 +854,8 @@
             .slider-row { flex-direction: column; align-items: stretch; gap: 12px; }
             .slider-wrap { width: 100%; justify-content: space-between; }
             input[type="range"].font-slider { flex: 1; width: auto; }
+            .privacy-card summary { padding:20px 48px 20px 20px; }
+            .privacy-card summary::after { right:20px; }
         }
         ::-webkit-scrollbar { width:8px; height:8px; }
         ::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:100px; border:2px solid var(--bg); }
@@ -1272,9 +1286,6 @@
         const DATA          = DATA_JSDELIVR;
         const CRYPTO_ICONS  = 'https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color';
 
-        // Иконки для монет, которых нет в cryptocurrency-icons@0.18.1 (пакет 2018 года).
-        // CoinGecko отдаёт эти иконки публично и без ключа.
-        // Если символ есть в этом словаре — используется его URL, иначе — пакет.
         const CRYPTO_ICON_OVERRIDES = {
             'NEAR': 'https://assets.coingecko.com/coins/images/10365/small/near.jpg',
             'APT':  'https://assets.coingecko.com/coins/images/26455/small/aptos_round.png',
@@ -1320,7 +1331,7 @@
             DOGE:'#C2A633', AVAX:'#E84142', TRX:'#FF060A', TON:'#0098EA',
             GRAM:'#0098EA', LINK:'#2A5ADA', DOT:'#E6007A', LTC:'#345D9D',
             SHIB:'#FFA409', DAI:'#F5AC37', WBTC:'#F09242', UNI:'#FF007A',
-            NEAR:'#000000', APT:'#000000', ARB:'#12AAFF', OP:'#FF0420',
+            NEAR:'#00C1DE', APT:'#00D9A5', ARB:'#12AAFF', OP:'#FF0420',
             SUI:'#4DA2FF', XLM:'#14B6E7'
         };
 
