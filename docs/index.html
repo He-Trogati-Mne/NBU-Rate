@@ -1510,7 +1510,7 @@
         const PRESET_KEY = 'nbu_site_preset_v1';
         const CACHE_KEY_PREFIX = 'nbu_site_cache_';
         const CACHE_TTL = 15 * 60 * 1000;
-        const HISTORY_CACHE_KEY = 'nbu_site_history_v15';
+        const HISTORY_CACHE_KEY = 'nbu_site_history_v16';
         const HISTORY_CACHE_TTL = 12 * 60 * 60 * 1000;
         const HISTORY_FORMAT_VERSION = 2;
         const START_DATE = '20030101';
@@ -1721,6 +1721,7 @@
             safeLS.removeItem('nbu_site_history_v13');
             safeLS.removeItem('nbu_site_history_v14');
             safeLS.removeItem('nbu_site_history_v15');
+            safeLS.removeItem('nbu_site_history_v16');
             loadAll();
         }
         window.refreshLiveRates = refreshLiveRates;
@@ -2226,14 +2227,15 @@
 
             let html = '';
             const dec = currentDecimals();
+            const eps = 0.5 * Math.pow(10, -dec);
             CURRENCIES.forEach(code => {
                 const item = rates[code];
                 if (!item) return;
-                let direction = 'flat', delta = null, symbol = '●', label = 'Без змін', text = '0.0000';
+                let direction = 'flat', delta = null, symbol = '●', label = 'Без змін', text = (0).toFixed(dec);
                 if (prevRates && prevRates[code] != null && item.rate != null) {
                     delta = item.rate - prevRates[code];
-                    if (delta > 0.0001)      { direction='up';   symbol='▲'; label='Зростання'; text='+'+delta.toFixed(dec); }
-                    else if (delta < -0.0001){ direction='down'; symbol='▼'; label='Падіння';   text=delta.toFixed(dec); }
+                    if (delta > eps)      { direction='up';   symbol='▲'; label='Зростання'; text='+'+delta.toFixed(dec); }
+                    else if (delta < -eps){ direction='down'; symbol='▼'; label='Падіння';   text=delta.toFixed(dec); }
                 }
                 const rateClass = direction === 'up' ? 'up' : direction === 'down' ? 'down' : '';
                 html += `<div class="rate-card ${code === currentCurrency ? 'active' : ''}" data-currency="${code}">
@@ -2508,9 +2510,6 @@
             const textMuted = styles.getPropertyValue('--text-muted').trim() || '#5a6472';
             const borderCol = styles.getPropertyValue('--border').trim() || '#e1e5ea';
 
-            // ВАЖНО: labels и data должны быть синхронны.
-            // У THB, ZAR, RSD, MYR, GEL, AZN, SAR и др. данные начинаются позже 2003,
-            // поэтому фильтруем даты ТОЛЬКО те, где есть значение для текущей валюты.
             const allDatesForPeriod = getFilteredData(currentPeriod);
             const points = allDatesForPeriod
                 .map(d => ({ date: d, value: historicalRates[d]?.[currentCurrency] }))
