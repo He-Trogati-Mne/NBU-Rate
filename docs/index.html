@@ -1267,8 +1267,6 @@
             };
         }
 
-        // Источники данных: raw.githubusercontent.com идёт первым (не кэшируется),
-        // jsDelivr — резервный (быстрее, но кэширует)
         const DATA_RAW      = 'https://raw.githubusercontent.com/He-Trogati-Mne/nbu-rate-data/main/data';
         const DATA_JSDELIVR = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@latest/data';
         const DATA          = DATA_JSDELIVR;
@@ -1512,7 +1510,7 @@
         const PRESET_KEY = 'nbu_site_preset_v1';
         const CACHE_KEY_PREFIX = 'nbu_site_cache_';
         const CACHE_TTL = 15 * 60 * 1000;
-        const HISTORY_CACHE_KEY = 'nbu_site_history_v14';
+        const HISTORY_CACHE_KEY = 'nbu_site_history_v15';
         const HISTORY_CACHE_TTL = 12 * 60 * 60 * 1000;
         const HISTORY_FORMAT_VERSION = 2;
         const START_DATE = '20030101';
@@ -1722,6 +1720,7 @@
             safeLS.removeItem('nbu_site_history_v12');
             safeLS.removeItem('nbu_site_history_v13');
             safeLS.removeItem('nbu_site_history_v14');
+            safeLS.removeItem('nbu_site_history_v15');
             loadAll();
         }
         window.refreshLiveRates = refreshLiveRates;
@@ -2076,7 +2075,6 @@
                 return;
             }
 
-            // 1) raw.githubusercontent.com — всегда свежий
             try {
                 const url = `${URLS_RAW.history}?t=${Date.now()}`;
                 console.log('history : fetching raw:', url);
@@ -2099,7 +2097,6 @@
                 console.log('history : raw failed → trying jsDelivr: ' + e.message);
             }
 
-            // 2) jsDelivr @latest
             try {
                 const url = `${URLS.history}?t=${Date.now()}`;
                 console.log('history : fetching jsDelivr:', url);
@@ -2122,7 +2119,6 @@
                 console.log('history : jsDelivr failed → fallback to proxy: ' + e.message);
             }
 
-            // 3) прокси
             historicalRates = {};
             await loadWithConcurrency(CURRENCIES, CONCURRENCY, async (code) => {
                 const history = await fetchHistoryForCurrency(code.toLowerCase());
@@ -2508,23 +2504,33 @@
             let cv = container.querySelector('#rateChart');
             if (!cv) { container.innerHTML = '<canvas id="rateChart"></canvas>'; cv = container.querySelector('#rateChart'); }
             const ctx = cv.getContext('2d');
-            const dates = getFilteredData(currentPeriod);
             const styles = getComputedStyle(document.documentElement);
             const textMuted = styles.getPropertyValue('--text-muted').trim() || '#5a6472';
             const borderCol = styles.getPropertyValue('--border').trim() || '#e1e5ea';
-            if (dates.length === 0) {
+
+            // ВАЖНО: labels и data должны быть синхронны.
+            // У THB, ZAR, RSD, MYR, GEL, AZN, SAR и др. данные начинаются позже 2003,
+            // поэтому фильтруем даты ТОЛЬКО те, где есть значение для текущей валюты.
+            const allDatesForPeriod = getFilteredData(currentPeriod);
+            const points = allDatesForPeriod
+                .map(d => ({ date: d, value: historicalRates[d]?.[currentCurrency] }))
+                .filter(p => p.value != null && typeof p.value === 'number' && p.value > 0);
+
+            if (points.length < 2) {
                 if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
                 ctx.clearRect(0, 0, cv.width, cv.height);
                 ctx.font = '15px system-ui'; ctx.fillStyle = textMuted; ctx.textAlign = 'center';
                 ctx.fillText(t('insufficient_data'), cv.width / 2, cv.height / 2);
                 return;
             }
-            const labels = dates.map(d => {
-                const [y, m, day] = d.split('-');
+
+            const labels = points.map(p => {
+                const [y, m, day] = p.date.split('-');
                 if (currentPeriod === 'MAX' || currentPeriod === '5Y') return `${m}.${y}`;
                 return `${day}.${m}`;
             });
-            const data = dates.map(d => historicalRates[d][currentCurrency]).filter(v => v != null);
+            const data = points.map(p => p.value);
+
             const color = CHART_COLORS[currentCurrency] || '#1a73e8';
             const gradient = ctx.createLinearGradient(0, 0, 0, cv.height);
             gradient.addColorStop(0, hexToRgba(color, 0.28));
