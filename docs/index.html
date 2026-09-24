@@ -180,7 +180,10 @@
             }
         }
         * { box-sizing:border-box; margin:0; padding:0; }
-        html { scroll-behavior:smooth; }
+        html {
+            scroll-behavior: smooth;
+            background: var(--bg);
+        }
         body {
             font-family: system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
             background:var(--bg); color:var(--text); line-height:1.55;
@@ -202,7 +205,7 @@
             padding-left:max(20px,env(safe-area-inset-left));
             padding-right:max(20px,env(safe-area-inset-right));
         }
-        .hero { position:relative; padding:56px 0 40px; overflow:hidden; }
+        .hero { position:relative; padding:56px 0 40px; overflow:hidden; background: var(--bg); }
         .hero::before {
             content:''; position:absolute; top:-160px; left:50%; transform:translateX(-50%);
             width:700px; height:420px;
@@ -639,7 +642,6 @@
         .modal-close:hover { color: var(--negative); background: var(--hover); transform: translateY(-50%) rotate(90deg); }
         .modal-close:active { transform: translateY(-50%) rotate(90deg) scale(0.9); }
 
-        /* Stagger-анимация секций настроек при открытии */
         .modal.visible .settings-group {
             animation: settingsGroupIn 0.45s var(--ease-smooth) backwards;
         }
@@ -652,7 +654,6 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* Stagger для списка палитр */
         .palette-list.visible .palette-item {
             animation: settingsGroupIn 0.35s var(--ease-smooth) backwards;
         }
@@ -1497,8 +1498,9 @@
         const PRECISE_KEY = 'nbu_site_precise_v1';
         const PRESET_KEY = 'nbu_site_preset_v1';
         const CACHE_KEY_PREFIX = 'nbu_site_cache_';
-        const CACHE_TTL = 30 * 60 * 1000;
+        const CACHE_TTL = 15 * 60 * 1000;               // живі курси: 15 хв
         const HISTORY_CACHE_KEY = 'nbu_site_history_v11';
+        const HISTORY_CACHE_TTL = 12 * 60 * 60 * 1000;  // історія: 12 год
         const START_DATE = '20200101';
         const REQUEST_TIMEOUT = 30000;
         const CONCURRENCY = 6;
@@ -1519,6 +1521,7 @@
         let liveDate = '';
         let pickerTarget = null;
         let historyLoading = false;
+        let fullHistoryReady = false;   // чи завантажена повна історія (кэш або повний фетч)
 
         const $ = (s) => document.querySelector(s);
         const $$ = (s) => document.querySelectorAll(s);
@@ -1649,7 +1652,9 @@
             throw lastErr;
         }
         async function fetchFromRepo(name) {
-            const res = await fetchWithTimeout(URLS[name], REQUEST_TIMEOUT);
+            // ?t= обходит кэш jsDelivr (он держит @main до 12 часов)
+            const url = `${URLS[name]}?t=${Math.floor(Date.now() / 60000)}`;
+            const res = await fetchWithTimeout(url, REQUEST_TIMEOUT);
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const json = await res.json();
             return json.data;
@@ -1686,13 +1691,19 @@
                 const raw = safeLS.getItem(HISTORY_CACHE_KEY);
                 if (!raw) return null;
                 const c = JSON.parse(raw);
-                if (Date.now() - c.timestamp > CACHE_TTL) return null;
+                if (Date.now() - c.timestamp > HISTORY_CACHE_TTL) return null;
                 return c.data;
             } catch { return null; }
         }
         function saveHistoryCache(data) {
             try { safeLS.setItem(HISTORY_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data })); } catch (e) {}
         }
+        // Скидає ТІЛЬКИ живий кэш курсів, історію не чіпає
+        function refreshLiveRates() {
+            safeLS.removeItem(cacheKey('nbu'));
+            loadAll();
+        }
+        window.refreshLiveRates = refreshLiveRates;
 
         function applyTheme(theme, customColors) {
             const root = document.documentElement;
@@ -1955,6 +1966,7 @@
             const fresh = loadLiveCache(source, false);
             const stale = loadLiveCache(source, true);
 
+            // Мгновенно показываем кэш (пусть и старый) — UI не ждёт
             if (fresh || stale) {
                 const use = fresh || stale;
                 liveRates = {};
@@ -1964,8 +1976,7 @@
                 saveLiveCache(source, use);
             }
 
-            if (fresh) return liveRates;
-
+            // ВАЖНО: без раннего return — всегда тянем свежее в фоне
             try {
                 const rates = await fetchNBU(currentLang);
                 if (!Array.isArray(rates) || rates.length === 0) throw new Error('Empty');
@@ -1997,6 +2008,28 @@
             return history;
         }
 
+        // БЫСТРЫЙ ДОГОН: последние 7 дней по ВСЕМ валютам одним запросом (без valcode).
+        // Используется только чтобы цвета ↑↓ появились с первого рендера.
+        async function fetchRecentHistory() {
+            const end = new Date();
+            const start = new Date();
+            start.setDate(end.getDate() - 7);
+            const fmt = d => d.toISOString().slice(0, 10).replace(/-/g, '');
+            const apiUrl = `${NBU_HISTORY}?start=${fmt(start)}&end=${fmt(end)}&sort=exchangedate&order=desc&json`;
+            const res = await proxiedFetch(apiUrl);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            const history = {};
+            (Array.isArray(data) ? data : []).forEach(item => {
+                if (!item || !item.exchangedate || !item.cc) return;
+                const [day, month, year] = item.exchangedate.split('.');
+                const iso = `${year}-${month}-${day}`;
+                if (!history[iso]) history[iso] = {};
+                history[iso][item.cc] = item.rate;
+            });
+            return history;
+        }
+
         async function loadWithConcurrency(items, limit, fn, onProgress) {
             let index = 0, done = 0;
             const total = items.length;
@@ -2019,6 +2052,7 @@
                 historicalRates = cached;
                 const dates = Object.keys(historicalRates).sort();
                 latestDate = dates[dates.length - 1];
+                fullHistoryReady = true;
                 return;
             }
             historicalRates = {};
@@ -2034,6 +2068,7 @@
             saveHistoryCache(historicalRates);
             const dates = Object.keys(historicalRates).sort();
             latestDate = dates[dates.length - 1] || '';
+            fullHistoryReady = true;
         }
 
         async function loadAll() {
@@ -2046,6 +2081,14 @@
                 const firstWithDate = stale.find(r => r.date);
                 if (firstWithDate) liveDate = firstWithDate.date;
                 if (Object.keys(liveRates).length > 0) {
+                    // Показываем сразу — но с учётом полного кэша истории, если он есть
+                    const cachedHistory = loadHistoryCache();
+                    if (cachedHistory && Object.keys(cachedHistory).length > 0) {
+                        historicalRates = cachedHistory;
+                        fullHistoryReady = true;
+                        const dates = Object.keys(historicalRates).sort();
+                        latestDate = dates[dates.length - 1];
+                    }
                     renderCards(liveRates);
                     initConverter(liveRates);
                 }
@@ -2055,9 +2098,25 @@
                 await loadLiveRates('nbu');
                 if (Object.keys(liveRates).length === 0) throw new Error('Empty');
 
+                // === БЫСТРЫЙ ДОГОН: 1 запрос за 7 дней по всем валютам,
+                // чтобы цвета ↑↓ были уже на первой отрисовке ===
+                if (!fullHistoryReady) {
+                    try {
+                        const recent = await fetchRecentHistory();
+                        Object.keys(recent).forEach(date => {
+                            if (!historicalRates[date]) historicalRates[date] = {};
+                            Object.assign(historicalRates[date], recent[date]);
+                        });
+                    } catch (e) {
+                        // Не критично — полная история догонит ниже
+                    }
+                }
+
                 if (!container.querySelector('.rate-card:not(.skeleton)')) {
                     renderCards(liveRates);
                     initConverter(liveRates);
+                } else {
+                    renderCards(liveRates);
                 }
 
                 const dateNow = liveDate
@@ -2065,7 +2124,8 @@
                     || new Date().toLocaleDateString('uk-UA');
                 setStatus(t('status_updated', {date: dateNow}), '');
 
-                if (Object.keys(historicalRates).length === 0) {
+                // === Полная история — в фоне, цвета уже на месте ===
+                if (!fullHistoryReady) {
                     if (!historyLoading) {
                         historyLoading = true;
                         loadHistoryNBU(true)
