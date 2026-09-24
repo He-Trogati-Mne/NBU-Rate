@@ -433,7 +433,7 @@
             text-decoration-thickness: 2px;
         }
 
-        .crypto-icon { width:28px; height:28px; flex-shrink:0; display:block; object-fit:contain; }
+        .crypto-icon { width:28px; height:28px; flex-shrink:0; display:block; object-fit:contain; border-radius:50%; }
         .crypto-icon-fallback {
             display:inline-flex; align-items:center; justify-content:center;
             width:28px; height:28px; border-radius:50%;
@@ -1272,6 +1272,21 @@
         const DATA          = DATA_JSDELIVR;
         const CRYPTO_ICONS  = 'https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color';
 
+        // Иконки для монет, которых нет в cryptocurrency-icons@0.18.1 (пакет 2018 года).
+        // CoinGecko отдаёт эти иконки публично и без ключа.
+        // Если символ есть в этом словаре — используется его URL, иначе — пакет.
+        const CRYPTO_ICON_OVERRIDES = {
+            'NEAR': 'https://assets.coingecko.com/coins/images/10365/small/near.jpg',
+            'APT':  'https://assets.coingecko.com/coins/images/26455/small/aptos_round.png',
+            'ARB':  'https://assets.coingecko.com/coins/images/16547/small/photo_2023-03-29_21.47.00.jpeg',
+            'OP':   'https://assets.coingecko.com/coins/images/25244/small/Optimism.png',
+            'SUI':  'https://assets.coingecko.com/coins/images/26375/small/sui_asset.jpeg',
+            'SHIB': 'https://assets.coingecko.com/coins/images/11939/small/shiba.png',
+            'TON':  'https://assets.coingecko.com/coins/images/17980/small/ton_symbol.png',
+            'GRAM': 'https://assets.coingecko.com/coins/images/17980/small/ton_symbol.png',
+            'LTC':  'https://assets.coingecko.com/coins/images/2/small/litecoin.png'
+        };
+
         const URLS = {
             nbu:     `${DATA}/nbu.json`,
             history: `${DATA}/nbu-history.json`,
@@ -1562,11 +1577,11 @@
         }
 
         function cryptoIcon(symbol) {
-            const lower = String(symbol).toLowerCase();
-            const url = `${CRYPTO_ICONS}/${lower}.svg`;
-            const fallbackColor = CRYPTO_COLORS[symbol] || '#666';
-            const letter = String(symbol).charAt(0);
-            return `<img class="crypto-icon" src="${url}" alt="${symbol}" loading="lazy" decoding="async"
+            const upper = String(symbol).toUpperCase();
+            const fallbackColor = CRYPTO_COLORS[upper] || '#666';
+            const letter = upper.charAt(0);
+            const url = CRYPTO_ICON_OVERRIDES[upper] || `${CRYPTO_ICONS}/${upper.toLowerCase()}.svg`;
+            return `<img class="crypto-icon" src="${url}" alt="${upper}" loading="lazy" decoding="async"
                         onerror="var s=document.createElement('span');s.className='crypto-icon-fallback';s.style.background='${fallbackColor}';s.textContent='${letter}';this.replaceWith(s);">`;
         }
 
