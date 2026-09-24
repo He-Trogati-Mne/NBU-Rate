@@ -602,7 +602,6 @@
             .footer-icon { width: 18px; height: 18px; }
         }
 
-        /* === MODAL with animation === */
         .modal {
             position:fixed; inset:0; background:rgba(0,0,0,0.5);
             backdrop-filter:blur(4px);
@@ -1268,11 +1267,10 @@
             };
         }
 
-        // === ИСТОЧНИКИ ДАННЫХ ===
-        // Основной: jsDelivr @latest (обновляется быстрее чем @main)
-        // Fallback: raw.githubusercontent.com (никогда не кэшируется)
-        const DATA_JSDELIVR = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@latest/data';
+        // Источники данных: raw.githubusercontent.com идёт первым (не кэшируется),
+        // jsDelivr — резервный (быстрее, но кэширует)
         const DATA_RAW      = 'https://raw.githubusercontent.com/He-Trogati-Mne/nbu-rate-data/main/data';
+        const DATA_JSDELIVR = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@latest/data';
         const DATA          = DATA_JSDELIVR;
         const CRYPTO_ICONS  = 'https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color';
 
@@ -1514,8 +1512,9 @@
         const PRESET_KEY = 'nbu_site_preset_v1';
         const CACHE_KEY_PREFIX = 'nbu_site_cache_';
         const CACHE_TTL = 15 * 60 * 1000;
-        const HISTORY_CACHE_KEY = 'nbu_site_history_v13';
+        const HISTORY_CACHE_KEY = 'nbu_site_history_v14';
         const HISTORY_CACHE_TTL = 12 * 60 * 60 * 1000;
+        const HISTORY_FORMAT_VERSION = 2;
         const START_DATE = '20030101';
         const REQUEST_TIMEOUT = 30000;
         const CONCURRENCY = 6;
@@ -1549,21 +1548,6 @@
         }
         function currencyName(code) { return t(code) || code; }
         function currentDecimals() { return showPreciseRate ? 4 : 2; }
-
-        // Определяем "битые" данные: если в обычной валюте значение > 100 — это старый формат ×100
-        function isHistoryBroken(h) {
-            const check = ['USD', 'EUR', 'GBP', 'PLN', 'CNY'];
-            const dates = Object.keys(h).slice(-30); // проверяем последние 30 дат — там точно новые значения
-            for (const d of dates) {
-                const day = h[d];
-                if (!day || typeof day !== 'object') continue;
-                for (const c of check) {
-                    const v = day[c];
-                    if (typeof v === 'number' && v > 100) return true;
-                }
-            }
-            return false;
-        }
 
         function flagUrl(code) {
             const f = FLAG_CODES[code];
@@ -1721,9 +1705,8 @@
                 if (!raw) return null;
                 const c = JSON.parse(raw);
                 if (Date.now() - c.timestamp > HISTORY_CACHE_TTL) return null;
-                // Проверяем, что кэш не битый
-                if (c.data && isHistoryBroken(c.data)) {
-                    console.log('history : cache is BROKEN (×100 format) → dropping');
+                if ((c.formatVersion || 1) < HISTORY_FORMAT_VERSION) {
+                    console.log('history : cache format v' + (c.formatVersion || 1) + ' < v' + HISTORY_FORMAT_VERSION + ' → dropping');
                     safeLS.removeItem(HISTORY_CACHE_KEY);
                     return null;
                 }
@@ -1731,13 +1714,14 @@
             } catch { return null; }
         }
         function saveHistoryCache(data) {
-            try { safeLS.setItem(HISTORY_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data })); } catch (e) {}
+            try { safeLS.setItem(HISTORY_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), formatVersion: HISTORY_FORMAT_VERSION, data })); } catch (e) {}
         }
         function refreshLiveRates() {
             safeLS.removeItem(cacheKey('nbu'));
             safeLS.removeItem('nbu_site_history_v11');
             safeLS.removeItem('nbu_site_history_v12');
             safeLS.removeItem('nbu_site_history_v13');
+            safeLS.removeItem('nbu_site_history_v14');
             loadAll();
         }
         window.refreshLiveRates = refreshLiveRates;
@@ -2038,7 +2022,8 @@
                 const [day, month, year] = item.exchangedate.split('.');
                 const iso = `${year}-${month}-${day}`;
                 if (!history[iso]) history[iso] = {};
-                history[iso][valcode.toUpperCase()] = item.rate;
+                const units = Number(item.units) > 0 ? Number(item.units) : 1;
+                history[iso][valcode.toUpperCase()] = item.rate / units;
             });
             return history;
         }
@@ -2058,7 +2043,8 @@
                 const [day, month, year] = item.exchangedate.split('.');
                 const iso = `${year}-${month}-${day}`;
                 if (!history[iso]) history[iso] = {};
-                history[iso][item.cc] = item.rate;
+                const units = Number(item.units) > 0 ? Number(item.units) : 1;
+                history[iso][item.cc] = item.rate / units;
             });
             return history;
         }
@@ -2079,7 +2065,6 @@
             await Promise.all(workers);
         }
 
-        // Загружает историю: jsDelivr @latest → raw.githubusercontent.com → прокси
         async function loadHistoryNBU(silent = false) {
             const cached = loadHistoryCache();
             if (cached && Object.keys(cached).length > 0) {
@@ -2091,16 +2076,41 @@
                 return;
             }
 
-            // 1) jsDelivr @latest с cache-buster
+            // 1) raw.githubusercontent.com — всегда свежий
+            try {
+                const url = `${URLS_RAW.history}?t=${Date.now()}`;
+                console.log('history : fetching raw:', url);
+                const res = await fetchWithTimeout(url, REQUEST_TIMEOUT, 1);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const json = await res.json();
+                if ((json.formatVersion || 1) < HISTORY_FORMAT_VERSION) {
+                    throw new Error('old format v' + (json.formatVersion || 1));
+                }
+                const data = json.data || {};
+                if (Object.keys(data).length === 0) throw new Error('empty');
+                historicalRates = data;
+                saveHistoryCache(historicalRates);
+                const dates = Object.keys(historicalRates).sort();
+                latestDate = dates[dates.length - 1] || '';
+                fullHistoryReady = true;
+                console.log(`history : ${dates.length} dates from raw (last ${latestDate})`);
+                return;
+            } catch (e) {
+                console.log('history : raw failed → trying jsDelivr: ' + e.message);
+            }
+
+            // 2) jsDelivr @latest
             try {
                 const url = `${URLS.history}?t=${Date.now()}`;
                 console.log('history : fetching jsDelivr:', url);
                 const res = await fetchWithTimeout(url, REQUEST_TIMEOUT, 1);
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const json = await res.json();
+                if ((json.formatVersion || 1) < HISTORY_FORMAT_VERSION) {
+                    throw new Error('old format v' + (json.formatVersion || 1));
+                }
                 const data = json.data || {};
                 if (Object.keys(data).length === 0) throw new Error('empty');
-                if (isHistoryBroken(data)) throw new Error('broken data (×100 format)');
                 historicalRates = data;
                 saveHistoryCache(historicalRates);
                 const dates = Object.keys(historicalRates).sort();
@@ -2109,31 +2119,10 @@
                 console.log(`history : ${dates.length} dates from jsDelivr (last ${latestDate})`);
                 return;
             } catch (e) {
-                console.log('history : jsDelivr failed → trying raw.githubusercontent.com: ' + e.message);
+                console.log('history : jsDelivr failed → fallback to proxy: ' + e.message);
             }
 
-            // 2) raw.githubusercontent.com — всегда свежий, без кэша
-            try {
-                const url = `${URLS_RAW.history}?t=${Date.now()}`;
-                console.log('history : fetching raw:', url);
-                const res = await fetchWithTimeout(url, REQUEST_TIMEOUT, 1);
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const json = await res.json();
-                const data = json.data || {};
-                if (Object.keys(data).length === 0) throw new Error('empty');
-                if (isHistoryBroken(data)) throw new Error('broken data (×100 format)');
-                historicalRates = data;
-                saveHistoryCache(historicalRates);
-                const dates = Object.keys(historicalRates).sort();
-                latestDate = dates[dates.length - 1] || '';
-                fullHistoryReady = true;
-                console.log(`history : ${dates.length} dates from raw GitHub (last ${latestDate})`);
-                return;
-            } catch (e) {
-                console.log('history : raw GitHub failed → fallback to per-currency proxy fetch: ' + e.message);
-            }
-
-            // 3) Последний шанс: 40 запросов через прокси
+            // 3) прокси
             historicalRates = {};
             await loadWithConcurrency(CURRENCIES, CONCURRENCY, async (code) => {
                 const history = await fetchHistoryForCurrency(code.toLowerCase());
