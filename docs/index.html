@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="google-site-verification" content="LfPlSooILG8H12Ov4mCh2Dq8bAOYDjIMN8NFanQzM6A" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" id="favicon-link" />
     <meta name="theme-color" content="#1a73e8" />
     <title>Курс НБУ</title>
@@ -27,12 +28,8 @@
     <script>
     var safeLS = (function() {
         var ok = true;
-        try {
-            localStorage.setItem('__test__', '1');
-            localStorage.removeItem('__test__');
-        } catch (e) {
-            ok = false;
-        }
+        try { localStorage.setItem('__test__', '1'); localStorage.removeItem('__test__'); }
+        catch (e) { ok = false; }
         return {
             getItem: function(k)    { try { return ok ? localStorage.getItem(k) : null; } catch(_) { return null; } },
             setItem: function(k, v) { try { if (ok) localStorage.setItem(k, v); } catch(_) {} },
@@ -87,11 +84,7 @@
                 function mix(a, b, k) {
                     var A = h2r(a), B = h2r(b);
                     if (!A || !B) return a;
-                    return r2h({
-                        r: A.r + (B.r - A.r) * k,
-                        g: A.g + (B.g - A.g) * k,
-                        b: A.b + (B.b - A.b) * k
-                    });
+                    return r2h({ r: A.r + (B.r - A.r) * k, g: A.g + (B.g - A.g) * k, b: A.b + (B.b - A.b) * k });
                 }
 
                 root.style.setProperty('--bg', bg);
@@ -399,14 +392,14 @@
 
         .rate-bs {
             display:flex; flex-direction:column; gap:0;
-            margin-top:auto; padding-top:12px;
+            margin-top:auto; padding-top:8px;
             border-top:1px dashed var(--border);
         }
-        .bs-row { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:6px 0; }
+        .bs-row { display:flex; justify-content:space-between; align-items:center; gap:6px; padding:4px 0; }
         .bs-row:first-child { padding-top:2px; }
         .bs-row:last-child { padding-bottom:0; }
-        .bs-label { font-size:10px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.4px; }
-        .bs-val { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:14px; font-weight:800; }
+        .bs-label { font-size:10px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.4px; white-space:nowrap; }
+        .bs-val { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:13.5px; font-weight:800; white-space:nowrap; }
         .bs-val.buy  { color:var(--positive); }
         .bs-val.sell { color:var(--negative); }
 
@@ -433,7 +426,7 @@
             text-decoration-thickness: 2px;
         }
 
-        .crypto-icon { width:28px; height:28px; flex-shrink:0; display:block; object-fit:contain; border-radius:50%; }
+        .crypto-icon { width:28px; height:28px; flex-shrink:0; display:block; object-fit:cover; border-radius:50%; }
         .crypto-icon-fallback {
             display:inline-flex; align-items:center; justify-content:center;
             width:28px; height:28px; border-radius:50%;
@@ -469,25 +462,6 @@
         .period-btn.active { background:var(--accent); color:var(--accent-text); box-shadow:0 2px 8px color-mix(in srgb, var(--accent) 25%, transparent); }
         .chart-container { position:relative; height:380px; width:100%; }
         @media (max-width:600px) { .chart-container { height:280px; } }
-
-        .bank-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 24px;
-        }
-        @media (max-width: 700px) {
-            .bank-columns { grid-template-columns: 1fr; gap: 32px; }
-        }
-        .bank-column-title {
-            font-size: 14px; font-weight: 800; color: var(--text-muted);
-            text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 16px; padding-bottom: 8px;
-            border-bottom: 2px solid var(--border);
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            text-align: center;
-        }
-        .bank-column .rate-grid { grid-template-columns: 1fr; margin-bottom: 0; }
 
         .privacy-card { padding:0; overflow:hidden; scroll-margin-top:20px; }
         .privacy-card summary {
@@ -865,6 +839,297 @@
             .modal-panel, .modal.visible .modal-panel,
             .modal.visible .settings-group { transform: none !important; animation: none !important; opacity: 1 !important; }
         }
+
+        /* ===== BANK CAROUSEL (CENTERED & ANIMATED) ===== */
+        .bank-carousel-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+            padding: 0 4px;
+        }
+        .bank-carousel {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .bank-carousel-viewport {
+            flex: 1;
+            overflow: hidden;
+            border-radius: var(--radius-lg);
+            min-width: 0;
+            padding: 6px 0;
+            -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+        }
+        .bank-carousel-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform;
+            align-items: stretch;
+        }
+        .bank-slide {
+            flex: 0 0 100%;
+            min-width: 100%;
+            padding: 0 10px;
+            box-sizing: border-box;
+            transition: opacity 0.5s var(--ease-soft), transform 0.5s var(--ease-soft);
+            opacity: 0.3;
+            transform: scale(0.92) translateY(4px);
+        }
+        .bank-slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        .bank-slide-inner {
+            background: var(--bg-elev);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+            height: 100%;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .bank-slide.active .bank-slide-inner {
+            border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+            box-shadow: 0 8px 30px color-mix(in srgb, var(--accent) 10%, transparent);
+        }
+
+        .bank-slide-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .bank-logo-wrap {
+            position: relative;
+            width: auto;
+            min-width: 54px;
+            max-width: 210px;
+            height: 54px;
+            border-radius: 0;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: none;
+            overflow: visible;
+            transition: transform 0.4s var(--ease-smooth);
+        }
+        .bank-logo-wrap.is-full-bleed {
+            width: 54px;
+            min-width: 54px;
+            border-radius: 14px;
+            background: transparent;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        }
+        .bank-slide.active .bank-logo-wrap {
+            transform: scale(1.08);
+        }
+        .bank-slide.active .bank-logo-wrap.is-full-bleed {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.28);
+        }
+        .bank-slide-logo {
+            width: auto;
+            max-width: 100%;
+            height: 100%;
+            max-height: 54px;
+            object-fit: contain;
+            padding: 2px;
+            position: relative;
+            z-index: 2;
+            display: block;
+        }
+        .bank-slide-logo.full-bleed {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            object-fit: cover;
+        }
+        .bank-slide-logo.is-rect-card {
+            padding: 0;
+            border-radius: 10px;
+        }
+        .bank-logo-fallback {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--accent);
+            z-index: 1;
+            text-transform: uppercase;
+            background: color-mix(in srgb, var(--accent) 12%, transparent);
+            border-radius: 14px;
+        }
+        .bank-slide-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.3px;
+            text-align: center;
+        }
+
+        .bank-slide-rates {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+            gap: 12px;
+        }
+        .bank-rate-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 82px;
+            justify-content: space-between;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.4s, transform 0.4s;
+        }
+        .bank-slide.active .bank-rate-card {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .bank-slide.active .bank-rate-card:nth-child(1) { transition-delay: 0.1s; }
+        .bank-slide.active .bank-rate-card:nth-child(2) { transition-delay: 0.15s; }
+        .bank-slide.active .bank-rate-card:nth-child(3) { transition-delay: 0.2s; }
+        .bank-slide.active .bank-rate-card:nth-child(4) { transition-delay: 0.25s; }
+
+        .bank-rate-head { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; font-family: ui-monospace, monospace; }
+        .bank-rate-card .rate-bs { margin-top: 0; padding-top: 8px; }
+
+        .carousel-btn {
+            background: var(--bg-elev);
+            border: 1.5px solid var(--border);
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            flex-shrink: 0;
+            transition: all 0.25s var(--ease-soft);
+            padding: 0;
+            box-shadow: var(--shadow-sm);
+            z-index: 2;
+        }
+        @media (hover: hover) {
+            .carousel-btn:hover {
+                color: var(--accent);
+                border-color: var(--accent);
+                transform: scale(1.1);
+                box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 30%, transparent);
+            }
+        }
+        .carousel-btn:active { transform: scale(0.9); }
+        .carousel-btn svg { width: 20px; height: 20px; }
+
+        .carousel-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-top: 10px;
+        }
+        .carousel-dots-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .carousel-dots {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .carousel-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--border-strong);
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.4s var(--ease-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        .carousel-dot:hover { background: var(--text-muted); }
+        .carousel-dot.active {
+            background: color-mix(in srgb, var(--accent) 30%, var(--border-strong));
+            width: 32px;
+            border-radius: 4px;
+        }
+        .carousel-dot.active::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 4px;
+        }
+        .carousel-dot.active.animating::after {
+            animation: dotProgress 15s linear forwards;
+        }
+        @keyframes dotProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .autoplay-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 100px;
+            border: 1.5px solid var(--border);
+            background: var(--bg-elev);
+            color: var(--text-muted);
+            font-size: 12px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s var(--ease-soft);
+            font-family: inherit;
+        }
+        @media (hover: hover) {
+            .autoplay-btn:hover { border-color: var(--accent); color: var(--accent); }
+        }
+        .autoplay-btn.active {
+            color: var(--accent);
+            border-color: var(--accent);
+            background: color-mix(in srgb, var(--accent) 10%, var(--bg-elev));
+        }
+        .autoplay-btn svg { width: 12px; height: 12px; }
+        .autoplay-btn .icon-play { margin-left: 1px; }
+
+        @media (max-width: 500px) {
+            .carousel-btn { width: 36px; height: 36px; }
+            .carousel-btn svg { width: 16px; height: 16px; }
+            .bank-slide-inner { padding: 18px 14px; }
+            .bank-slide-rates { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .bank-rate-card { padding: 10px; }
+            .bank-rate-card .bs-label { font-size: 9.5px; }
+            .bank-rate-card .bs-val { font-size: 12.5px; }
+            .bank-slide-name { font-size: 16px; }
+            .bank-carousel { gap: 6px; }
+            .bank-logo-wrap { height: 48px; max-width: 180px; }
+            .bank-logo-wrap.is-full-bleed { width: 48px; min-width: 48px; height: 48px; border-radius: 12px; }
+            .bank-slide-logo { max-height: 48px; }
+        }
     </style>
 </head>
 <body>
@@ -966,26 +1231,49 @@
             </div>
         </section>
 
+        <!-- CAROUSEL SECTION -->
         <section class="card" id="card-rates-card">
             <div class="section-head">
                 <h2 class="section-title">
                     <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                    <span data-i18n="section_card_rates">Курс Валют по картам</span>
+                    <span data-i18n="section_card_rates">Курс Валют по картах</span>
                 </h2>
             </div>
-            <div class="bank-columns">
-                <div class="bank-column">
-                    <div class="bank-column-title">ПриватБанк</div>
-                    <div class="rate-grid" id="privat-rates-grid">
-                        <div class="rate-card skeleton"><div class="skeleton-shape sk-head"></div><div class="skeleton-shape sk-name"></div><div class="skeleton-shape sk-value"></div></div>
-                        <div class="rate-card skeleton"><div class="skeleton-shape sk-head"></div><div class="skeleton-shape sk-name"></div><div class="skeleton-shape sk-value"></div></div>
+
+            <div class="bank-carousel-wrapper">
+                <div class="bank-carousel" id="bank-carousel">
+                    <button class="carousel-btn carousel-prev" id="bank-prev" aria-label="Попередній банк">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                    </button>
+                    <div class="bank-carousel-viewport">
+                        <div class="bank-carousel-track" id="bank-track">
+                            <div class="bank-slide active">
+                                <div class="bank-slide-inner">
+                                    <div class="bank-slide-header">
+                                        <div class="skeleton-shape" style="width:54px;height:54px;border-radius:14px;"></div>
+                                        <div class="skeleton-shape" style="width:140px;height:18px;"></div>
+                                    </div>
+                                    <div class="bank-slide-rates">
+                                        <div class="skeleton-shape" style="height:82px;border-radius:12px;"></div>
+                                        <div class="skeleton-shape" style="height:82px;border-radius:12px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    <button class="carousel-btn carousel-next" id="bank-next" aria-label="Наступний банк">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
                 </div>
-                <div class="bank-column">
-                    <div class="bank-column-title">МоноБанк</div>
-                    <div class="rate-grid" id="mono-rates-grid">
-                        <div class="rate-card skeleton"><div class="skeleton-shape sk-head"></div><div class="skeleton-shape sk-name"></div><div class="skeleton-shape sk-value"></div></div>
-                        <div class="rate-card skeleton"><div class="skeleton-shape sk-head"></div><div class="skeleton-shape sk-name"></div><div class="skeleton-shape sk-value"></div></div>
+
+                <div class="carousel-controls">
+                    <div class="carousel-dots-wrapper">
+                        <button class="autoplay-btn active" id="bank-autoplay-btn" aria-pressed="true" title="Автопрокрутка 15с">
+                            <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+                            <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            <span data-i18n="autoplay_15s">Авто 15с</span>
+                        </button>
+                        <div class="carousel-dots" id="bank-dots"></div>
                     </div>
                 </div>
             </div>
@@ -1024,7 +1312,7 @@
                 <h3 data-i18n="privacy_h_stored">Що зберігається</h3>
                 <p data-i18n-html="privacy_p_stored">Усі налаштування (тема, мова, вибір валют) зберігаються локально у браузері через <code>localStorage</code>.</p>
                 <h3 data-i18n="privacy_h_external">Зовнішні запити</h3>
-                <p data-i18n-html="privacy_p_external">Курси валют читаються з публічного репозиторію на GitHub, який оновлюється з офіційних API: <code>bank.gov.ua</code>, <code>api.privatbank.ua</code>, <code>api.monobank.ua</code>, <code>api.coingecko.com</code>. Іконки криптовалют — <code>cdn.jsdelivr.net</code>. Прапори — <code>flagcdn.com</code>.</p>
+                <p data-i18n-html="privacy_p_external">Курси валют читаються з публічного репозиторію на GitHub, який оновлюється з офіційних сайтів та API банків (<code>bank.gov.ua</code>, <code>api.privatbank.ua</code>, <code>api.monobank.ua</code>, <code>api.coingecko.com</code>). Іконки криптовалют — <code>cdn.jsdelivr.net</code>, <code>cryptologos.cc</code>. Прапори — <code>flagcdn.com</code>.</p>
             </div>
         </details>
 
@@ -1258,12 +1546,25 @@
     </div>
 
     <div class="modal" id="crypto-chart-modal">
-        <div class="modal-panel" style="max-width:700px;">
-            <div class="modal-head">
-                <h2 class="modal-title" id="crypto-chart-title">Криптовалюта</h2>
+        <div class="modal-panel" style="max-width:740px;">
+            <div class="modal-head" style="margin-bottom:16px;">
+                <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+                    <span id="crypto-chart-icon"></span>
+                    <h2 class="modal-title" id="crypto-chart-title">Криптовалюта</h2>
+                    <span id="crypto-chart-badge" class="rate-change" style="align-self:center;"></span>
+                </div>
                 <button class="modal-close" id="crypto-chart-close">×</button>
             </div>
-            <div class="chart-container" style="height:350px;">
+            <div class="period-switcher" id="crypto-modal-period-switcher" style="margin-bottom:14px;">
+                <button class="period-btn" data-period="7D">7 Днів</button>
+                <button class="period-btn" data-period="1M">1 Місяць</button>
+                <button class="period-btn" data-period="6M">6 Міс.</button>
+                <button class="period-btn active" data-period="1Y">1 Рік</button>
+                <button class="period-btn" data-period="5Y">5 Років</button>
+                <button class="period-btn" data-period="MAX">Макс.</button>
+            </div>
+            <div id="crypto-chart-stats" style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);font-family:ui-monospace,monospace;margin-bottom:12px;"></div>
+            <div class="chart-container" style="height:340px;">
                 <canvas id="cryptoChart"></canvas>
             </div>
         </div>
@@ -1281,47 +1582,31 @@
             };
         }
 
-        const DATA_RAW      = 'https://raw.githubusercontent.com/He-Trogati-Mne/nbu-rate-data/main/data';
-        const DATA_JSDELIVR = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@latest/data';
-        const DATA          = DATA_JSDELIVR;
+        // =============== CONFIG ===============
+        const DATA          = 'https://raw.githubusercontent.com/He-Trogati-Mne/nbu-rate-data/main/data';
+        const DATA_JSDELIVR = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@main/data';
+        const BASE_DATA_URL = DATA_JSDELIVR;
         const CRYPTO_ICONS  = 'https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color';
-
-        const CRYPTO_ICON_OVERRIDES = {
-            'NEAR': 'https://assets.coingecko.com/coins/images/10365/small/near.jpg',
-            'APT':  'https://assets.coingecko.com/coins/images/26455/small/aptos_round.png',
-            'ARB':  'https://assets.coingecko.com/coins/images/16547/small/photo_2023-03-29_21.47.00.jpeg',
-            'OP':   'https://assets.coingecko.com/coins/images/25244/small/Optimism.png',
-            'SUI':  'https://assets.coingecko.com/coins/images/26375/small/sui_asset.jpeg',
-            'SHIB': 'https://assets.coingecko.com/coins/images/11939/small/shiba.png',
-            'TON':  'https://assets.coingecko.com/coins/images/17980/small/ton_symbol.png',
-            'GRAM': 'https://assets.coingecko.com/coins/images/17980/small/ton_symbol.png',
-            'LTC':  'https://assets.coingecko.com/coins/images/2/small/litecoin.png'
-        };
+        const COINGECKO_FALLBACK = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,tether,binancecoin,solana,usd-coin,ripple,cardano,dogecoin,avalanche-2,tron,the-open-network,chainlink,polkadot,litecoin,dai,wrapped-bitcoin,uniswap,near,aptos,arbitrum,optimism,sui,stellar&order=market_cap_desc&per_page=25&page=1&sparkline=true&price_change_percentage=24h';
 
         const URLS = {
-            nbu:     `${DATA}/nbu.json`,
-            history: `${DATA}/nbu-history.json`,
-            privat:  `${DATA}/privat.json`,
-            mono:    `${DATA}/mono.json`,
-            crypto:  `${DATA}/crypto.json`
+            nbu:     `${BASE_DATA_URL}/nbu.json`,
+            history: `${BASE_DATA_URL}/nbu-history.json`,
+            crypto:  `${BASE_DATA_URL}/crypto.json`
         };
-
         const URLS_RAW = {
-            history: `${DATA_RAW}/nbu-history.json`
+            history: `${DATA}/nbu-history.json`
         };
 
         const CORS_PROXY = 'https://nbu-rate.nightmod.workers.dev/?url=';
         const NBU_HISTORY = 'https://bank.gov.ua/NBU_Exchange/exchange_site';
 
         const FLAG_CODES = {
-            UAH:'ua',
-            USD:'us', EUR:'eu', GBP:'gb', PLN:'pl', CNY:'cn', CHF:'ch', JPY:'jp',
+            UAH:'ua', USD:'us', EUR:'eu', GBP:'gb', PLN:'pl', CNY:'cn', CHF:'ch', JPY:'jp',
             CAD:'ca', AUD:'au', TRY:'tr', SEK:'se', NOK:'no', DKK:'dk', CZK:'cz',
             HUF:'hu', RON:'ro', ILS:'il', KRW:'kr', SGD:'sg', HKD:'hk', NZD:'nz',
-            MXN:'mx', INR:'in',
-            TND:'tn', EGP:'eg', DZD:'dz', AED:'ae', SAR:'sa',
-            AZN:'az', GEL:'ge', KZT:'kz', MYR:'my', THB:'th',
-            MDL:'md', ZAR:'za', RSD:'rs'
+            MXN:'mx', INR:'in', TND:'tn', EGP:'eg', DZD:'dz', AED:'ae', SAR:'sa',
+            AZN:'az', GEL:'ge', KZT:'kz', MYR:'my', THB:'th', MDL:'md', ZAR:'za', RSD:'rs'
         };
         const METAL_COLORS = { XAU:'#D4AF37', XAG:'#8a8a8a', XPT:'#D8D8DC', XPD:'#B8BCC8', XDR:'#7C83B8' };
 
@@ -1334,197 +1619,161 @@
             NEAR:'#00C1DE', APT:'#00D9A5', ARB:'#12AAFF', OP:'#FF0420',
             SUI:'#4DA2FF', XLM:'#14B6E7'
         };
-
-        const ISO_NUMERIC = {
-            USD:840, EUR:978, GBP:826, PLN:985, CNY:156, CHF:756, JPY:392, CAD:124,
-            AUD:36,  TRY:949, SEK:752, NOK:578, DKK:208, CZK:203, HUF:348, RON:946,
-            ILS:376, KRW:410, SGD:702, HKD:344, NZD:554, MXN:484, INR:356,
-            TND:788, EGP:818, DZD:12,  AED:784, SAR:682,
-            AZN:944, GEL:981, KZT:398, MYR:458, THB:764,
-            MDL:498, ZAR:710, RSD:941, XDR:960,
-            XAU:959, XAG:961, XPT:962, XPD:964
+        const CRYPTO_EXTRA_ICONS = {
+            TON:  'https://cryptologos.cc/logos/toncoin-ton-logo.svg',
+            GRAM: 'https://cryptologos.cc/logos/toncoin-ton-logo.svg',
+            ARB:  'https://cryptologos.cc/logos/arbitrum-arb-logo.svg',
+            OP:   'https://cryptologos.cc/logos/optimism-ethereum-op-logo.svg',
+            AVAX: 'https://cryptologos.cc/logos/avalanche-avax-logo.svg',
+            SOL:  'https://cryptologos.cc/logos/solana-sol-logo.svg',
+            NEAR: 'https://coin-images.coingecko.com/coins/images/10365/large/near.jpg',
+            APT:  'https://coin-images.coingecko.com/coins/images/26455/large/aptos_round.png',
+            SUI:  'https://coin-images.coingecko.com/coins/images/26375/small/sui-ocean-square.png',
+            UNI:  'https://coin-images.coingecko.com/coins/images/12504/large/uniswap-logo.png',
+            USDC: 'https://coin-images.coingecko.com/coins/images/6319/large/USDC.png'
         };
-        const NUMERIC_TO_CC = Object.fromEntries(Object.entries(ISO_NUMERIC).map(([k, v]) => [v, k]));
+        const HIDDEN_CRYPTO = new Set(['SHIB']);
 
         const CURRENCIES = [
             'USD','EUR','GBP','PLN','CNY','CHF','JPY','CAD','AUD','TRY',
             'SEK','NOK','DKK','CZK','HUF','RON','ILS','KRW','SGD','HKD',
-            'NZD','MXN','INR',
-            'TND','EGP','DZD','AED','SAR',
-            'AZN','GEL','KZT','MYR','THB',
-            'MDL','ZAR','RSD','XDR',
-            'XAU','XAG','XPT','XPD'
+            'NZD','MXN','INR','TND','EGP','DZD','AED','SAR','AZN','GEL',
+            'KZT','MYR','THB','MDL','ZAR','RSD','XDR','XAU','XAG','XPT','XPD'
         ];
 
         const CARD_RATE_ORDER = ['USD', 'EUR', 'GBP', 'PLN'];
-        const CARD_RATE_ORDER_IDX = Object.fromEntries(CARD_RATE_ORDER.map((c, i) => [c, i]));
 
-        const BANK_LOGOS = {
-            privat: `<img src="bank/privat.png" class="bank-logo" alt="PrivatBank" width="32" height="32" loading="lazy" decoding="async" onerror="this.style.display='none'">`,
-            mono:   `<img src="bank/mono.png" class="bank-logo" alt="MonoBank" width="32" height="32" loading="lazy" decoding="async" onerror="this.style.display='none'">`
-        };
+        // =============== BANKS CONFIG ===============
+        const BANKS_CONFIG = [
+            { id: 'privat',          nameUk: 'ПриватБанк',     nameEn: 'PrivatBank',      logo: 'privat.png',          letter: 'П' },
+            { id: 'mono',            nameUk: 'МоноБанк',       nameEn: 'MonoBank',        logo: 'mono.png',            letter: 'М', fullBleed: true },
+            { id: 'oschad',          nameUk: 'Ощадбанк',       nameEn: 'Oschadbank',      logo: 'oschad.png',          letter: 'О' },
+            { id: 'pumb',            nameUk: 'ПУМБ',           nameEn: 'PUMB',            logo: 'pumb.png',            letter: 'П' },
+            { id: 'raif',            nameUk: 'Райффайзен',     nameEn: 'Raiffeisen',      logo: 'raif.png',            letter: 'Р' },
+            { id: 'ukrsib',          nameUk: 'УкрСиббанк',     nameEn: 'UkrSibbank',      logo: 'ukrsib.png',          letter: 'У' },
+            { id: 'sense',           nameUk: 'Sense Bank',     nameEn: 'Sense Bank',      logo: 'sense.png',           letter: 'S' },
+            { id: 'otp',             nameUk: 'ОТП Банк',       nameEn: 'OTP Bank',        logo: 'otp.png',             letter: 'О' },
+            { id: 'ukrexim',         nameUk: 'Укрексімбанк',   nameEn: 'UkrEximBank',     logo: 'ukrexim.png',         letter: 'У' },
+            { id: 'ukrgas',          nameUk: 'Укргазбанк',     nameEn: 'UkrGasBank',      logo: 'ukrgas.png',          letter: 'У' },
+            { id: 'a-bank',          nameUk: 'А-Банк',         nameEn: 'A-Bank',          logo: 'a-bank.png',          letter: 'А' },
+            { id: 'kredo',           nameUk: 'Кредобанк',      nameEn: 'KredoBank',       logo: 'kredo.png',           letter: 'К' },
+            { id: 'tas',             nameUk: 'Таскомбанк',     nameEn: 'TAScombank',      logo: 'tas.png',             letter: 'Т' },
+            { id: 'credit-agricole', nameUk: 'Креді Агріколь', nameEn: 'Credit Agricole', logo: 'credit-agricole.png', letter: 'C' },
+            { id: 'pinbank',         nameUk: 'Перший інвестиційний банк', nameEn: 'First Investment Bank', logo: 'pinbank.png', letter: 'П' },
+            { id: 'procredit',       nameUk: 'ПроКредит Банк', nameEn: 'ProCredit Bank',  logo: 'procredit.png',       letter: 'П' },
+            { id: 'pravex',          nameUk: 'Правекс Банк',   nameEn: 'Pravex Bank',     logo: 'pravex.png',          letter: 'П' },
+            { id: 'idea',            nameUk: 'Ідея Банк',      nameEn: 'Idea Bank',       logo: 'idea.png',            letter: 'І' },
+            { id: 'piraeus',         nameUk: 'Піреус Банк',    nameEn: 'Piraeus Bank',    logo: 'piraeus.png',         letter: 'П' },
+            { id: 'universal',       nameUk: 'Універсал Банк', nameEn: 'Universal Bank',  logo: 'universal.png',       letter: 'У' },
+            { id: 'pivdenny',        nameUk: 'Банк Південний', nameEn: 'Bank Pivdenny',   logo: 'pivdenny.png',        letter: 'П' },
+            { id: 'credit-dnipro',   nameUk: 'Банк Кредит Дніпро', nameEn: 'Credit Dnipro Bank', logo: 'credit-dnipro.png', letter: 'К' },
+            { id: 'mtb',             nameUk: 'МТБ Банк',       nameEn: 'MTB Bank',        logo: 'mtb.png',             letter: 'М' },
+            { id: 'vostok',          nameUk: 'Банк Восток',    nameEn: 'Bank Vostok',     logo: 'vostok.png',          letter: 'В' },
+            { id: 'accord',          nameUk: 'Акордбанк',      nameEn: 'Accordbank',      logo: 'accord.png',          letter: 'А' },
+            { id: 'lviv',            nameUk: 'Банк Львів',     nameEn: 'Bank Lviv',       logo: 'lviv.png',            letter: 'Л' },
+            { id: 'globus',          nameUk: 'Глобус Банк',    nameEn: 'Globus Bank',     logo: 'globus.png',          letter: 'Г' },
+            { id: 'alliance',        nameUk: 'Банк Альянс',    nameEn: 'Bank Alliance',   logo: 'alliance.png',        letter: 'А' },
+            { id: 'industrial',      nameUk: 'Індустріалбанк', nameEn: 'Industrialbank',  logo: 'industrial.png',      letter: 'І' },
+            { id: 'radabank',        nameUk: 'Радабанк',       nameEn: 'Radabank',        logo: 'radabank.png',        letter: 'Р' },
+            { id: 'mib',             nameUk: 'Міжнародний Інвестиційний Банк', nameEn: 'International Investment Bank', logo: 'mib.png', letter: 'М' },
+            { id: 'asvio',           nameUk: 'Асвіо Банк',     nameEn: 'Asvio Bank',      logo: 'asvio.png',           letter: 'А' },
+            { id: 'komin',           nameUk: 'Комінбанк',      nameEn: 'Kominbank',       logo: 'komin.png',           letter: 'К' },
+            { id: 'krystal',         nameUk: 'Кристалбанк',    nameEn: 'Krystalbank',     logo: 'krystal.png',         letter: 'К' },
+            { id: 'agroprosperis',   nameUk: 'Агропросперіс Банк', nameEn: 'Agroprosperis Bank', logo: 'agroprosperis.png', letter: 'А' },
+            { id: 'clearing',        nameUk: 'Банк Кліринговий Дім', nameEn: 'Clearing House Bank', logo: 'clearing.png', letter: 'Б' },
+            { id: 'poltava',         nameUk: 'Полтава-Банк',   nameEn: 'Poltava-Bank',    logo: 'poltava.png',         letter: 'П' },
+            { id: 'polikom',         nameUk: 'Полікомбанк',    nameEn: 'Polikombank',     logo: 'polikom.png',         letter: 'П' },
+            { id: 'unex',            nameUk: 'Юнекс Банк',     nameEn: 'Unex Bank',       logo: 'unex.png',            letter: 'Ю' },
+            { id: 'altbank',         nameUk: 'Альтбанк',       nameEn: 'Altbank',         logo: 'altbank.png',         letter: 'А' },
+            { id: 'sky',             nameUk: 'Скай Банк',      nameEn: 'Sky Bank',        logo: 'sky.png',             letter: 'С' },
+            { id: 'ukrcapital',      nameUk: 'Банк Український капітал', nameEn: 'Ukrainian Capital Bank', logo: 'ukrcapital.png', letter: 'У' },
+            { id: 'bank34',          nameUk: 'Банк 3/4',       nameEn: 'Bank 3/4',        logo: 'bank34.png',          letter: 'Б' },
+            { id: 'avangard',        nameUk: 'Банк Авангард',  nameEn: 'Bank Avangard',   logo: 'avangard.png',        letter: 'А' },
+            { id: 'bizbank',         nameUk: 'Бізбанк',        nameEn: 'Bizbank',         logo: 'bizbank.png',         letter: 'Б' },
+            { id: 'metabank',        nameUk: 'МетаБанк',       nameEn: 'MetaBank',        logo: 'metabank.png',        letter: 'М' },
+            { id: 'oksi',            nameUk: 'Оксі Банк',      nameEn: 'Oksi Bank',       logo: 'oksi.png',            letter: 'О' },
+            { id: 'grant',           nameUk: 'Банк Грант',     nameEn: 'Bank Grant',      logo: 'grant.png',           letter: 'Б' },
+            { id: 'family',          nameUk: 'Банк Фамільний', nameEn: 'Family Bank',     logo: 'family.png',          letter: 'Б' },
+            { id: 'trust-capital',   nameUk: 'Банк Траст-капітал', nameEn: 'Trust-Capital Bank', logo: 'trust-capital.png', letter: 'Б' }
+        ];
 
         const TRANSLATIONS = {
             uk: {
-                hero_title: 'Курс НБУ',
-                hero_subtitle: 'Офіційні курси валют, конвертер та історія з 2003 року',
-                section_converter: 'Конвертер',
-                section_analytics: 'Аналітика',
-                section_card_rates: 'Курс Валют по картам',
-                section_crypto: 'Криптовалюта',
+                hero_title: 'Курс НБУ', hero_subtitle: 'Офіційні курси валют, конвертер та історія з 2003 року',
+                section_converter: 'Конвертер', section_analytics: 'Аналітика',
+                section_card_rates: 'Курс Валют по картах', section_crypto: 'Криптовалюта',
                 privacy_title: 'Політика конфіденційності',
-                privacy_h_what: 'Які дані ми збираємо',
-                privacy_p_what: 'Сайт «Курс НБУ» не збирає жодних персональних даних: ні ім\'я, ні email, ні історію, ні місцезнаходження.',
-                privacy_h_stored: 'Що зберігається',
-                privacy_p_stored: 'Усі налаштування (тема, мова, вибір валют) зберігаються локально у браузері через <code>localStorage</code>.',
-                privacy_h_external: 'Зовнішні запити',
-                privacy_p_external: 'Курси валют читаються з публічного репозиторію на GitHub, який оновлюється з офіційних API: <code>bank.gov.ua</code>, <code>api.privatbank.ua</code>, <code>api.monobank.ua</code>, <code>api.coingecko.com</code>. Іконки криптовалют — <code>cdn.jsdelivr.net</code>. Прапори — <code>flagcdn.com</code>.',
-                label_from: 'З валюти', label_to: 'У валюту',
-                settings_title: 'Налаштування',
-                settings_language: 'Мова', settings_theme: 'Тема', settings_a11y: 'Доступність',
-                settings_advanced: 'Додатково',
-                precise_rate: 'Точний курс (4 знаки)',
-                precise_rate_desc: 'Показувати 44.6743 замість 44.67',
+                privacy_h_what: 'Які дані ми збираємо', privacy_p_what: 'Сайт «Курс НБУ» не збирає жодних персональних даних: ні ім\'я, ні email, ні історію, ні місцезнаходження.',
+                privacy_h_stored: 'Що зберігається', privacy_p_stored: 'Усі налаштування (тема, мова, вибір валют) зберігаються локально у браузері через <code>localStorage</code>.',
+                privacy_h_external: 'Зовнішні запити', privacy_p_external: 'Курси валют читаються з публічного репозиторію на GitHub, який оновлюється з офіційних сайтів та API банків (<code>bank.gov.ua</code>, <code>api.privatbank.ua</code>, <code>api.monobank.ua</code>, <code>api.coingecko.com</code>). Іконки криптовалют — <code>cdn.jsdelivr.net</code>, <code>cryptologos.cc</code>. Прапори — <code>flagcdn.com</code>.',
+                label_from: 'З валюти', label_to: 'У валюту', settings_title: 'Налаштування',
+                settings_language: 'Мова', settings_theme: 'Тема', settings_a11y: 'Доступність', settings_advanced: 'Додатково',
+                precise_rate: 'Точний курс (4 знаки)', precise_rate_desc: 'Показувати 44.6743 замість 44.67',
                 theme_light: 'Світла', theme_dark: 'Темна', theme_system: 'Системна', theme_custom: 'Власна',
-                color_bg: 'Фон', color_text: 'Текст', color_accent: 'Акцент', color_reset: 'Скинути',
-                color_preset_label: 'Швидкі пресети:',
-                a11y_cvd: 'Режим для дальтоніків', a11y_cvd_desc: 'Замінює кольори та додає символи',
-                a11y_symbols: 'Символи замість кольору', a11y_symbols_desc: 'Додає ▲▼● та текстові мітки',
-                a11y_underline: 'Підкреслювати зміну', a11y_underline_desc: 'Стрілки ↑↓→ підкреслені',
-                a11y_font: 'Великий шрифт', a11y_font_desc: 'Розмір тексту інтерфейсу (100–150%)',
-                period_1d: '1 День', period_5d: '5 Днів', period_1m: '1 Місяць',
-                period_1y: '1 Рік', period_5y: '5 Років', period_max: 'Макс.',
-                picker_title_from: 'З валюти', picker_title_to: 'У валюту',
-                picker_search: 'Пошук (USD, Долар...)',
-                status_loading: 'Завантаження курсів...',
-                status_loading_n: 'Завантажено {n}/{total} валют...',
-                status_updated: 'Оновлено {date}',
-                status_error: 'Помилка завантаження',
-                status_rate_limited: 'Забагато запитів, спробуйте пізніше',
-                status_cors: 'Не вдалося отримати дані (мережа/проксі)',
-                no_data: 'Дані ще не завантажені',
-                insufficient_data: 'Недостатньо даних',
-                buy_label: 'Купівля', sell_label: 'Продаж',
-                load_error: 'Не вдалося завантажити',
-                no_data_short: 'Немає даних',
-                bank_privat: 'ПриватБанк',
-                bank_mono: 'МоноБанк',
-
-                USD:'Долар США', EUR:'Євро', GBP:'Фунт стерлінгів', PLN:'Польський злотий',
-                CNY:'Китайський юань', CHF:'Швейцарський франк', JPY:'Японська єна',
-                CAD:'Канадський долар', AUD:'Австралійський долар', TRY:'Турецька ліра',
-                SEK:'Шведська крона', NOK:'Норвезька крона', DKK:'Данська крона',
-                CZK:'Чеська крона', HUF:'Угорський форинт', RON:'Румунський лей',
-                ILS:'Ізраїльський шекель', KRW:'Південнокорейська вона', SGD:'Сінгапурський долар',
-                HKD:'Гонконгський долар', NZD:'Новозеландський долар', MXN:'Мексиканське песо',
-                INR:'Індійська рупія',
-                TND:'Туніський динар', EGP:'Єгипетський фунт',
-                DZD:'Алжирський динар', AED:'Дирхам ОАЕ',
-                SAR:'Саудівський ріял', AZN:'Азербайджанський манат', GEL:'Грузинський ларі',
-                KZT:'Казахстанський теньге', MYR:'Малайзійський ринггіт', THB:'Таїландський бат',
-                MDL:'Молдовський лей', ZAR:'Південноафриканський ренд',
-                RSD:'Сербський динар', XDR:'СПЗ (спеціальні права запозичення)',
-                XAU:'Золото (тройська унція)', XAG:'Срібло (тройська унція)',
-                XPT:'Платина (тройська унція)', XPD:'Паладій (тройська унція)',
-                UAH:'Українська гривня'
+                color_bg: 'Фон', color_text: 'Текст', color_accent: 'Акцент', color_reset: 'Скинути', color_preset_label: 'Швидкі пресети:',
+                a11y_cvd: 'Режим для дальтоніків', a11y_cvd_desc: 'Замінює кольори та додає символи', a11y_symbols: 'Символи замість кольору', a11y_symbols_desc: 'Додає ▲▼● та текстові мітки',
+                a11y_underline: 'Підкреслювати зміну курсу', a11y_underline_desc: 'Стрілки ↑↓→ підкреслені — видно без кольору', a11y_font: 'Великий шрифт', a11y_font_desc: 'Розмір тексту інтерфейсу (100–150%)',
+                period_1d: '1 День', period_5d: '5 Днів', period_7d: '7 Днів', period_1m: '1 Місяць', period_6m: '6 Міс.', period_1y: '1 Рік', period_5y: '5 Років', period_max: 'Макс.',
+                picker_title_from: 'З валюти', picker_title_to: 'У валюту', picker_search: 'Пошук (USD, Долар...)',
+                status_loading: 'Завантаження курсів...', status_loading_n: 'Завантажено {n}/{total} валют...', status_updated: 'Оновлено {date}',
+                status_error: 'Помилка завантаження', status_rate_limited: 'Забагато запитів, спробуйте пізніше', status_cors: 'Не вдалося отримати дані (мережа/проксі)',
+                no_data: 'Дані ще не завантажені', insufficient_data: 'Недостатньо даних', buy_label: 'Купівля', sell_label: 'Продаж',
+                min_label: 'Мін', max_label: 'Макс', current_label: 'Зараз',
+                load_error: 'Не вдалося завантажити', no_data_short: 'Немає даних', bank_privat: 'ПриватБанк', bank_mono: 'МоноБанк',
+                autoplay_15s: 'Авто 15с',
+                USD:'Долар США', EUR:'Євро', GBP:'Фунт стерлінгів', PLN:'Польський злотий', CNY:'Китайський юань', CHF:'Швейцарський франк', JPY:'Японська єна',
+                CAD:'Канадський долар', AUD:'Австралійський долар', TRY:'Турецька ліра', SEK:'Шведська крона', NOK:'Норвезька крона', DKK:'Данська крона',
+                CZK:'Чеська крона', HUF:'Угорський форинт', RON:'Румунський лей', ILS:'Ізраїльський шекель', KRW:'Південнокорейська вона', SGD:'Сінгапурський долар',
+                HKD:'Гонконгський долар', NZD:'Новозеландський долар', MXN:'Мексиканське песо', INR:'Індійська рупія', TND:'Туніський динар', EGP:'Єгипетський фунт',
+                DZD:'Алжирський динар', AED:'Дирхам ОАЕ', SAR:'Саудівський ріял', AZN:'Азербайджанський манат', GEL:'Грузинський ларі', KZT:'Казахстанський теньге', MYR:'Малайзійський ринггіт', THB:'Таїландський бат',
+                MDL:'Молдовський лей', ZAR:'Південноафриканський ренд', RSD:'Сербський динар', XDR:'СПЗ (спеціальні права запозичення)', XAU:'Золото (тройська унція)', XAG:'Срібло (тройська унція)', XPT:'Платина (тройська унція)', XPD:'Паладій (тройська унція)', UAH:'Українська гривня'
             },
             en: {
-                hero_title: 'NBU Rate',
-                hero_subtitle: 'Official exchange rates, converter and history since 2003',
-                section_converter: 'Converter',
-                section_analytics: 'Analytics',
-                section_card_rates: 'Card Rates',
-                section_crypto: 'Cryptocurrency',
-                privacy_title: 'Privacy Policy',
-                privacy_h_what: 'What data we collect',
-                privacy_p_what: 'The "NBU Rate" site does not collect any personal data: no name, no email, no browsing history, no location.',
-                privacy_h_stored: 'What is stored',
-                privacy_p_stored: 'All settings (theme, language, currency selection) are stored locally in your browser via <code>localStorage</code>.',
-                privacy_h_external: 'External requests',
-                privacy_p_external: 'Exchange rates are read from a public GitHub repository that is updated from official APIs: <code>bank.gov.ua</code>, <code>api.privatbank.ua</code>, <code>api.monobank.ua</code>, <code>api.coingecko.com</code>. Cryptocurrency icons — <code>cdn.jsdelivr.net</code>. Flags — <code>flagcdn.com</code>.',
-                label_from: 'From', label_to: 'To',
-                settings_title: 'Settings',
-                settings_language: 'Language', settings_theme: 'Theme', settings_a11y: 'Accessibility',
-                settings_advanced: 'Advanced',
-                precise_rate: 'Precise rate (4 decimals)',
-                precise_rate_desc: 'Show 44.6743 instead of 44.67',
+                hero_title: 'NBU Rate', hero_subtitle: 'Official exchange rates, converter and history since 2003',
+                section_converter: 'Converter', section_analytics: 'Analytics', section_card_rates: 'Card Rates', section_crypto: 'Cryptocurrency',
+                privacy_title: 'Privacy Policy', privacy_h_what: 'What data we collect', privacy_p_what: 'The "NBU Rate" site does not collect any personal data: no name, no email, no browsing history, no location.',
+                privacy_h_stored: 'What is stored', privacy_p_stored: 'All settings (theme, language, currency selection) are stored locally in your browser via <code>localStorage</code>.',
+                privacy_h_external: 'External requests', privacy_p_external: 'Exchange rates are read from a public GitHub repository updated from official bank websites and APIs (<code>bank.gov.ua</code>, <code>api.privatbank.ua</code>, <code>api.monobank.ua</code>, <code>api.coingecko.com</code>). Crypto icons — <code>cdn.jsdelivr.net</code>, <code>cryptologos.cc</code>. Flags — <code>flagcdn.com</code>.',
+                label_from: 'From', label_to: 'To', settings_title: 'Settings', settings_language: 'Language',
+                settings_theme: 'Theme', settings_a11y: 'Accessibility', settings_advanced: 'Advanced',
+                precise_rate: 'Precise rate (4 decimals)', precise_rate_desc: 'Show 44.6743 instead of 44.67',
                 theme_light: 'Light', theme_dark: 'Dark', theme_system: 'System', theme_custom: 'Custom',
-                color_bg: 'Background', color_text: 'Text', color_accent: 'Accent', color_reset: 'Reset',
-                color_preset_label: 'Quick presets:',
-                a11y_cvd: 'Colorblind mode', a11y_cvd_desc: 'Replaces colors and adds symbols',
-                a11y_symbols: 'Symbols instead of color', a11y_symbols_desc: 'Adds ▲▼● and text labels',
-                a11y_underline: 'Underline rate changes', a11y_underline_desc: '↑↓→ arrows underlined',
-                a11y_font: 'Large font', a11y_font_desc: 'Interface text size (100–150%)',
-                period_1d: '1 Day', period_5d: '5 Days', period_1m: '1 Month',
-                period_1y: '1 Year', period_5y: '5 Years', period_max: 'Max',
-                picker_title_from: 'From', picker_title_to: 'To',
-                picker_search: 'Search (USD, Dollar...)',
-                status_loading: 'Loading rates...',
-                status_loading_n: 'Loaded {n}/{total} currencies...',
-                status_updated: 'Updated {date}',
-                status_error: 'Loading error',
-                status_rate_limited: 'Too many requests, try later',
-                status_cors: 'Failed to fetch (network/proxy)',
-                no_data: 'Data not loaded yet',
-                insufficient_data: 'Not enough data',
-                buy_label: 'Buy', sell_label: 'Sell',
-                load_error: 'Failed to load',
-                no_data_short: 'No data',
-                bank_privat: 'PrivatBank',
-                bank_mono: 'MonoBank',
-
-                USD:'US Dollar', EUR:'Euro', GBP:'British Pound', PLN:'Polish Zloty',
-                CNY:'Chinese Yuan', CHF:'Swiss Franc', JPY:'Japanese Yen',
-                CAD:'Canadian Dollar', AUD:'Australian Dollar', TRY:'Turkish Lira',
-                SEK:'Swedish Krona', NOK:'Norwegian Krone', DKK:'Danish Krone',
-                CZK:'Czech Koruna', HUF:'Hungarian Forint', RON:'Romanian Leu',
-                ILS:'Israeli Shekel', KRW:'South Korean Won', SGD:'Singapore Dollar',
-                HKD:'Hong Kong Dollar', NZD:'New Zealand Dollar', MXN:'Mexican Peso',
-                INR:'Indian Rupee',
-                TND:'Tunisian Dinar', EGP:'Egyptian Pound',
-                DZD:'Algerian Dinar', AED:'UAE Dirham',
-                SAR:'Saudi Riyal', AZN:'Azerbaijani Manat', GEL:'Georgian Lari',
-                KZT:'Kazakhstani Tenge', MYR:'Malaysian Ringgit', THB:'Thai Baht',
-                MDL:'Moldovan Leu', ZAR:'South African Rand',
-                RSD:'Serbian Dinar', XDR:'SDR (Special Drawing Rights)',
-                XAU:'Gold (troy ounce)', XAG:'Silver (troy ounce)',
-                XPT:'Platinum (troy ounce)', XPD:'Palladium (troy ounce)',
-                UAH:'Ukrainian Hryvnia'
+                color_bg: 'Background', color_text: 'Text', color_accent: 'Accent', color_reset: 'Reset', color_preset_label: 'Quick presets:',
+                a11y_cvd: 'Colorblind mode', a11y_cvd_desc: 'Replaces colors and adds symbols', a11y_symbols: 'Symbols instead of color', a11y_symbols_desc: 'Adds ▲▼● and text labels',
+                a11y_underline: 'Underline rate changes', a11y_underline_desc: '↑↓→ arrows underlined', a11y_font: 'Large font', a11y_font_desc: 'Interface text size (100–150%)',
+                period_1d: '1 Day', period_5d: '5 Days', period_7d: '7 Days', period_1m: '1 Month', period_6m: '6 Mos', period_1y: '1 Year', period_5y: '5 Years', period_max: 'Max',
+                picker_title_from: 'From', picker_title_to: 'To', picker_search: 'Search (USD, Dollar...)',
+                status_loading: 'Loading rates...', status_loading_n: 'Loaded {n}/{total} currencies...', status_updated: 'Updated {date}',
+                status_error: 'Loading error', status_rate_limited: 'Too many requests, try later', status_cors: 'Failed to fetch (network/proxy)',
+                no_data: 'Data not loaded yet', insufficient_data: 'Not enough data', buy_label: 'Buy', sell_label: 'Sell',
+                min_label: 'Min', max_label: 'Max', current_label: 'Now',
+                load_error: 'Failed to load', no_data_short: 'No data', bank_privat: 'PrivatBank', bank_mono: 'MonoBank',
+                autoplay_15s: 'Auto 15s',
+                USD:'US Dollar', EUR:'Euro', GBP:'British Pound', PLN:'Polish Zloty', CNY:'Chinese Yuan', CHF:'Swiss Franc', JPY:'Japanese Yen',
+                CAD:'Canadian Dollar', AUD:'Australian Dollar', TRY:'Turkish Lira', SEK:'Swedish Krona', NOK:'Norwegian Krone', DKK:'Danish Krone',
+                CZK:'Czech Koruna', HUF:'Hungarian Forint', RON:'Romanian Leu', ILS:'Israeli Shekel', KRW:'South Korean Won', SGD:'Singapore Dollar',
+                HKD:'Hong Kong Dollar', NZD:'New Zealand Dollar', MXN:'Mexican Peso', INR:'Indian Rupee', TND:'Tunisian Dinar', EGP:'Egyptian Pound',
+                DZD:'Algerian Dinar', AED:'UAE Dirham', SAR:'Saudi Riyal', AZN:'Azerbaijani Manat', GEL:'Georgian Lari', KZT:'Kazakhstani Tenge',
+                MYR:'Malaysian Ringgit', THB:'Thai Baht', MDL:'Moldovan Leu', ZAR:'South African Rand', RSD:'Serbian Dinar', XDR:'SDR (Special Drawing Rights)',
+                XAU:'Gold (troy ounce)', XAG:'Silver (troy ounce)', XPT:'Platinum (troy ounce)', XPD:'Palladium (troy ounce)', UAH:'Ukrainian Hryvnia'
             }
         };
 
         const CHART_COLORS = {
-            USD:'#1a73e8',EUR:'#34a853',GBP:'#ea4335',PLN:'#fbbc04',CNY:'#ff6d01',
-            CHF:'#d93025',JPY:'#bc002d',CAD:'#d80621',AUD:'#00008b',TRY:'#e30a17',
-            SEK:'#006AA7',NOK:'#BA0C2F',DKK:'#C60C30',CZK:'#11457E',HUF:'#477050',
-            RON:'#002B7F',ILS:'#0038B8',KRW:'#CD2E3A',SGD:'#EF3340',
-            HKD:'#DE2910',NZD:'#7a7a7a',MXN:'#006847',INR:'#FF9933',
-            TND:'#E70013',EGP:'#C8102E',DZD:'#006233',AED:'#00732F',SAR:'#165d31',
-            AZN:'#00B5E2',GEL:'#DA291C',KZT:'#00AFCA',MYR:'#CC0001',THB:'#A51931',
-            MDL:'#003DA5',ZAR:'#007A4D',RSD:'#C6363C',XDR:'#7C83B8',
-            XAU:'#D4AF37',XAG:'#8a8a8a',XPT:'#D8D8DC',XPD:'#B8BCC8'
+            USD:'#1a73e8',EUR:'#34a853',GBP:'#ea4335',PLN:'#fbbc04',CNY:'#ff6d01',CHF:'#d93025',JPY:'#bc002d',CAD:'#d80621',
+            AUD:'#00008b',TRY:'#e30a17',SEK:'#006AA7',NOK:'#BA0C2F',DKK:'#C60C30',CZK:'#11457E',HUF:'#477050',RON:'#002B7F',
+            ILS:'#0038B8',KRW:'#CD2E3A',SGD:'#EF3340',HKD:'#DE2910',NZD:'#7a7a7a',MXN:'#006847',INR:'#FF9933',TND:'#E70013',
+            EGP:'#C8102E',DZD:'#006233',AED:'#00732F',SAR:'#165d31',AZN:'#00B5E2',GEL:'#DA291C',KZT:'#00AFCA',MYR:'#CC0001',
+            THB:'#A51931',MDL:'#003DA5',ZAR:'#007A4D',RSD:'#C6363C',XDR:'#7C83B8',XAU:'#D4AF37',XAG:'#8a8a8a',XPT:'#D8D8DC',XPD:'#B8BCC8'
         };
 
         const PRESETS = {
-            midnight:{bg:'#0f172a',text:'#e2e8f0',accent:'#38bdf8'},
-            nord:{bg:'#2e3440',text:'#eceff4',accent:'#88c0d0'},
-            dracula:{bg:'#282a36',text:'#f8f8f2',accent:'#bd93f9'},
-            sepia:{bg:'#f4ecd8',text:'#3b2f1e',accent:'#8b5a2b'},
-            forest:{bg:'#0f2417',text:'#d1fae5',accent:'#4ade80'},
-            rose:{bg:'#fff1f2',text:'#4c0519',accent:'#e11d48'}
+            midnight:{bg:'#0f172a',text:'#e2e8f0',accent:'#38bdf8'}, nord:{bg:'#2e3440',text:'#eceff4',accent:'#88c0d0'},
+            dracula:{bg:'#282a36',text:'#f8f8f2',accent:'#bd93f9'}, sepia:{bg:'#f4ecd8',text:'#3b2f1e',accent:'#8b5a2b'},
+            forest:{bg:'#0f2417',text:'#d1fae5',accent:'#4ade80'}, rose:{bg:'#fff1f2',text:'#4c0519',accent:'#e11d48'}
         };
-
-        const PRESET_ICONS = {
-            midnight: 'color-fvcn/blue.ico',
-            nord: 'color-fvcn/lightblue.ico',
-            dracula: 'color-fvcn/purple.ico',
-            sepia: 'color-fvcn/brown.ico',
-            forest: 'color-fvcn/green.ico',
-            rose: 'color-fvcn/red.ico'
-        };
-
+        const PRESET_ICONS = { midnight:'color-fvcn/blue.ico', nord:'color-fvcn/lightblue.ico', dracula:'color-fvcn/purple.ico', sepia:'color-fvcn/brown.ico', forest:'color-fvcn/green.ico', rose:'color-fvcn/red.ico' };
         const DEFAULT_FAVICON = 'favicon.ico';
-
         const DEFAULT_CUSTOM = {bg:'#1a1a1a',text:'#e8eaed',accent:'#8ab4f8'};
         const DEFAULT_A11Y = {cvd:false,palette:'universal',font:100,symbols:true,underline:false};
 
@@ -1542,12 +1791,15 @@
         const START_DATE = '20030101';
         const REQUEST_TIMEOUT = 30000;
         const CONCURRENCY = 6;
+        const CAROUSEL_INTERVAL = 15000;
 
         let currentLang = safeLS.getItem(LANG_KEY) || 'uk';
         let showPreciseRate = true;
         let currentCurrency = 'USD';
         let currentPeriod = 'MAX';
         let currentCryptoPeriod = 'MAX';
+        let activeCryptoCoin = null;
+        let activeCryptoModalPeriod = '1Y';
         let chartInstance = null;
         let cardChartInstance = null;
         let cryptoChartInstance = null;
@@ -1560,6 +1812,7 @@
         let pickerTarget = null;
         let historyLoading = false;
         let fullHistoryReady = false;
+        const bankCarouselState = { current: 0, total: 0, autoplay: true, paused: false, timer: null };
 
         const $ = (s) => document.querySelector(s);
         const $$ = (s) => document.querySelectorAll(s);
@@ -1572,59 +1825,47 @@
         }
         function currencyName(code) { return t(code) || code; }
         function currentDecimals() { return showPreciseRate ? 4 : 2; }
+        function bankDisplayName(bank) { return currentLang === 'en' ? bank.nameEn : bank.nameUk; }
 
         function flagUrl(code) {
             const f = FLAG_CODES[code];
-            if (!f) return null;
-            return `https://flagcdn.com/w40/${f}.png`;
+            return f ? `https://flagcdn.com/w40/${f}.png` : null;
         }
         function flagHtml(code, cssClass = 'rate-flag') {
-            if (code in METAL_COLORS) {
-                return `<span class="flag-metal-wrap" style="width:26px;height:18px;background:${METAL_COLORS[code]};"></span>`;
-            }
+            if (code in METAL_COLORS) return `<span class="flag-metal-wrap" style="width:26px;height:18px;background:${METAL_COLORS[code]};"></span>`;
             const url = flagUrl(code);
             if (!url) return `<span class="${cssClass}-fallback">${code}</span>`;
             return `<img class="${cssClass}" src="${url}" alt="${code}" width="26" height="18" loading="lazy" decoding="async" onerror="this.style.display='none'">`;
         }
-
-        function cryptoIcon(symbol) {
-            const upper = String(symbol).toUpperCase();
-            const fallbackColor = CRYPTO_COLORS[upper] || '#666';
-            const letter = upper.charAt(0);
-            const url = CRYPTO_ICON_OVERRIDES[upper] || `${CRYPTO_ICONS}/${upper.toLowerCase()}.svg`;
-            return `<img class="crypto-icon" src="${url}" alt="${upper}" loading="lazy" decoding="async"
-                        onerror="var s=document.createElement('span');s.className='crypto-icon-fallback';s.style.background='${fallbackColor}';s.textContent='${letter}';this.replaceWith(s);">`;
+        function cryptoIcon(symbol, imageUrl = null) {
+            const sym = String(symbol || '').toUpperCase();
+            const lower = sym.toLowerCase();
+            const cdnSvg = `${CRYPTO_ICONS}/${lower}.svg`;
+            const hdJsonImg = imageUrl ? String(imageUrl).replace('/small/', '/large/') : null;
+            const primary = CRYPTO_EXTRA_ICONS[sym] || cdnSvg || hdJsonImg;
+            const fallbackUrl = hdJsonImg && hdJsonImg !== primary ? hdJsonImg : (primary !== cdnSvg ? cdnSvg : '');
+            const fallbackColor = CRYPTO_COLORS[sym] || '#666';
+            const letter = sym.charAt(0);
+            const fallbackAttr = fallbackUrl ? ` data-fb="${fallbackUrl}"` : '';
+            return `<img class="crypto-icon" src="${primary}" alt="${sym}"${fallbackAttr} loading="lazy" decoding="async" onerror="if(this.dataset.fb&&this.src!==this.dataset.fb){var u=this.dataset.fb;this.dataset.fb='';this.src=u;return;}var s=document.createElement('span');s.className='crypto-icon-fallback';s.style.background='${fallbackColor}';s.textContent='${letter}';this.replaceWith(s);">`;
         }
-
         function sparklineSvg(history, color, width = 300, height = 60) {
             const dates = Object.keys(history || {}).sort();
             if (dates.length < 2) return `<div class="sparkline-empty">—</div>`;
             const values = dates.map(d => history[d]).filter(v => typeof v === 'number' && !isNaN(v));
             if (values.length < 2) return `<div class="sparkline-empty">—</div>`;
-            const min = Math.min(...values);
-            const max = Math.max(...values);
-            const range = max - min || 1;
-            const padY = 4;
-            const usableH = height - padY * 2;
-            const points = values.map((v, i) => {
-                const x = (i / (values.length - 1)) * width;
-                const y = padY + (1 - (v - min) / range) * usableH;
-                return [x, y];
-            });
+            const min = Math.min(...values), max = Math.max(...values), range = max - min || 1;
+            const padY = 4, usableH = height - padY * 2;
+            const points = values.map((v, i) => [(i / (values.length - 1)) * width, padY + (1 - (v - min) / range) * usableH]);
             const linePath = 'M ' + points.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' L ');
             const fillPath = `${linePath} L ${width},${height} L 0,${height} Z`;
             const uid = 'sg' + Math.random().toString(36).slice(2, 8);
             return `<svg class="sparkline" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true">
-                <defs><linearGradient id="${uid}" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="${color}" stop-opacity="0.35"/>
-                    <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
-                </linearGradient></defs>
+                <defs><linearGradient id="${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.35"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
                 <path d="${fillPath}" fill="url(#${uid})" stroke="none"/>
-                <path d="${linePath}" fill="none" stroke="${color}" stroke-width="1.5"
-                      stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+                <path d="${linePath}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
             </svg>`;
         }
-
         function hexToRgb(hex) {
             if (!hex) return null;
             hex = String(hex).replace('#', '').trim();
@@ -1633,28 +1874,14 @@
             const num = parseInt(hex, 16);
             return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
         }
-        function hexToRgba(hex, alpha) {
-            const c = hexToRgb(hex); if (!c) return hex;
-            return `rgba(${c.r}, ${c.g}, ${c.b}, ${alpha})`;
-        }
-        function rgbToHex({r,g,b}) {
-            return '#' + [r,g,b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2,'0')).join('');
-        }
-        function mixHex(a, b, t) {
-            const A = hexToRgb(a), B = hexToRgb(b);
-            if (!A || !B) return a;
-            return rgbToHex({ r: A.r + (B.r - A.r) * t, g: A.g + (B.g - A.g) * t, b: A.b + (B.b - A.b) * t });
-        }
-        function luminance(hex) {
-            const c = hexToRgb(hex); if (!c) return 0.5;
-            return (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) / 255;
-        }
+        function hexToRgba(hex, alpha) { const c = hexToRgb(hex); return c ? `rgba(${c.r}, ${c.g}, ${c.b}, ${alpha})` : hex; }
+        function rgbToHex({r,g,b}) { return '#' + [r,g,b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2,'0')).join(''); }
+        function mixHex(a, b, t) { const A = hexToRgb(a), B = hexToRgb(b); return (!A || !B) ? a : rgbToHex({ r: A.r + (B.r - A.r) * t, g: A.g + (B.g - A.g) * t, b: A.b + (B.b - A.b) * t }); }
+        function luminance(hex) { const c = hexToRgb(hex); return c ? (0.299 * c.r + 0.587 * c.g + 0.114 * c.b) / 255 : 0.5; }
 
         function setFavicon(presetName) {
             const theme = safeLS.getItem(THEME_KEY) || 'system';
-            const useIcon = (theme === 'custom' && presetName && PRESET_ICONS[presetName])
-                ? PRESET_ICONS[presetName]
-                : DEFAULT_FAVICON;
+            const useIcon = (theme === 'custom' && presetName && PRESET_ICONS[presetName]) ? PRESET_ICONS[presetName] : DEFAULT_FAVICON;
             let link = document.getElementById('favicon-link');
             if (!link) {
                 link = document.createElement('link');
@@ -1672,51 +1899,29 @@
                 const controller = new AbortController();
                 const timer = setTimeout(() => controller.abort(), timeout);
                 try {
-                    const res = await fetch(url, {
-                        signal: controller.signal,
-                        cache: 'no-store'
-                    });
+                    const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
                     clearTimeout(timer);
                     if (!res.ok && res.status >= 500) throw new Error('HTTP ' + res.status);
                     return res;
                 } catch (e) {
                     clearTimeout(timer);
                     lastErr = e;
-                    if (attempt < retries) {
-                        await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
-                    }
+                    if (attempt < retries) await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
                 }
             }
             throw lastErr;
-        }
-        async function fetchFromRepo(name) {
-            const url = `${URLS[name]}?t=${Date.now()}`;
-            const res = await fetchWithTimeout(url, REQUEST_TIMEOUT);
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const json = await res.json();
-            return json.data;
         }
         async function proxiedFetch(targetUrl) {
             const url = CORS_PROXY + encodeURIComponent(targetUrl) + '&_=' + Date.now();
             return fetchWithTimeout(url, REQUEST_TIMEOUT);
         }
 
-        async function fetchNBU(lang) {
-            const data = await fetchFromRepo('nbu');
-            return data.map(item => ({
-                cc: item.cc, name: t(item.cc) || item.txt,
-                rate: item.rate, date: item.exchangedate, hasBuySell: false
-            }));
-        }
-
         function cacheKey(source) { return CACHE_KEY_PREFIX + source; }
         function loadLiveCache(source, allowStale = false) {
             try {
-                const raw = safeLS.getItem(cacheKey(source));
-                if (!raw) return null;
+                const raw = safeLS.getItem(cacheKey(source)); if (!raw) return null;
                 const c = JSON.parse(raw);
-                const age = Date.now() - c.timestamp;
-                if (!allowStale && age > CACHE_TTL) return null;
+                if (!allowStale && Date.now() - c.timestamp > CACHE_TTL) return null;
                 return c.data;
             } catch { return null; }
         }
@@ -1725,12 +1930,10 @@
         }
         function loadHistoryCache() {
             try {
-                const raw = safeLS.getItem(HISTORY_CACHE_KEY);
-                if (!raw) return null;
+                const raw = safeLS.getItem(HISTORY_CACHE_KEY); if (!raw) return null;
                 const c = JSON.parse(raw);
                 if (Date.now() - c.timestamp > HISTORY_CACHE_TTL) return null;
                 if ((c.formatVersion || 1) < HISTORY_FORMAT_VERSION) {
-                    console.log('history : cache format v' + (c.formatVersion || 1) + ' < v' + HISTORY_FORMAT_VERSION + ' → dropping');
                     safeLS.removeItem(HISTORY_CACHE_KEY);
                     return null;
                 }
@@ -1740,63 +1943,48 @@
         function saveHistoryCache(data) {
             try { safeLS.setItem(HISTORY_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), formatVersion: HISTORY_FORMAT_VERSION, data })); } catch (e) {}
         }
-        function refreshLiveRates() {
-            safeLS.removeItem(cacheKey('nbu'));
-            safeLS.removeItem('nbu_site_history_v11');
-            safeLS.removeItem('nbu_site_history_v12');
-            safeLS.removeItem('nbu_site_history_v13');
-            safeLS.removeItem('nbu_site_history_v14');
-            safeLS.removeItem('nbu_site_history_v15');
-            safeLS.removeItem('nbu_site_history_v16');
-            loadAll();
+
+        function refreshBankLogosForTheme() {
+            $$('#bank-track .bank-slide-logo').forEach(img => {
+                if (img.dataset.presetFullBleed === '1') return;
+                const orig = img.dataset.origSrc;
+                if (!orig) return;
+                img.dataset.logoChecked = '';
+                img.classList.remove('full-bleed', 'is-rect-card');
+                img.parentElement?.classList.remove('is-full-bleed');
+                img.src = orig;
+            });
         }
-        window.refreshLiveRates = refreshLiveRates;
 
         function applyTheme(theme, customColors) {
             const root = document.documentElement;
             root.setAttribute('data-theme', theme);
             let scheme = theme;
-
             if (theme === 'custom' && customColors) {
                 const bg = hexToRgb(customColors.bg) ? customColors.bg : DEFAULT_CUSTOM.bg;
                 const text = hexToRgb(customColors.text) ? customColors.text : DEFAULT_CUSTOM.text;
                 const accent = hexToRgb(customColors.accent) ? customColors.accent : DEFAULT_CUSTOM.accent;
-                const isDark = luminance(bg) < 0.5;
-                scheme = isDark ? 'dark' : 'light';
+                const isDark = luminance(bg) < 0.5; scheme = isDark ? 'dark' : 'light';
                 const acRgb = hexToRgb(accent);
-                root.style.setProperty('--bg', bg);
-                root.style.setProperty('--bg-elev', isDark ? mixHex(bg, '#fff', 0.06) : mixHex(bg, '#000', 0.02));
+                root.style.setProperty('--bg', bg); root.style.setProperty('--bg-elev', isDark ? mixHex(bg, '#fff', 0.06) : mixHex(bg, '#000', 0.02));
                 root.style.setProperty('--surface-1', isDark ? mixHex(bg, '#fff', 0.03) : mixHex(bg, '#000', 0.02));
                 root.style.setProperty('--surface-2', isDark ? mixHex(bg, '#fff', 0.06) : mixHex(bg, '#000', 0.04));
-                root.style.setProperty('--text', text);
-                root.style.setProperty('--text-muted', mixHex(text, bg, 0.45));
-                root.style.setProperty('--text-faint', mixHex(text, bg, 0.65));
-                root.style.setProperty('--accent', accent);
+                root.style.setProperty('--text', text); root.style.setProperty('--text-muted', mixHex(text, bg, 0.45));
+                root.style.setProperty('--text-faint', mixHex(text, bg, 0.65)); root.style.setProperty('--accent', accent);
                 root.style.setProperty('--accent-text', luminance(accent) < 0.55 ? '#ffffff' : '#0a0e14');
                 root.style.setProperty('--accent-glow', `rgba(${acRgb.r}, ${acRgb.g}, ${acRgb.b}, 0.25)`);
                 root.style.setProperty('--border', isDark ? mixHex(bg, '#fff', 0.15) : mixHex(bg, '#000', 0.12));
                 root.style.setProperty('--border-strong', isDark ? mixHex(bg, '#fff', 0.25) : mixHex(bg, '#000', 0.2));
                 root.style.setProperty('--hover', isDark ? mixHex(bg, '#fff', 0.08) : mixHex(bg, '#000', 0.05));
-                root.style.setProperty('--positive', isDark ? '#56d68b' : '#0d652d');
-                root.style.setProperty('--negative', isDark ? '#ff6b6b' : '#c5221f');
+                root.style.setProperty('--positive', isDark ? '#56d68b' : '#0d652d'); root.style.setProperty('--negative', isDark ? '#ff6b6b' : '#c5221f');
             } else {
-                ['--bg','--bg-elev','--surface-1','--surface-2','--text','--text-muted','--text-faint',
-                 '--accent','--accent-text','--accent-glow','--border','--border-strong','--hover',
-                 '--positive','--negative']
-                    .forEach(v => root.style.removeProperty(v));
-
-                if (theme === 'system') {
-                    scheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                }
+                ['--bg','--bg-elev','--surface-1','--surface-2','--text','--text-muted','--text-faint','--accent','--accent-text','--accent-glow','--border','--border-strong','--hover','--positive','--negative'].forEach(v => root.style.removeProperty(v));
+                if (theme === 'system') scheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             }
-
             root.setAttribute('data-scheme', scheme);
-
-            $$('#theme-switch button').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.theme === theme);
-            });
-            const panel = $('#custom-colors-panel');
-            if (panel) panel.style.display = theme === 'custom' ? 'block' : 'none';
+            $$('#theme-switch button').forEach(btn => btn.classList.toggle('active', btn.dataset.theme === theme));
+            const panel = $('#custom-colors-panel'); if (panel) panel.style.display = theme === 'custom' ? 'block' : 'none';
+            refreshBankLogosForTheme();
         }
 
         function initTheme() {
@@ -1806,17 +1994,12 @@
             $('#color-bg').value = custom.bg; $('#hex-bg').value = custom.bg.toUpperCase();
             $('#color-text').value = custom.text; $('#hex-text').value = custom.text.toUpperCase();
             $('#color-accent').value = custom.accent; $('#hex-accent').value = custom.accent.toUpperCase();
-
             $$('#theme-switch button').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const th = btn.dataset.theme;
-                    safeLS.setItem(THEME_KEY, th);
+                    const th = btn.dataset.theme; safeLS.setItem(THEME_KEY, th);
                     const c = JSON.parse(safeLS.getItem(CUSTOM_COLORS_KEY) || 'null') || DEFAULT_CUSTOM;
-                    applyTheme(th, c);
-                    const preset = safeLS.getItem(PRESET_KEY);
-                    setFavicon(preset);
-                    renderChart();
-                    renderCryptoCards();
+                    applyTheme(th, c); setFavicon(safeLS.getItem(PRESET_KEY)); renderChart(); renderCryptoCards();
+                    if ($('#crypto-chart-modal').classList.contains('visible')) renderCryptoModalChart();
                 });
             });
             ['bg','text','accent'].forEach(name => {
@@ -1827,49 +2010,31 @@
                     if (hexToRgb(v)) { picker.value = v.toLowerCase(); saveCustomColors(); }
                 });
             });
-
             $$('.preset-swatch').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    const presetName = btn.dataset.preset;
-                    const p = PRESETS[presetName]; if (!p) return;
-
+                    const presetName = btn.dataset.preset; const p = PRESETS[presetName]; if (!p) return;
                     $('#color-bg').value = p.bg; $('#hex-bg').value = p.bg.toUpperCase();
                     $('#color-text').value = p.text; $('#hex-text').value = p.text.toUpperCase();
                     $('#color-accent').value = p.accent; $('#hex-accent').value = p.accent.toUpperCase();
-
                     const colors = { bg: p.bg, text: p.text, accent: p.accent };
                     safeLS.setItem(CUSTOM_COLORS_KEY, JSON.stringify(colors));
-                    safeLS.setItem(THEME_KEY, 'custom');
-                    safeLS.setItem(PRESET_KEY, presetName);
-                    applyTheme('custom', colors);
-
-                    $$('#theme-switch button').forEach(b => {
-                        b.classList.toggle('active', b.dataset.theme === 'custom');
-                    });
-                    const panel = $('#custom-colors-panel');
-                    if (panel) panel.style.display = 'block';
-
-                    setFavicon(presetName);
-
-                    renderChart();
-                    renderCryptoCards();
+                    safeLS.setItem(THEME_KEY, 'custom'); safeLS.setItem(PRESET_KEY, presetName);
+                    applyTheme('custom', colors); $$('#theme-switch button').forEach(b => b.classList.toggle('active', b.dataset.theme === 'custom'));
+                    $('#custom-colors-panel').style.display = 'block'; setFavicon(presetName); renderChart(); renderCryptoCards();
+                    if ($('#crypto-chart-modal').classList.contains('visible')) renderCryptoModalChart();
                 });
             });
-
             $('#reset-colors').addEventListener('click', () => {
                 $('#color-bg').value = DEFAULT_CUSTOM.bg; $('#hex-bg').value = DEFAULT_CUSTOM.bg.toUpperCase();
                 $('#color-text').value = DEFAULT_CUSTOM.text; $('#hex-text').value = DEFAULT_CUSTOM.text.toUpperCase();
                 $('#color-accent').value = DEFAULT_CUSTOM.accent; $('#hex-accent').value = DEFAULT_CUSTOM.accent.toUpperCase();
-                safeLS.removeItem(PRESET_KEY);
-                saveCustomColors();
-                setFavicon(null);
+                safeLS.removeItem(PRESET_KEY); saveCustomColors(); setFavicon(null);
             });
         }
         function saveCustomColors() {
             const colors = { bg: $('#color-bg').value, text: $('#color-text').value, accent: $('#color-accent').value };
             safeLS.setItem(CUSTOM_COLORS_KEY, JSON.stringify(colors));
-            const theme = safeLS.getItem(THEME_KEY) || 'system';
-            if (theme === 'custom') { applyTheme('custom', colors); renderChart(); renderCryptoCards(); }
+            if ((safeLS.getItem(THEME_KEY) || 'system') === 'custom') { applyTheme('custom', colors); renderChart(); renderCryptoCards(); }
         }
 
         function getA11y() {
@@ -1877,36 +2042,24 @@
                 const stored = JSON.parse(safeLS.getItem(A11Y_KEY) || 'null') || {};
                 if (typeof stored.font === 'boolean') stored.font = stored.font ? 125 : 100;
                 return { ...DEFAULT_A11Y, ...stored };
-            } catch {
-                return { ...DEFAULT_A11Y };
-            }
+            } catch { return { ...DEFAULT_A11Y }; }
         }
         function applyA11y(a) {
-            const root = document.documentElement;
-            const v = { ...DEFAULT_A11Y, ...a };
-            root.setAttribute('data-a11y-cvd', v.cvd ? 'true' : 'false');
-            root.setAttribute('data-a11y-palette', v.palette);
-            root.setAttribute('data-a11y-symbols', v.symbols ? 'true' : 'false');
-            root.setAttribute('data-a11y-underline', v.underline ? 'true' : 'false');
-
+            const root = document.documentElement; const v = { ...DEFAULT_A11Y, ...a };
+            root.setAttribute('data-a11y-cvd', v.cvd ? 'true' : 'false'); root.setAttribute('data-a11y-palette', v.palette);
+            root.setAttribute('data-a11y-symbols', v.symbols ? 'true' : 'false'); root.setAttribute('data-a11y-underline', v.underline ? 'true' : 'false');
             const fontSize = parseInt(v.font, 10) || 100;
             root.style.setProperty('--a11y-font-scale', (fontSize / 100).toFixed(2));
-
             const cvd = $('#a11y-cvd-toggle'); if (cvd) cvd.checked = v.cvd;
             const sym = $('#a11y-symbols-toggle'); if (sym) sym.checked = v.symbols;
             const und = $('#a11y-underline-toggle'); if (und) und.checked = v.underline;
-
-            const slider = $('#a11y-font-slider');
-            if (slider) slider.value = fontSize;
-            const label = $('#a11y-font-value');
-            if (label) label.textContent = fontSize + '%';
-
+            const slider = $('#a11y-font-slider'); if (slider) slider.value = fontSize;
+            const label = $('#a11y-font-value'); if (label) label.textContent = fontSize + '%';
             $$('input[name="palette"]').forEach(r => r.checked = (r.value === v.palette));
             const list = $('#palette-list'); if (list) list.classList.toggle('visible', v.cvd);
         }
         function initA11y() {
             applyA11y(getA11y());
-
             function save() {
                 const slider = $('#a11y-font-slider');
                 const v = {
@@ -1916,27 +2069,18 @@
                     symbols: $('#a11y-symbols-toggle')?.checked || false,
                     underline: $('#a11y-underline-toggle')?.checked || false
                 };
-                safeLS.setItem(A11Y_KEY, JSON.stringify(v));
-                applyA11y(v);
+                safeLS.setItem(A11Y_KEY, JSON.stringify(v)); applyA11y(v);
             }
-
-            ['a11y-cvd-toggle','a11y-symbols-toggle','a11y-underline-toggle'].forEach(id => {
-                const el = $('#' + id);
-                if (el) el.addEventListener('change', save);
-            });
+            ['a11y-cvd-toggle','a11y-symbols-toggle','a11y-underline-toggle'].forEach(id => { const el = $('#' + id); if (el) el.addEventListener('change', save); });
             const slider = $('#a11y-font-slider');
             if (slider) {
                 let rafId = null;
                 slider.addEventListener('input', () => {
-                    const label = $('#a11y-font-value');
-                    if (label) label.textContent = slider.value + '%';
+                    const label = $('#a11y-font-value'); if (label) label.textContent = slider.value + '%';
                     if (rafId) return;
                     rafId = requestAnimationFrame(() => {
                         rafId = null;
-                        document.documentElement.style.setProperty(
-                            '--a11y-font-scale',
-                            (parseInt(slider.value, 10) / 100).toFixed(2)
-                        );
+                        document.documentElement.style.setProperty('--a11y-font-scale', (parseInt(slider.value, 10) / 100).toFixed(2));
                     });
                 });
                 slider.addEventListener('change', save);
@@ -1951,13 +2095,12 @@
             if (toggle) {
                 toggle.checked = showPreciseRate;
                 toggle.addEventListener('change', () => {
-                    showPreciseRate = toggle.checked;
-                    safeLS.setItem(PRECISE_KEY, showPreciseRate ? 'true' : 'false');
+                    showPreciseRate = toggle.checked; safeLS.setItem(PRECISE_KEY, showPreciseRate ? 'true' : 'false');
                     if (Object.keys(liveRates).length > 0) renderCards(liveRates);
-                    loadCardRates();
-                    convert();
+                    initBankCarousel(); convert();
                     if (Object.keys(historicalRates).length > 0) renderChart();
                     renderCryptoCards();
+                    if ($('#crypto-chart-modal').classList.contains('visible')) renderCryptoModalChart();
                 });
             }
         }
@@ -1972,21 +2115,18 @@
             $$('#lang-switch button').forEach(btn => { btn.classList.toggle('active', btn.dataset.lang === currentLang); });
             if (Object.keys(liveRates).length > 0) {
                 renderCards(liveRates);
-                if (latestDate) setStatus(t('status_updated', {date: formatDate(latestDate)}), '');
+                const d = liveDate || formatDate(latestDate);
+                if (d) setStatus(t('status_updated', {date: d}), '');
             }
-            if ($('#picker-modal').classList.contains('visible')) {
-                renderPickerList($('#picker-search').value);
-            }
+            if ($('#picker-modal').classList.contains('visible')) renderPickerList($('#picker-search').value);
+            if ($('#crypto-chart-modal').classList.contains('visible')) renderCryptoModalChart();
+            updateBankNamesForLanguage();
         }
         function initLanguage() {
             $$('#lang-switch button').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    currentLang = btn.dataset.lang;
-                    safeLS.setItem(LANG_KEY, currentLang);
-                    applyTranslations();
-                    renderChart();
-                    renderCryptoCards();
-                    loadCardRates();
+                    currentLang = btn.dataset.lang; safeLS.setItem(LANG_KEY, currentLang);
+                    applyTranslations(); renderChart(); renderCryptoCards(); initBankCarousel();
                 });
             });
         }
@@ -1994,39 +2134,53 @@
         function setStatus(text, state = '') {
             const el = $('#hero-status'), txt = $('#status-text');
             if (!el || !txt) return;
-            el.classList.remove('loading', 'error');
-            if (state) el.classList.add(state);
+            el.classList.remove('loading', 'error'); if (state) el.classList.add(state);
             txt.textContent = text;
         }
-        function formatDate(iso) {
-            if (!iso) return '';
-            const [y, m, d] = iso.split('-');
-            return `${d}.${m}.${y}`;
-        }
+        function formatDate(iso) { if (!iso) return ''; const [y, m, d] = iso.split('-'); return `${d}.${m}.${y}`; }
         function formatNumber(num, decimals = null) {
-            if (num == null || isNaN(num)) return '—';
+            const n = Number(num);
+            if (num == null || num === '' || isNaN(n)) return '—';
             const d = decimals == null ? currentDecimals() : decimals;
-            return num.toLocaleString('uk-UA', { minimumFractionDigits: d, maximumFractionDigits: d });
+            return n.toLocaleString('uk-UA', { minimumFractionDigits: d, maximumFractionDigits: d });
+        }
+        function formatCryptoUsd(num) {
+            const n = Number(num);
+            if (!Number.isFinite(n)) return '—';
+            let d = 2;
+            if (n > 0 && n < 0.01) d = 6;
+            else if (n < 1) d = 4;
+            else if (n < 100 && showPreciseRate) d = 4;
+            return '$' + n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
         }
 
         async function loadLiveRates(source) {
             const fresh = loadLiveCache(source, false);
             const stale = loadLiveCache(source, true);
-
             if (fresh || stale) {
                 const use = fresh || stale;
-                liveRates = {};
-                use.forEach(r => { liveRates[r.cc] = r; });
+                liveRates = {}; use.forEach(r => { liveRates[r.cc] = r; });
                 const firstWithDate = use.find(r => r.date);
                 if (firstWithDate) liveDate = firstWithDate.date;
                 saveLiveCache(source, use);
             }
 
             try {
-                const rates = await fetchNBU(currentLang);
-                if (!Array.isArray(rates) || rates.length === 0) throw new Error('Empty');
-                liveRates = {};
-                rates.forEach(r => { liveRates[r.cc] = r; });
+                const candidates = [URLS[source], `${DATA}/${source}.json`];
+                let json = null;
+                for (const url of candidates) {
+                    try {
+                        const res = await fetchWithTimeout(`${url}?t=${Date.now()}`, REQUEST_TIMEOUT, 1);
+                        if (!res.ok) continue;
+                        json = await res.json();
+                        if (json && (Array.isArray(json.data) || Array.isArray(json))) break;
+                    } catch (e) {}
+                }
+                if (!json) throw new Error('Failed to load live rates');
+                const arr = Array.isArray(json) ? json : (json.data || []);
+                const rates = arr.map(item => ({ cc: item.cc, name: t(item.cc) || item.txt, rate: item.rate, date: item.exchangedate, hasBuySell: false }));
+                if (rates.length === 0) throw new Error('Empty');
+                liveRates = {}; rates.forEach(r => { liveRates[r.cc] = r; });
                 const firstWithDate = rates.find(r => r.date);
                 if (firstWithDate) liveDate = firstWithDate.date;
                 saveLiveCache(source, rates);
@@ -2041,7 +2195,7 @@
             const end = new Date().toISOString().slice(0, 10).replace(/-/g, '');
             const apiUrl = `${NBU_HISTORY}?start=${START_DATE}&end=${end}&valcode=${valcode}&sort=exchangedate&order=desc&json`;
             const res = await proxiedFetch(apiUrl);
-            if (!res.ok) throw new Error(`HTTP ${res.status} для ${valcode}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             const history = {};
             data.forEach(item => {
@@ -2076,16 +2230,12 @@
         }
 
         async function loadWithConcurrency(items, limit, fn, onProgress) {
-            let index = 0, done = 0;
-            const total = items.length;
+            let index = 0, done = 0; const total = items.length;
             const workers = Array(Math.min(limit, items.length)).fill(0).map(async () => {
                 while (true) {
-                    const i = index++;
-                    if (i >= items.length) return;
-                    try { await fn(items[i], i); }
-                    catch (e) {}
-                    done++;
-                    if (onProgress) onProgress(done, total);
+                    const i = index++; if (i >= items.length) return;
+                    try { await fn(items[i], i); } catch (e) {}
+                    done++; if (onProgress) onProgress(done, total);
                 }
             });
             await Promise.all(workers);
@@ -2098,52 +2248,24 @@
                 const dates = Object.keys(historicalRates).sort();
                 latestDate = dates[dates.length - 1];
                 fullHistoryReady = true;
-                console.log(`history : ${dates.length} dates from cache (last ${latestDate})`);
                 return;
             }
 
-            try {
-                const url = `${URLS_RAW.history}?t=${Date.now()}`;
-                console.log('history : fetching raw:', url);
-                const res = await fetchWithTimeout(url, REQUEST_TIMEOUT, 1);
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const json = await res.json();
-                if ((json.formatVersion || 1) < HISTORY_FORMAT_VERSION) {
-                    throw new Error('old format v' + (json.formatVersion || 1));
-                }
-                const data = json.data || {};
-                if (Object.keys(data).length === 0) throw new Error('empty');
-                historicalRates = data;
-                saveHistoryCache(historicalRates);
-                const dates = Object.keys(historicalRates).sort();
-                latestDate = dates[dates.length - 1] || '';
-                fullHistoryReady = true;
-                console.log(`history : ${dates.length} dates from raw (last ${latestDate})`);
-                return;
-            } catch (e) {
-                console.log('history : raw failed → trying jsDelivr: ' + e.message);
-            }
-
-            try {
-                const url = `${URLS.history}?t=${Date.now()}`;
-                console.log('history : fetching jsDelivr:', url);
-                const res = await fetchWithTimeout(url, REQUEST_TIMEOUT, 1);
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                const json = await res.json();
-                if ((json.formatVersion || 1) < HISTORY_FORMAT_VERSION) {
-                    throw new Error('old format v' + (json.formatVersion || 1));
-                }
-                const data = json.data || {};
-                if (Object.keys(data).length === 0) throw new Error('empty');
-                historicalRates = data;
-                saveHistoryCache(historicalRates);
-                const dates = Object.keys(historicalRates).sort();
-                latestDate = dates[dates.length - 1] || '';
-                fullHistoryReady = true;
-                console.log(`history : ${dates.length} dates from jsDelivr (last ${latestDate})`);
-                return;
-            } catch (e) {
-                console.log('history : jsDelivr failed → fallback to proxy: ' + e.message);
+            for (const urlBase of [URLS_RAW.history, URLS.history]) {
+                try {
+                    const res = await fetchWithTimeout(`${urlBase}?t=${Date.now()}`, REQUEST_TIMEOUT, 1);
+                    if (!res.ok) continue;
+                    const json = await res.json();
+                    if ((json.formatVersion || 1) < HISTORY_FORMAT_VERSION) continue;
+                    const data = json.data || {};
+                    if (Object.keys(data).length === 0) continue;
+                    historicalRates = data;
+                    saveHistoryCache(historicalRates);
+                    const dates = Object.keys(historicalRates).sort();
+                    latestDate = dates[dates.length - 1] || '';
+                    fullHistoryReady = true;
+                    return;
+                } catch (e) {}
             }
 
             historicalRates = {};
@@ -2165,6 +2287,9 @@
         async function loadAll() {
             const container = $('#current-rates');
             setStatus(t('status_loading'), 'loading');
+
+            loadCrypto();
+            initBankCarousel();
 
             const stale = loadLiveCache('nbu', true);
             if (stale && Array.isArray(stale)) {
@@ -2198,16 +2323,10 @@
                     } catch (e) {}
                 }
 
-                if (!container.querySelector('.rate-card:not(.skeleton)')) {
-                    renderCards(liveRates);
-                    initConverter(liveRates);
-                } else {
-                    renderCards(liveRates);
-                }
+                renderCards(liveRates);
+                initConverter(liveRates);
 
-                const dateNow = liveDate
-                    || formatDate(latestDate)
-                    || new Date().toLocaleDateString('uk-UA');
+                const dateNow = liveDate || formatDate(latestDate) || new Date().toLocaleDateString('uk-UA');
                 setStatus(t('status_updated', {date: dateNow}), '');
 
                 if (!fullHistoryReady) {
@@ -2227,21 +2346,15 @@
                     renderChart();
                     renderCards(liveRates);
                 }
-
-                loadCardRates();
-                loadCrypto();
             } catch (err) {
                 if (Object.keys(liveRates).length > 0) return;
-                if (err && err.rateLimited) setStatus(t('status_rate_limited'), 'error');
-                else if (err && (err.name === 'TypeError' || /Failed to fetch/i.test(err.message))) setStatus(t('status_cors'), 'error');
-                else setStatus(t('status_error'), 'error');
+                setStatus(err.name === 'TypeError' || /Failed to fetch/i.test(err.message) ? t('status_cors') : t('status_error'), 'error');
                 container.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('status_error')}<br><small style="opacity:0.7;">${err.message}</small></p>`;
             }
         }
 
         function renderCards(rates) {
             const container = $('#current-rates');
-
             const todayIso = new Date().toISOString().slice(0, 10);
             const allDates = Object.keys(historicalRates).sort();
             let prevDate = null;
@@ -2251,17 +2364,15 @@
             if (!prevDate && allDates.length > 1) prevDate = allDates[allDates.length - 2];
             const prevRates = prevDate ? historicalRates[prevDate] : null;
 
-            let html = '';
-            const dec = currentDecimals();
+            let html = ''; const dec = currentDecimals();
             const eps = 0.5 * Math.pow(10, -dec);
             CURRENCIES.forEach(code => {
-                const item = rates[code];
-                if (!item) return;
+                const item = rates[code]; if (!item) return;
                 let direction = 'flat', delta = null, symbol = '●', label = 'Без змін', text = (0).toFixed(dec);
                 if (prevRates && prevRates[code] != null && item.rate != null) {
                     delta = item.rate - prevRates[code];
-                    if (delta > eps)      { direction='up';   symbol='▲'; label='Зростання'; text='+'+delta.toFixed(dec); }
-                    else if (delta < -eps){ direction='down'; symbol='▼'; label='Падіння';   text=delta.toFixed(dec); }
+                    if (delta > eps)       { direction='up';   symbol='▲'; label='Зростання'; text='+'+delta.toFixed(dec); }
+                    else if (delta < -eps) { direction='down'; symbol='▼'; label='Падіння';   text=delta.toFixed(dec); }
                 }
                 const rateClass = direction === 'up' ? 'up' : direction === 'down' ? 'down' : '';
                 html += `<div class="rate-card ${code === currentCurrency ? 'active' : ''}" data-currency="${code}">
@@ -2282,253 +2393,729 @@
             });
         }
 
-        function openCardChart(bank, code, buy, sell) {
-            const modal = $('#card-chart-modal');
-            const title = $('#card-chart-title');
-            const canvas = $('#cardChart');
-            const ctx = canvas.getContext('2d');
-            const bankName = bank === 'privat' ? t('bank_privat') : t('bank_mono');
-            title.textContent = `${currencyName(code)} (${code}) — ${bankName}`;
-            if (cardChartInstance) cardChartInstance.destroy();
-            const chartColor = bank === 'privat' ? '#4EA524' : '#4a4a4a';
-            const styles = getComputedStyle(document.documentElement);
-            const textMuted = styles.getPropertyValue('--text-muted').trim() || '#5a6472';
-            const borderCol = styles.getPropertyValue('--border').trim() || '#e1e5ea';
-            cardChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [t('buy_label'), t('sell_label')],
-                    datasets: [{
-                        label: `${code} / UAH`,
-                        data: [buy, sell],
-                        backgroundColor: [hexToRgba(chartColor, 0.8), hexToRgba(chartColor, 0.5)],
-                        borderColor: chartColor, borderWidth: 2, borderRadius: 8, barPercentage: 0.6
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', padding: 12, cornerRadius: 10, displayColors: false, callbacks: { label: (c) => `${c.parsed.y.toFixed(4)} ₴` } } },
-                    scales: {
-                        y: { beginAtZero: false, grid: { color: borderCol, drawTicks: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 12 }, padding: 8, callback: (v) => v.toFixed(4) + ' ₴' } },
-                        x: { grid: { display: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 14, weight: 'bold' }, padding: 8 } }
+        // =============== BANK CAROUSEL ===============
+        window.__checkBankLogo = function(img) {
+            try {
+                if (!img || !img.naturalWidth || img.dataset.logoChecked) return;
+                img.dataset.logoChecked = '1';
+                if (!img.dataset.origSrc) img.dataset.origSrc = img.getAttribute('src');
+                if (img.dataset.presetFullBleed === '1') return;
+
+                const scale = Math.min(1, 360 / Math.max(img.naturalWidth, img.naturalHeight));
+                const w = Math.max(1, Math.round(img.naturalWidth * scale));
+                const h = Math.max(1, Math.round(img.naturalHeight * scale));
+
+                const c = document.createElement('canvas');
+                c.width = w; c.height = h;
+                const ctx = c.getContext('2d', { willReadFrequently: true });
+                ctx.drawImage(img, 0, 0, w, h);
+
+                const imgData = ctx.getImageData(0, 0, w, h);
+                const d = imgData.data;
+
+                const isNearWhite = (i) => {
+                    const r = d[i], g = d[i+1], b = d[i+2], a = d[i+3];
+                    return a >= 220 && r > 232 && g > 232 && b > 232 && (Math.max(r, g, b) - Math.min(r, g, b) < 28);
+                };
+
+                let whiteBorderCount = 0;
+                const checkPts = [
+                    [0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1],
+                    [w >> 1, 0], [w >> 1, h - 1], [0, h >> 1], [w - 1, h >> 1]
+                ];
+                checkPts.forEach(([x, y]) => {
+                    if (isNearWhite((y * w + x) * 4)) whiteBorderCount++;
+                });
+
+                let removedWhite = false;
+                if (whiteBorderCount >= 2) {
+                    const visited = new Uint8Array(w * h);
+                    const queue = new Int32Array(w * h);
+                    let head = 0, tail = 0;
+
+                    const tryPush = (x, y) => {
+                        const pos = y * w + x;
+                        if (visited[pos]) return;
+                        if (isNearWhite(pos * 4)) { visited[pos] = 1; queue[tail++] = pos; }
+                    };
+
+                    for (let x = 0; x < w; x++) { tryPush(x, 0); tryPush(x, h - 1); }
+                    for (let y = 0; y < h; y++) { tryPush(0, y); tryPush(w - 1, y); }
+
+                    if (tail > 0) {
+                        removedWhite = true;
+                        while (head < tail) {
+                            const pos = queue[head++];
+                            d[pos * 4 + 3] = 0;
+                            const x = pos % w;
+                            const y = (pos - x) / w;
+                            if (x > 0)     tryPush(x - 1, y);
+                            if (x < w - 1) tryPush(x + 1, y);
+                            if (y > 0)     tryPush(x, y - 1);
+                            if (y < h - 1) tryPush(x, y + 1);
+                        }
+                        for (let y = 1; y < h - 1; y++) {
+                            for (let x = 1; x < w - 1; x++) {
+                                const pos = y * w + x;
+                                if (visited[pos]) continue;
+                                const i = pos * 4;
+                                if (d[i+3] === 0) continue;
+                                if (visited[pos - 1] || visited[pos + 1] || visited[pos - w] || visited[pos + w]) {
+                                    const r = d[i], g = d[i+1], b = d[i+2];
+                                    const avg = (r + g + b) / 3;
+                                    if (avg > 200 && Math.max(r, g, b) - Math.min(r, g, b) < 28) {
+                                        d[i+3] = Math.max(0, Math.round(d[i+3] * (255 - avg) / 55));
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-            });
-            modal.classList.add('visible');
+
+                let minX = w, minY = h, maxX = -1, maxY = -1;
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < w; x++) {
+                        if (d[(y * w + x) * 4 + 3] > 24) {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                        }
+                    }
+                }
+                if (maxX < minX || maxY < minY) return;
+
+                const cw = maxX - minX + 1;
+                const ch = maxY - minY + 1;
+                const needsCrop = minX > 1 || minY > 1 || maxX < w - 2 || maxY < h - 2;
+                if (removedWhite) ctx.putImageData(imgData, 0, 0);
+
+                const sampleOpaque = (rx, ry) => {
+                    const sx = Math.min(maxX, Math.max(minX, minX + Math.round((cw - 1) * rx)));
+                    const sy = Math.min(maxY, Math.max(minY, minY + Math.round((ch - 1) * ry)));
+                    const i = (sy * w + sx) * 4;
+                    return d[i+3] >= 220 && !isNearWhite(i);
+                };
+
+                const edgePts = [
+                    [0.25, 0.03], [0.75, 0.03],
+                    [0.25, 0.97], [0.75, 0.97],
+                    [0.03, 0.25], [0.97, 0.75]
+                ];
+                const solidEdges = edgePts.filter(([rx, ry]) => sampleOpaque(rx, ry)).length;
+                const ratio = Math.max(cw / ch, ch / cw);
+
+                let isSolidBox = false;
+                if (solidEdges >= 5) {
+                    isSolidBox = true;
+                    if (ratio <= 1.25) {
+                        img.classList.add('full-bleed');
+                        img.parentElement?.classList.add('is-full-bleed');
+                    } else {
+                        img.classList.add('is-rect-card');
+                    }
+                }
+
+                let recolored = false;
+                const isDarkScheme = document.documentElement.getAttribute('data-scheme') === 'dark';
+                const bankId = img.dataset.bankId || '';
+
+                if (isDarkScheme && !isSolidBox && bankId !== 'privat') {
+                    let visCount = 0, darkNeutralCount = 0, whiteCount = 0;
+                    for (let y = minY; y <= maxY; y++) {
+                        for (let x = minX; x <= maxX; x++) {
+                            const i = (y * w + x) * 4;
+                            if (d[i+3] > 60) {
+                                visCount++;
+                                const r = d[i], g = d[i+1], b = d[i+2];
+                                const diff = Math.max(r, g, b) - Math.min(r, g, b);
+                                if (r < 90 && g < 90 && b < 90 && diff < 28) darkNeutralCount++;
+                                else if (r > 190 && g > 190 && b > 190 && diff < 28) whiteCount++;
+                            }
+                        }
+                    }
+
+                    if (visCount > 0 && darkNeutralCount > visCount * 0.12 && whiteCount < visCount * 0.25) {
+                        recolored = true;
+                        for (let y = minY; y <= maxY; y++) {
+                            for (let x = minX; x <= maxX; x++) {
+                                const i = (y * w + x) * 4;
+                                if (d[i+3] <= 10) continue;
+                                const r = d[i], g = d[i+1], b = d[i+2];
+                                const diff = Math.max(r, g, b) - Math.min(r, g, b);
+                                const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+                                if (lum < 105 && diff < 30) {
+                                    const v = Math.min(244, Math.max(190, Math.round(244 - lum * 0.45)));
+                                    d[i] = v; d[i+1] = v; d[i+2] = Math.min(248, v + 3);
+                                }
+                            }
+                        }
+                        ctx.putImageData(imgData, 0, 0);
+                    }
+                }
+
+                if (removedWhite || needsCrop || recolored) {
+                    const out = document.createElement('canvas');
+                    out.width = cw; out.height = ch;
+                    out.getContext('2d').drawImage(c, minX, minY, cw, ch, 0, 0, cw, ch);
+                    img.src = out.toDataURL('image/png');
+                }
+            } catch (e) {}
+        };
+
+        function normalizeBankData(bankId, parsed) {
+            if (!parsed) return null;
+            if (Array.isArray(parsed)) {
+                const out = {};
+                if (bankId === 'privat') {
+                    parsed.forEach(item => {
+                        let cc = String(item.ccy || '').toUpperCase();
+                        if (cc === 'PLZ') cc = 'PLN';
+                        if (CARD_RATE_ORDER.includes(cc)) {
+                            out[cc] = { buy: Number(item.buy), sell: Number(item.sale) };
+                        }
+                    });
+                } else if (bankId === 'mono') {
+                    const ISO = { 840: 'USD', 978: 'EUR', 826: 'GBP', 985: 'PLN' };
+                    parsed.forEach(item => {
+                        if (item.currencyCodeB !== 980) return;
+                        const cc = ISO[item.currencyCodeA];
+                        if (!cc) return;
+                        const buy = item.rateBuy ?? item.rateCross;
+                        const sell = item.rateSell ?? item.rateCross;
+                        if (buy != null || sell != null) {
+                            out[cc] = { buy: Number(buy), sell: Number(sell) };
+                        }
+                    });
+                }
+                return Object.keys(out).length ? out : null;
+            }
+            return (typeof parsed === 'object') ? parsed : null;
         }
 
-        async function loadCardRates() {
-            const privatGrid = $('#privat-rates-grid');
-            const monoGrid = $('#mono-rates-grid');
-            if (!privatGrid || !monoGrid) return;
+        async function getAvailableBankIds() {
+            const cacheK = CACHE_KEY_PREFIX + 'bank_ids_v1';
             try {
-                const [privatData, monoData] = await Promise.all([
-                    fetchFromRepo('privat').catch(() => []),
-                    fetchFromRepo('mono').catch(() => [])
-                ]);
-                const privatCards = [];
-                const monoCards = [];
-
-                (Array.isArray(privatData) ? privatData : []).forEach(item => {
-                    const code = (item.ccy || '').toUpperCase();
-                    if (!CARD_RATE_ORDER.includes(code)) return;
-                    const buy = parseFloat(item.buy || 0);
-                    const sell = parseFloat(item.sale || 0);
-                    if (!buy && !sell) return;
-                    privatCards.push({ bank: 'privat', code, buy, sell });
-                });
-
-                const UAH = 980, USD = 840, EUR = 978;
-                (Array.isArray(monoData) ? monoData : []).forEach(item => {
-                    if (!item) return;
-                    const a = item.currencyCodeA, b = item.currencyCodeB;
-                    let code = null;
-                    let buy = item.rateBuy, sell = item.rateSell;
-                    if (b === UAH && (a === USD || a === EUR)) { code = NUMERIC_TO_CC[a]; }
-                    else if (a === UAH && (b === USD || b === EUR)) {
-                        code = NUMERIC_TO_CC[b];
-                        buy  = (buy  != null && buy  > 0) ? 1 / buy  : null;
-                        sell = (sell != null && sell > 0) ? 1 / sell : null;
+                const raw = safeLS.getItem(cacheK);
+                if (raw) {
+                    const c = JSON.parse(raw);
+                    if (Date.now() - c.timestamp < 5 * 60 * 1000 && Array.isArray(c.ids) && c.ids.length > 0) {
+                        return new Set(c.ids);
                     }
-                    if (!code || (buy == null && sell == null)) return;
-                    monoCards.push({ bank: 'mono', code, buy, sell });
-                });
+                }
+            } catch {}
 
-                privatCards.sort((a, b) => CARD_RATE_ORDER_IDX[a.code] - CARD_RATE_ORDER_IDX[b.code]);
-                monoCards.sort((a, b) => CARD_RATE_ORDER_IDX[a.code] - CARD_RATE_ORDER_IDX[b.code]);
+            const saveIds = (ids) => {
+                try { safeLS.setItem(cacheK, JSON.stringify({ timestamp: Date.now(), ids })); } catch {}
+                return new Set(ids);
+            };
 
-                let privatHtml = '';
-                privatCards.forEach(c => {
-                    const buyStr  = c.buy  != null ? c.buy.toFixed(2)  : '—';
-                    const sellStr = c.sell != null ? c.sell.toFixed(2) : '—';
-                    privatHtml += `<div class="rate-card" data-bank="${c.bank}" data-code="${c.code}" data-buy="${c.buy}" data-sell="${c.sell}" style="cursor:pointer;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            ${BANK_LOGOS[c.bank]}
-                            <div class="rate-card-head">${flagHtml(c.code)}<span class="rate-code">${c.code}</span></div>
-                        </div>
-                        <div class="rate-name">${currencyName(c.code)}</div>
-                        <div class="rate-bs">
-                            <div class="bs-row"><span class="bs-label">${t('buy_label')}</span><span class="bs-val buy">${buyStr} ₴</span></div>
-                            <div class="bs-row"><span class="bs-label">${t('sell_label')}</span><span class="bs-val sell">${sellStr} ₴</span></div>
-                        </div>
-                    </div>`;
-                });
-                privatGrid.innerHTML = privatHtml || `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:20px;">${t('no_data_short')}</p>`;
+            try {
+                const res = await fetchWithTimeout('https://api.github.com/repos/He-Trogati-Mne/nbu-rate-data/contents/data?ref=main', 8000, 0);
+                if (res.ok) {
+                    const list = await res.json();
+                    if (Array.isArray(list)) {
+                        const ids = list
+                            .filter(it => it && typeof it.name === 'string' && it.name.endsWith('.json'))
+                            .map(it => it.name.slice(0, -5));
+                        if (ids.length > 0) return saveIds(ids);
+                    }
+                }
+            } catch {}
 
-                let monoHtml = '';
-                monoCards.forEach(c => {
-                    const buyStr  = c.buy  != null ? c.buy.toFixed(2)  : '—';
-                    const sellStr = c.sell != null ? c.sell.toFixed(2) : '—';
-                    monoHtml += `<div class="rate-card" data-bank="${c.bank}" data-code="${c.code}" data-buy="${c.buy}" data-sell="${c.sell}" style="cursor:pointer;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            ${BANK_LOGOS[c.bank]}
-                            <div class="rate-card-head">${flagHtml(c.code)}<span class="rate-code">${c.code}</span></div>
-                        </div>
-                        <div class="rate-name">${currencyName(c.code)}</div>
-                        <div class="rate-bs">
-                            <div class="bs-row"><span class="bs-label">${t('buy_label')}</span><span class="bs-val buy">${buyStr} ₴</span></div>
-                            <div class="bs-row"><span class="bs-label">${t('sell_label')}</span><span class="bs-val sell">${sellStr} ₴</span></div>
-                        </div>
-                    </div>`;
-                });
-                monoGrid.innerHTML = monoHtml || `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:20px;">${t('no_data_short')}</p>`;
+            try {
+                const res = await fetchWithTimeout('https://data.jsdelivr.com/v1/packages/gh/He-Trogati-Mne/nbu-rate-data@main?structure=flat', 8000, 0);
+                if (res.ok) {
+                    const json = await res.json();
+                    const ids = (json.files || [])
+                        .map(f => String(f.name || ''))
+                        .filter(n => n.startsWith('/data/') && n.endsWith('.json'))
+                        .map(n => n.slice(6, -5));
+                    if (ids.length > 0) return saveIds(ids);
+                }
+            } catch {}
 
-                document.querySelectorAll('#card-rates-card .rate-card[data-bank]').forEach(card => {
-                    card.addEventListener('click', () => {
-                        const bank = card.dataset.bank;
-                        const code = card.dataset.code;
-                        const buy = parseFloat(card.dataset.buy);
-                        const sell = parseFloat(card.dataset.sell);
-                        openCardChart(bank, code, buy, sell);
-                    });
-                });
-            } catch (e) {
-                privatGrid.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('load_error')}</p>`;
-                monoGrid.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('load_error')}</p>`;
+            return new Set(['privat', 'mono']);
+        }
+
+        async function fetchBankData(bank) {
+            const urls = [`${DATA}/${bank.id}.json`, `${BASE_DATA_URL}/${bank.id}.json`];
+            for (const url of urls) {
+                try {
+                    const res = await fetchWithTimeout(`${url}?t=${Date.now()}`, 8000, 0);
+                    if (!res.ok) continue;
+                    const json = await res.json();
+                    const norm = normalizeBankData(bank.id, json.data || json);
+                    if (norm) return norm;
+                } catch (e) {}
             }
+            return null;
+        }
+
+        function renderBankSlide(bank, data) {
+            const name = bankDisplayName(bank);
+            const currencies = CARD_RATE_ORDER.filter(c => {
+                const r = data?.[c]; return r && (r.buy != null || r.sell != null);
+            });
+            if (currencies.length === 0) return '';
+            const cardsHtml = currencies.map(c => {
+                const r = data[c];
+                const buy  = r.buy  != null ? Number(r.buy).toFixed(currentDecimals())  : '—';
+                const sell = r.sell != null ? Number(r.sell).toFixed(currentDecimals()) : '—';
+                return `
+                    <div class="bank-rate-card">
+                        <div class="bank-rate-head">${flagHtml(c, 'rate-flag')}<span>${c}</span></div>
+                        <div class="rate-bs">
+                            <div class="bs-row">
+                                <span class="bs-label" data-i18n="buy_label">${t('buy_label')}</span>
+                                <span class="bs-val buy">${buy}</span>
+                            </div>
+                            <div class="bs-row">
+                                <span class="bs-label" data-i18n="sell_label">${t('sell_label')}</span>
+                                <span class="bs-val sell">${sell}</span>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
+
+            const wrapClass = bank.fullBleed ? 'bank-logo-wrap is-full-bleed' : 'bank-logo-wrap';
+            const imgClass  = bank.fullBleed ? 'bank-slide-logo full-bleed' : 'bank-slide-logo';
+            const presetAttr = bank.fullBleed ? ' data-preset-full-bleed="1"' : '';
+            return `
+                <div class="bank-slide" data-bank-id="${bank.id}">
+                    <div class="bank-slide-inner">
+                        <div class="bank-slide-header">
+                            <div class="${wrapClass}">
+                                <span class="bank-logo-fallback">${bank.letter || 'Б'}</span>
+                                <img class="${imgClass}" src="${bank.logo}" alt="${name}"
+                                     data-bank-id="${bank.id}"${presetAttr}
+                                     loading="lazy" decoding="async"
+                                     onload="window.__checkBankLogo(this)"
+                                     onerror="this.style.display='none';if(this.previousElementSibling)this.previousElementSibling.style.display='flex';">
+                            </div>
+                            <span class="bank-slide-name">${name}</span>
+                        </div>
+                        <div class="bank-slide-rates">${cardsHtml}</div>
+                    </div>
+                </div>`;
+        }
+
+        async function initBankCarousel() {
+            const track = $('#bank-track');
+            if (!track) return;
+
+            track.innerHTML = `<div class="bank-slide active"><div class="bank-slide-inner"><div class="bank-slide-header"><div class="skeleton-shape" style="width:54px;height:54px;border-radius:14px;"></div><div class="skeleton-shape" style="width:140px;height:18px;"></div></div><div class="bank-slide-rates"><div class="skeleton-shape" style="height:82px;"></div><div class="skeleton-shape" style="height:82px;"></div></div></div></div>`;
+
+            const availableIds = await getAvailableBankIds();
+            const activeBanks = BANKS_CONFIG.filter(b => availableIds.has(b.id));
+            const results = await Promise.all(activeBanks.map(async bank => ({ bank, data: await fetchBankData(bank) })));
+            const visible = results.filter(r => r.data != null && CARD_RATE_ORDER.some(c => r.data[c]));
+
+            if (visible.length === 0) {
+                track.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);">${t('no_data')}</div>`;
+                return;
+            }
+
+            track.innerHTML = visible.map(r => renderBankSlide(r.bank, r.data)).join('');
+            bankCarouselState.total = visible.length;
+            if (bankCarouselState.current >= visible.length) bankCarouselState.current = 0;
+
+            const dots = $('#bank-dots');
+            if (dots) {
+                dots.innerHTML = visible.map((r, i) =>
+                    `<button class="carousel-dot${i === bankCarouselState.current ? ' active' : ''}" data-index="${i}" aria-label="${bankDisplayName(r.bank)}"></button>`
+                ).join('');
+            }
+
+            setActiveSlide(bankCarouselState.current);
+            startAutoplay();
+        }
+
+        function setActiveSlide(index) {
+            const track = $('#bank-track');
+            if (!track) return;
+
+            bankCarouselState.current = index;
+            track.style.transform = `translateX(-${index * 100}%)`;
+
+            track.querySelectorAll('.bank-slide').forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+
+            $$('#bank-dots .carousel-dot').forEach((d, i) => {
+                const isActive = i === index;
+                d.classList.toggle('active', isActive);
+                d.classList.remove('animating');
+                if (isActive && bankCarouselState.autoplay) {
+                    void d.offsetWidth;
+                    d.classList.add('animating');
+                }
+            });
+        }
+
+        function goToBank(index) {
+            if (bankCarouselState.total === 0) return;
+            const total = bankCarouselState.total;
+            setActiveSlide(((index % total) + total) % total);
+        }
+        function nextBank() { goToBank(bankCarouselState.current + 1); }
+        function prevBank() { goToBank(bankCarouselState.current - 1); }
+
+        function startAutoplay() {
+            stopAutoplay();
+            if (!bankCarouselState.autoplay) return;
+
+            const activeDot = $('#bank-dots .carousel-dot.active');
+            if (activeDot) {
+                activeDot.classList.remove('animating');
+                void activeDot.offsetWidth;
+                activeDot.classList.add('animating');
+            }
+
+            bankCarouselState.timer = setInterval(() => {
+                if (!bankCarouselState.paused) nextBank();
+            }, CAROUSEL_INTERVAL);
+        }
+
+        function stopAutoplay() {
+            if (bankCarouselState.timer) { clearInterval(bankCarouselState.timer); bankCarouselState.timer = null; }
+            $$('#bank-dots .carousel-dot').forEach(d => d.classList.remove('animating'));
+        }
+
+        function restartAutoplay() { if (bankCarouselState.autoplay) startAutoplay(); }
+
+        function toggleAutoplay() {
+            bankCarouselState.autoplay = !bankCarouselState.autoplay;
+            const btn = $('#bank-autoplay-btn');
+            if (btn) {
+                btn.classList.toggle('active', bankCarouselState.autoplay);
+                btn.setAttribute('aria-pressed', String(bankCarouselState.autoplay));
+                const pause = btn.querySelector('.icon-pause');
+                const play  = btn.querySelector('.icon-play');
+                if (pause) pause.style.display = bankCarouselState.autoplay ? '' : 'none';
+                if (play)  play.style.display  = bankCarouselState.autoplay ? 'none' : '';
+            }
+            if (bankCarouselState.autoplay) startAutoplay(); else stopAutoplay();
+        }
+
+        function setupBankCarouselEvents() {
+            $('#bank-prev')?.addEventListener('click', () => { prevBank(); restartAutoplay(); });
+            $('#bank-next')?.addEventListener('click', () => { nextBank(); restartAutoplay(); });
+            $('#bank-autoplay-btn')?.addEventListener('click', toggleAutoplay);
+            $('#bank-dots')?.addEventListener('click', (e) => {
+                const dot = e.target.closest('.carousel-dot');
+                if (!dot) return;
+                const idx = parseInt(dot.dataset.index, 10);
+                if (!isNaN(idx)) { goToBank(idx); restartAutoplay(); }
+            });
+            const carousel = $('#bank-carousel');
+            carousel?.addEventListener('mouseenter', () => { bankCarouselState.paused = true; });
+            carousel?.addEventListener('mouseleave', () => { bankCarouselState.paused = false; });
+            const viewport = carousel?.querySelector('.bank-carousel-viewport');
+            if (viewport) {
+                let startX = 0;
+                viewport.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+                viewport.addEventListener('touchend', e => {
+                    const dx = e.changedTouches[0].clientX - startX;
+                    if (Math.abs(dx) > 50) { if (dx < 0) nextBank(); else prevBank(); restartAutoplay(); }
+                }, { passive: true });
+            }
+        }
+        function updateBankNamesForLanguage() {
+            $$('#bank-track .bank-slide').forEach(slide => {
+                const bank = BANKS_CONFIG.find(b => b.id === slide.dataset.bankId);
+                const nameEl = slide.querySelector('.bank-slide-name');
+                if (nameEl && bank) nameEl.textContent = bankDisplayName(bank);
+            });
+        }
+
+        // =============== CRYPTO ===============
+        function normalizeCryptoData(raw) {
+            if (!raw) return [];
+            let list = [];
+            if (Array.isArray(raw)) {
+                list = raw;
+            } else if (typeof raw === 'object') {
+                if (Array.isArray(raw.data?.coins)) list = raw.data.coins;
+                else if (Array.isArray(raw.data)) list = raw.data;
+                else if (Array.isArray(raw.coins)) list = raw.coins;
+                else if (Array.isArray(raw.rates)) list = raw.rates;
+                else if (raw.data && typeof raw.data === 'object') {
+                    list = Object.entries(raw.data).map(([key, val]) =>
+                        (val && typeof val === 'object') ? { symbol: val.symbol || key, name: val.name || key, ...val } : null
+                    ).filter(Boolean);
+                } else {
+                    list = Object.entries(raw).map(([key, val]) =>
+                        (val && typeof val === 'object') ? { symbol: val.symbol || key, name: val.name || key, ...val } : null
+                    ).filter(Boolean);
+                }
+            }
+            return list.map(c => {
+                if (!c || typeof c !== 'object') return null;
+                const sym = String(c.symbol || c.code || '').toUpperCase();
+                if (!sym || HIDDEN_CRYPTO.has(sym)) return null;
+                const price = Number(c.current_price ?? c.price ?? c.usd ?? c.rate ?? 0);
+                const change24h = Number(c.price_change_percentage_24h ?? c.change24h ?? c.usd_24h_change ?? 0) || 0;
+                const hist = {};
+                if (Array.isArray(c.sparkline_in_7d?.price)) {
+                    const now = Date.now();
+                    c.sparkline_in_7d.price.forEach((p, i) => {
+                        const d = new Date(now - (c.sparkline_in_7d.price.length - i) * 3600 * 1000).toISOString().slice(0, 10);
+                        const numVal = Number(p);
+                        if (!isNaN(numVal)) hist[d] = numVal;
+                    });
+                }
+                if (c.history && typeof c.history === 'object') {
+                    Object.entries(c.history).forEach(([k, v]) => {
+                        const numVal = Number(v);
+                        if (!isNaN(numVal)) hist[k] = numVal;
+                    });
+                }
+                return {
+                    symbol: sym,
+                    name: c.name || sym,
+                    image: c.image || null,
+                    price,
+                    change24h,
+                    history: hist
+                };
+            }).filter(c => c && !isNaN(c.price) && c.price > 0);
         }
 
         async function loadCrypto() {
             const grid = $('#crypto-grid');
             if (!grid) return;
             try {
-                const data = await fetchFromRepo('crypto');
-                cryptoCoins = data.coins || [];
-                if (cryptoCoins.length === 0) throw new Error('Empty');
+                const cached = loadLiveCache('crypto');
+                let normalized = normalizeCryptoData(cached);
+
+                if (normalized.length === 0) {
+                    const sources = [URLS.crypto, `${DATA}/crypto.json`, COINGECKO_FALLBACK];
+                    for (const url of sources) {
+                        try {
+                            const res = await fetchWithTimeout(`${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`, REQUEST_TIMEOUT, 1);
+                            if (!res.ok) continue;
+                            const json = await res.json();
+                            normalized = normalizeCryptoData(json);
+                            if (normalized.length > 0) {
+                                saveLiveCache('crypto', json.data || json);
+                                break;
+                            }
+                        } catch (e) {}
+                    }
+                }
+
+                if (normalized.length === 0) throw new Error('Empty crypto data');
+
                 cryptoDataMap = {};
-                cryptoCoins.forEach(c => cryptoDataMap[c.symbol] = c);
+                cryptoCoins = normalized.map(c => {
+                    cryptoDataMap[c.symbol] = c;
+                    return c;
+                });
                 renderCryptoCards();
             } catch (e) {
+                console.warn('[Crypto]', e);
                 grid.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('load_error')}</p>`;
             }
         }
 
         function getCryptoHistoryForPeriod(coin, period) {
-            const full = coin.history || {};
-            const dates = Object.keys(full).sort();
+            const full = coin.history || {}; const dates = Object.keys(full).sort();
             if (dates.length === 0) return {};
-            const now = new Date();
-            const start = new Date(now);
+            if (period === '1D') {
+                const lastDates = dates.slice(-3);
+                const out = {};
+                lastDates.forEach(d => { out[d] = full[d]; });
+                return out;
+            }
+            const now = new Date(); const start = new Date(now);
             switch (period) {
-                case '1D': start.setDate(now.getDate() - 1); break;
                 case '5D': start.setDate(now.getDate() - 5); break;
+                case '7D': start.setDate(now.getDate() - 7); break;
                 case '1M': start.setMonth(now.getMonth() - 1); break;
+                case '6M': start.setMonth(now.getMonth() - 6); break;
                 case '1Y': start.setFullYear(now.getFullYear() - 1); break;
+                case '5Y': start.setFullYear(now.getFullYear() - 5); break;
                 default: return full;
             }
-            const startStr = start.toISOString().slice(0, 10);
-            const filtered = {};
+            const startStr = start.toISOString().slice(0, 10); const filtered = {};
             dates.forEach(d => { if (d >= startStr) filtered[d] = full[d]; });
             return Object.keys(filtered).length >= 2 ? filtered : full;
         }
 
         function renderCryptoCards() {
             const grid = $('#crypto-grid');
-            const dec = currentDecimals();
+            if (!grid || cryptoCoins.length === 0) return;
             let html = '';
             cryptoCoins.forEach(c => {
-                const changeClass = c.change24h > 0 ? 'up' : c.change24h < 0 ? 'down' : '';
-                const symbol = c.change24h > 0 ? '▲' : c.change24h < 0 ? '▼' : '●';
+                const ch = Number(c.change24h) || 0;
+                const changeClass = ch > 0 ? 'up' : ch < 0 ? 'down' : '';
+                const symbol = ch > 0 ? '▲' : ch < 0 ? '▼' : '●';
                 const color = CRYPTO_COLORS[c.symbol] || '#F7931A';
                 const history = getCryptoHistoryForPeriod(c, currentCryptoPeriod);
                 const spark = sparklineSvg(history, color);
                 html += `<div class="rate-card crypto-card" data-crypto="${c.symbol}">
-                    <div class="rate-card-head">${cryptoIcon(c.symbol)}<span class="rate-code">${c.symbol}</span></div>
+                    <div class="rate-card-head">${cryptoIcon(c.symbol, c.image)}<span class="rate-code">${c.symbol}</span></div>
                     <div class="rate-name">${c.name}</div>
-                    <div class="rate-value ${changeClass}">$${formatNumber(c.price, dec)}</div>
+                    <div class="rate-value ${changeClass}">${formatCryptoUsd(c.price)}</div>
                     ${spark}
-                    <div class="rate-change ${changeClass}">
-                        <span>${symbol}</span><span>${c.change24h.toFixed(2)}%</span>
-                    </div>
+                    <div class="rate-change ${changeClass}"><span>${symbol}</span><span>${ch.toFixed(2)}%</span></div>
                 </div>`;
             });
             grid.innerHTML = html;
             grid.querySelectorAll('.crypto-card').forEach(card => {
                 card.addEventListener('click', () => {
-                    const symbol = card.dataset.crypto;
-                    const coin = cryptoDataMap[symbol];
+                    const symbol = card.dataset.crypto; const coin = cryptoDataMap[symbol];
                     if (coin) openCryptoChart(coin);
                 });
             });
         }
 
         function openCryptoChart(coin) {
-            const modal = $('#crypto-chart-modal');
+            activeCryptoCoin = coin;
+            const totalDates = Object.keys(coin.history || {}).length;
+            activeCryptoModalPeriod = totalDates > 90 ? '1Y' : 'MAX';
+            $$('#crypto-modal-period-switcher .period-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.period === activeCryptoModalPeriod);
+            });
+            $('#crypto-chart-modal').classList.add('visible');
+            renderCryptoModalChart();
+        }
+
+        function renderCryptoModalChart() {
+            const coin = activeCryptoCoin;
+            if (!coin) return;
+
             const title = $('#crypto-chart-title');
+            const iconWrap = $('#crypto-chart-icon');
+            const badge = $('#crypto-chart-badge');
+            const stats = $('#crypto-chart-stats');
             const canvas = $('#cryptoChart');
             const ctx = canvas.getContext('2d');
-            title.textContent = `${coin.name} (${coin.symbol}) — $${coin.price}`;
-            if (cryptoChartInstance) cryptoChartInstance.destroy();
-            const color = CRYPTO_COLORS[coin.symbol] || '#1a73e8';
-            const history = coin.history || {};
+
+            if (iconWrap) iconWrap.innerHTML = cryptoIcon(coin.symbol, coin.image);
+            title.textContent = `${coin.name} (${coin.symbol}) — ${formatCryptoUsd(coin.price)}`;
+
+            const history = getCryptoHistoryForPeriod(coin, activeCryptoModalPeriod);
             const dates = Object.keys(history).sort();
             const values = dates.map(d => history[d]);
+
+            if (values.length >= 2 && values[0] > 0) {
+                const first = values[0], last = values[values.length - 1];
+                const pct = ((last - first) / first) * 100;
+                const dir = pct > 0.01 ? 'up' : pct < -0.01 ? 'down' : 'flat';
+                const sym = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '●';
+                badge.className = `rate-change ${dir}`;
+                badge.innerHTML = `<span>${sym}</span><span>${pct > 0 ? '+' : ''}${pct.toFixed(2)}%</span>`;
+                badge.style.display = 'inline-flex';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            if (values.length >= 1) {
+                const minVal = Math.min(...values);
+                const maxVal = Math.max(...values);
+                stats.innerHTML = `<span>${t('min_label')}: <strong style="color:var(--text)">${formatCryptoUsd(minVal)}</strong></span><span>${t('max_label')}: <strong style="color:var(--text)">${formatCryptoUsd(maxVal)}</strong></span><span>${t('current_label')}: <strong style="color:var(--accent)">${formatCryptoUsd(coin.price)}</strong></span>`;
+            } else {
+                stats.innerHTML = '';
+            }
+
+            if (cryptoChartInstance) cryptoChartInstance.destroy();
+
+            const color = CRYPTO_COLORS[coin.symbol] || '#1a73e8';
             const styles = getComputedStyle(document.documentElement);
             const textMuted = styles.getPropertyValue('--text-muted').trim() || '#5a6472';
             const borderCol = styles.getPropertyValue('--border').trim() || '#e1e5ea';
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height || 340);
+            gradient.addColorStop(0, hexToRgba(color, 0.28));
+            gradient.addColorStop(1, hexToRgba(color, 0));
+
+            const labels = dates.map(d => {
+                const [y, m, day] = d.split('-');
+                return (activeCryptoModalPeriod === '5Y' || activeCryptoModalPeriod === 'MAX') ? `${m}.${y}` : `${day}.${m}`;
+            });
+
             cryptoChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates,
+                    labels,
                     datasets: [{
                         label: `${coin.symbol} / USD`,
                         data: values,
-                        borderColor: color, backgroundColor: hexToRgba(color, 0.15),
-                        fill: true, tension: 0.3, pointRadius: 0, pointHoverRadius: 5,
-                        pointHoverBackgroundColor: color, pointHoverBorderColor: '#fff',
-                        pointHoverBorderWidth: 2, borderWidth: 2
+                        borderColor: color,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.25,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: color,
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 3,
+                        borderWidth: 2.5
                     }]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', padding: 12, cornerRadius: 10, displayColors: false, callbacks: { label: (c) => `$${c.parsed.y}` } } },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 350, easing: 'easeOutQuart' },
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.88)',
+                            padding: 12,
+                            cornerRadius: 10,
+                            displayColors: false,
+                            callbacks: {
+                                title: (items) => {
+                                    const idx = items[0]?.dataIndex;
+                                    return idx != null && dates[idx] ? formatDate(dates[idx]) : '';
+                                },
+                                label: (c) => formatCryptoUsd(c.parsed.y)
+                            }
+                        }
+                    },
                     scales: {
-                        y: { beginAtZero: false, grid: { color: borderCol, drawTicks: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 11 }, padding: 8 } },
-                        x: { grid: { display: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 11 }, maxTicksLimit: 10, padding: 6 } }
+                        y: {
+                            beginAtZero: false,
+                            grid: { color: borderCol, drawTicks: false },
+                            border: { display: false },
+                            ticks: {
+                                color: textMuted,
+                                font: { size: 11 },
+                                padding: 8,
+                                callback: (v) => formatCryptoUsd(v)
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: {
+                                color: textMuted,
+                                font: { size: 11 },
+                                maxTicksLimit: 7,
+                                maxRotation: 0,
+                                padding: 6
+                            }
+                        }
                     }
                 }
             });
-            modal.classList.add('visible');
         }
 
         function getFilteredData(period) {
-            const dates = Object.keys(historicalRates).sort();
-            if (dates.length === 0) return dates;
+            const dates = Object.keys(historicalRates).sort(); if (dates.length === 0) return dates;
             const now = new Date(); const start = new Date(now);
             switch (period) {
-                case '1D': start.setDate(now.getDate() - 1); break;
-                case '5D': start.setDate(now.getDate() - 5); break;
-                case '1M': start.setMonth(now.getMonth() - 1); break;
-                case '1Y': start.setFullYear(now.getFullYear() - 1); break;
-                case '5Y': start.setFullYear(now.getFullYear() - 5); break;
-                default: return dates;
+                case '1D': start.setDate(now.getDate() - 1); break; case '5D': start.setDate(now.getDate() - 5); break;
+                case '1M': start.setMonth(now.getMonth() - 1); break; case '1Y': start.setFullYear(now.getFullYear() - 1); break;
+                case '5Y': start.setFullYear(now.getFullYear() - 5); break; default: return dates;
             }
             const startStr = start.toISOString().slice(0, 10);
             return dates.filter(d => d >= startStr);
         }
         function renderChart() {
-            const container = $('#chart-container');
-            if (!container) return;
+            const container = $('#chart-container'); if (!container) return;
             let cv = container.querySelector('#rateChart');
             if (!cv) { container.innerHTML = '<canvas id="rateChart"></canvas>'; cv = container.querySelector('#rateChart'); }
             const ctx = cv.getContext('2d');
@@ -2555,11 +3142,9 @@
                 return `${day}.${m}`;
             });
             const data = points.map(p => p.value);
-
             const color = CHART_COLORS[currentCurrency] || '#1a73e8';
             const gradient = ctx.createLinearGradient(0, 0, 0, cv.height);
-            gradient.addColorStop(0, hexToRgba(color, 0.28));
-            gradient.addColorStop(1, hexToRgba(color, 0));
+            gradient.addColorStop(0, hexToRgba(color, 0.28)); gradient.addColorStop(1, hexToRgba(color, 0));
             const dec = currentDecimals();
 
             if (chartInstance && chartInstance.data && chartInstance.data.datasets.length) {
@@ -2582,156 +3167,93 @@
         }
 
         function openPicker(target) {
-            pickerTarget = target;
-            $('#picker-title').textContent = t(target === 'from' ? 'picker_title_from' : 'picker_title_to');
-            renderPickerList('');
-            $('#picker-modal').classList.add('visible');
-            $('#picker-search').value = '';
+            pickerTarget = target; $('#picker-title').textContent = t(target === 'from' ? 'picker_title_from' : 'picker_title_to');
+            renderPickerList(''); $('#picker-modal').classList.add('visible'); $('#picker-search').value = '';
             setTimeout(() => $('#picker-search').focus(), 200);
         }
         function renderPickerList(query) {
-            const list = $('#picker-list');
-            const q = query.trim().toLowerCase();
+            const list = $('#picker-list'); const q = query.trim().toLowerCase();
             const options = [{ code: 'UAH', name: currencyName('UAH') }, ...CURRENCIES.map(c => ({ code: c, name: currencyName(c) }))];
             const filtered = options.filter(opt => !q || opt.code.toLowerCase().includes(q) || opt.name.toLowerCase().includes(q));
             list.innerHTML = filtered.map(opt => {
                 let flag;
-                if (opt.code in METAL_COLORS) {
-                    flag = `<span class="flag-metal-wrap" style="width:32px;height:22px;background:${METAL_COLORS[opt.code]};"></span>`;
-                } else {
-                    const url = flagUrl(opt.code);
-                    flag = url ? `<img class="rate-flag" src="${url}" alt="" width="26" height="18" loading="lazy" decoding="async" onerror="this.style.display='none'">` : '';
-                }
+                if (opt.code in METAL_COLORS) flag = `<span class="flag-metal-wrap" style="width:32px;height:22px;background:${METAL_COLORS[opt.code]};"></span>`;
+                else { const url = flagUrl(opt.code); flag = url ? `<img class="rate-flag" src="${url}" alt="" width="26" height="18" loading="lazy" decoding="async" onerror="this.style.display='none'">` : ''; }
                 return `<div class="picker-item" data-value="${opt.code}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;transition:background-color 0.15s;">${flag}<span style="font-weight:800;font-family:ui-monospace,monospace;font-size:14px;color:var(--accent);min-width:46px;">${opt.code}</span><span style="font-size:14px;color:var(--text-muted);">${opt.name}</span></div>`;
             }).join('');
             list.querySelectorAll('.picker-item').forEach(el => {
                 el.addEventListener('mouseenter', () => el.style.background = 'var(--hover)');
                 el.addEventListener('mouseleave', () => el.style.background = '');
-                el.addEventListener('click', () => {
-                    setPickerValue(pickerTarget, el.dataset.value);
-                    $('#picker-modal').classList.remove('visible');
-                    convert();
-                });
+                el.addEventListener('click', () => { setPickerValue(pickerTarget, el.dataset.value); $('#picker-modal').classList.remove('visible'); convert(); });
             });
         }
         function setPickerValue(target, code) {
-            const picker = $(`#conv-${target}-picker`);
-            picker.dataset.value = code;
-            picker.querySelector('.code').textContent = code;
+            const picker = $(`#conv-${target}-picker`); picker.dataset.value = code; picker.querySelector('.code').textContent = code;
             picker.querySelectorAll('img.flag-mini, span.flag-metal-wrap').forEach(n => n.remove());
             if (code in METAL_COLORS) {
-                const s = document.createElement('span');
-                s.className = 'flag-metal-wrap';
-                s.style.cssText = `width:28px;height:20px;background:${METAL_COLORS[code]};`;
-                picker.insertBefore(s, picker.firstChild);
+                const s = document.createElement('span'); s.className = 'flag-metal-wrap'; s.style.cssText = `width:28px;height:20px;background:${METAL_COLORS[code]};`; picker.insertBefore(s, picker.firstChild);
             } else {
                 const url = flagUrl(code);
                 if (url) {
-                    const img = document.createElement('img');
-                    img.className = 'flag-mini';
-                    img.src = url;
-                    img.width = 28; img.height = 20;
-                    img.loading = 'lazy';
-                    img.decoding = 'async';
-                    img.onerror = function() { this.style.display = 'none'; };
-                    picker.insertBefore(img, picker.firstChild);
+                    const img = document.createElement('img'); img.className = 'flag-mini'; img.src = url;
+                    img.width = 28; img.height = 20; img.loading = 'lazy'; img.decoding = 'async';
+                    img.onerror = function() { this.style.display = 'none'; }; picker.insertBefore(img, picker.firstChild);
                 }
             }
         }
         function convert() {
-            const from = $('#conv-from-picker').dataset.value;
-            const to = $('#conv-to-picker').dataset.value;
+            const from = $('#conv-from-picker').dataset.value, to = $('#conv-to-picker').dataset.value;
             const amount = parseFloat($('#conv-from').value) || 0;
-            function rateOf(code) {
-                if (code === 'UAH') return 1;
-                const r = liveRates[code];
-                if (!r) return 0;
-                return r.rate ?? 0;
-            }
-            const rateFrom = rateOf(from);
-            const rateTo = rateOf(to);
-            if (!rateFrom || !rateTo) {
-                $('#conv-result').textContent = '—';
-                $('#conv-detail').textContent = t('no_data');
-                return;
-            }
-            const dec = currentDecimals();
-            const result = (amount * rateFrom) / rateTo;
-            $('#conv-to').value = result.toFixed(dec);
-            $('#conv-result').textContent = `${formatNumber(amount, 2)} ${from} = ${formatNumber(result, dec)} ${to}`;
+            function rateOf(code) { if (code === 'UAH') return 1; const r = liveRates[code]; return r ? (r.rate ?? 0) : 0; }
+            const rateFrom = rateOf(from), rateTo = rateOf(to);
+            if (!rateFrom || !rateTo) { $('#conv-result').textContent = '—'; $('#conv-detail').textContent = t('no_data'); return; }
+            const dec = currentDecimals(); const result = (amount * rateFrom) / rateTo;
+            $('#conv-to').value = result.toFixed(dec); $('#conv-result').textContent = `${formatNumber(amount, 2)} ${from} = ${formatNumber(result, dec)} ${to}`;
             let detail = '';
-            if (from !== 'UAH' && to !== 'UAH') {
-                detail = `1 ${from} = ${(rateFrom / rateTo).toFixed(dec)} ${to} · 1 ${to} = ${(rateTo / rateFrom).toFixed(dec)} ${from}`;
-            } else if (from === 'UAH' && to !== 'UAH') {
-                detail = `1 ${to} = ${rateTo.toFixed(dec)} ₴`;
-            } else if (from !== 'UAH' && to === 'UAH') {
-                detail = `1 ${from} = ${rateFrom.toFixed(dec)} ₴`;
-            }
+            if (from !== 'UAH' && to !== 'UAH') detail = `1 ${from} = ${(rateFrom / rateTo).toFixed(dec)} ${to} · 1 ${to} = ${(rateTo / rateFrom).toFixed(dec)} ${from}`;
+            else if (from === 'UAH' && to !== 'UAH') detail = `1 ${to} = ${rateTo.toFixed(dec)} ₴`;
+            else if (from !== 'UAH' && to === 'UAH') detail = `1 ${from} = ${rateFrom.toFixed(dec)} ₴`;
             $('#conv-detail').textContent = detail;
         }
         function initConverter(rates) {
             ['#conv-swap','#conv-from-picker','#conv-to-picker','#copy-result'].forEach(sel => {
-                const el = $(sel);
-                if (!el) return;
-                const clone = el.cloneNode(true);
-                el.parentNode.replaceChild(clone, el);
+                const el = $(sel); if (!el) return; const clone = el.cloneNode(true); el.parentNode.replaceChild(clone, el);
             });
             $('#conv-from').oninput = convert;
-            $('#conv-swap').addEventListener('click', () => {
-                const f = $('#conv-from-picker').dataset.value;
-                const t2 = $('#conv-to-picker').dataset.value;
-                setPickerValue('from', t2);
-                setPickerValue('to', f);
-                convert();
-            });
+            $('#conv-swap').addEventListener('click', () => { const f = $('#conv-from-picker').dataset.value; const t2 = $('#conv-to-picker').dataset.value; setPickerValue('from', t2); setPickerValue('to', f); convert(); });
             $('#conv-from-picker').addEventListener('click', () => openPicker('from'));
             $('#conv-to-picker').addEventListener('click', () => openPicker('to'));
             $('#copy-result').addEventListener('click', async () => {
                 const text = $('#conv-result').textContent;
-                try {
-                    await navigator.clipboard.writeText(text);
-                    const btn = $('#copy-result');
-                    btn.classList.add('copied');
-                    const svg = btn.innerHTML;
-                    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-                    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = svg; }, 1500);
-                } catch (e) {}
+                try { await navigator.clipboard.writeText(text); const btn = $('#copy-result'); btn.classList.add('copied'); const svg = btn.innerHTML; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'; setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = svg; }, 1500); } catch (e) {}
             });
             convert();
         }
 
         function handlePrivacyAnchor() {
             if (window.location.hash !== '#privacy') return;
-            const p = document.getElementById('privacy');
-            if (!p) return;
-            p.open = true;
-            setTimeout(() => p.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+            const p = document.getElementById('privacy'); if (!p) return;
+            p.open = true; setTimeout(() => p.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            initTheme();
-            initA11y();
-            initLanguage();
-            initPreciseRate();
-            applyTranslations();
-            handlePrivacyAnchor();
+            initTheme(); initA11y(); initLanguage(); initPreciseRate(); applyTranslations(); handlePrivacyAnchor();
             window.addEventListener('hashchange', handlePrivacyAnchor);
 
             $$('#period-switcher .period-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    $$('#period-switcher .period-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentPeriod = btn.dataset.period;
-                    renderChart();
-                });
+                btn.addEventListener('click', () => { $$('#period-switcher .period-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentPeriod = btn.dataset.period; renderChart(); });
             });
 
             $$('#crypto-period-switcher .period-btn').forEach(btn => {
+                btn.addEventListener('click', () => { $$('#crypto-period-switcher .period-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); currentCryptoPeriod = btn.dataset.period; renderCryptoCards(); });
+            });
+
+            $$('#crypto-modal-period-switcher .period-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
-                    $$('#crypto-period-switcher .period-btn').forEach(b => b.classList.remove('active'));
+                    $$('#crypto-modal-period-switcher .period-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    currentCryptoPeriod = btn.dataset.period;
-                    renderCryptoCards();
+                    activeCryptoModalPeriod = btn.dataset.period;
+                    renderCryptoModalChart();
                 });
             });
 
@@ -2741,16 +3263,11 @@
 
             const modal = $('#settings-modal');
             const settingsBtn = $('#open-settings');
-            settingsBtn.addEventListener('click', () => {
-                modal.classList.add('visible');
-                settingsBtn.classList.add('open');
-            });
-            function closeSettings() {
-                modal.classList.remove('visible');
-                settingsBtn.classList.remove('open');
-            }
+            settingsBtn.addEventListener('click', () => { modal.classList.add('visible'); settingsBtn.classList.add('open'); });
+            function closeSettings() { modal.classList.remove('visible'); settingsBtn.classList.remove('open'); }
             $('#close-settings').addEventListener('click', closeSettings);
             modal.addEventListener('click', (e) => { if (e.target === modal) closeSettings(); });
+
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     closeSettings();
@@ -2760,47 +3277,33 @@
                 }
             });
 
-            $('#card-chart-close').addEventListener('click', () => {
-                $('#card-chart-modal').classList.remove('visible');
-                if (cardChartInstance) { cardChartInstance.destroy(); cardChartInstance = null; }
-            });
-            $('#card-chart-modal').addEventListener('click', (e) => {
-                if (e.target.id === 'card-chart-modal') {
-                    $('#card-chart-modal').classList.remove('visible');
-                    if (cardChartInstance) { cardChartInstance.destroy(); cardChartInstance = null; }
-                }
-            });
+            $('#card-chart-close').addEventListener('click', () => { $('#card-chart-modal').classList.remove('visible'); if (cardChartInstance) { cardChartInstance.destroy(); cardChartInstance = null; } });
+            $('#card-chart-modal').addEventListener('click', (e) => { if (e.target.id === 'card-chart-modal') { $('#card-chart-modal').classList.remove('visible'); if (cardChartInstance) { cardChartInstance.destroy(); cardChartInstance = null; } } });
 
-            $('#crypto-chart-close').addEventListener('click', () => {
-                $('#crypto-chart-modal').classList.remove('visible');
-                if (cryptoChartInstance) { cryptoChartInstance.destroy(); cryptoChartInstance = null; }
-            });
-            $('#crypto-chart-modal').addEventListener('click', (e) => {
-                if (e.target.id === 'crypto-chart-modal') {
-                    $('#crypto-chart-modal').classList.remove('visible');
-                    if (cryptoChartInstance) { cryptoChartInstance.destroy(); cryptoChartInstance = null; }
-                }
-            });
+            $('#crypto-chart-close').addEventListener('click', () => { $('#crypto-chart-modal').classList.remove('visible'); if (cryptoChartInstance) { cryptoChartInstance.destroy(); cryptoChartInstance = null; } });
+            $('#crypto-chart-modal').addEventListener('click', (e) => { if (e.target.id === 'crypto-chart-modal') { $('#crypto-chart-modal').classList.remove('visible'); if (cryptoChartInstance) { cryptoChartInstance.destroy(); cryptoChartInstance = null; } } });
 
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
                 const theme = safeLS.getItem(THEME_KEY) || 'system';
-                if (theme === 'system') {
-                    const c = JSON.parse(safeLS.getItem(CUSTOM_COLORS_KEY) || 'null') || DEFAULT_CUSTOM;
-                    applyTheme('system', c);
-                }
+                if (theme === 'system') { const c = JSON.parse(safeLS.getItem(CUSTOM_COLORS_KEY) || 'null') || DEFAULT_CUSTOM; applyTheme('system', c); }
             });
 
+            setupBankCarouselEvents();
             await loadAll();
         });
 
         window.__nbu = {
-            get liveRates()         { return liveRates; },
-            get historicalRates()   { return historicalRates; },
-            get fullHistoryReady()  { return fullHistoryReady; },
-            get latestDate()        { return latestDate; },
-            get liveDate()          { return liveDate; },
-            get historyLoading()    { return historyLoading; },
-            refreshLiveRates: refreshLiveRates
+            get liveRates()        { return liveRates; },
+            get historicalRates()  { return historicalRates; },
+            get fullHistoryReady() { return fullHistoryReady; },
+            get latestDate()       { return latestDate; },
+            get liveDate()         { return liveDate; },
+            get historyLoading()   { return historyLoading; },
+            refreshLiveRates: () => {
+                safeLS.removeItem(cacheKey('nbu'));
+                safeLS.removeItem(HISTORY_CACHE_KEY);
+                loadAll();
+            }
         };
     })();
     </script>
