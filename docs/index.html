@@ -1360,7 +1360,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 @media(max-width:380px){.fx-footer-meta{flex-direction:column}.fx-footer-github,.fx-footer-date{width:100%;justify-content:center}}
 
 </style>
-    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="manifest" href="./manifest.webmanifest?v=14">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -1574,6 +1574,54 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
   .fx-widget-v5 .fx-widget-row-value strong{font-size:13px!important;}
 }
 </style>
+<style>
+/* ===== v14: mobile bank carousel · accessible, no clipped currency cards ===== */
+.bank-mobile-counter { display:none; }
+@media (max-width:700px) {
+    #card-rates-card { padding:22px 16px; }
+    #card-rates-card .bank-carousel-wrapper { padding:0; max-width:100%; }
+    #card-rates-card .bank-carousel {
+        display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+        align-items:center; gap:10px 12px; min-width:0;
+    }
+    #card-rates-card .bank-carousel-viewport {
+        grid-column:1 / -1; grid-row:1; width:100%; min-width:0;
+        padding:3px 0 8px; overflow:hidden; border-radius:16px;
+        -webkit-mask-image:none; mask-image:none;
+    }
+    #card-rates-card #bank-prev {grid-column:1;grid-row:2;justify-self:end;}
+    #card-rates-card #bank-next {grid-column:2;grid-row:2;justify-self:start;}
+    #card-rates-card .carousel-btn {width:42px;height:42px;}
+    #card-rates-card .bank-carousel-track { min-width:0; width:100%; }
+    #card-rates-card .bank-slide { min-width:0; padding:0 3px; }
+    #card-rates-card .bank-slide-inner {width:100%;min-width:0;max-width:100%;padding:16px 15px 18px;gap:12px;}
+    #card-rates-card .bank-slide-header { gap:9px;padding-bottom:14px; }
+    #card-rates-card .bank-slide-name {font-size:17px;line-height:1.3;overflow-wrap:anywhere;}
+    #card-rates-card .bank-slide-rates {display:grid;grid-template-columns:minmax(0,1fr);gap:9px;min-width:0;}
+    #card-rates-card .bank-rate-card { min-width:0;width:100%;padding:12px 15px;border-radius:12px; }
+    #card-rates-card .bank-rate-head { font-size:14px;gap:9px;min-width:0; }
+    #card-rates-card .bank-rate-card .rate-bs { margin-top:8px;padding-top:7px; }
+    #card-rates-card .bank-rate-card .bs-row { gap:12px;min-width:0; }
+    #card-rates-card .bank-rate-card .bs-label { font-size:11px; }
+    #card-rates-card .bank-rate-card .bs-val { font-size:14px; }
+    #card-rates-card .carousel-controls {margin-top:8px;gap:10px;}
+    #card-rates-card .carousel-dots-wrapper { flex-direction:column;gap:10px; }
+    #card-rates-card .carousel-dots {display:none;}
+    #card-rates-card .bank-mobile-counter {
+        display:inline-flex;align-items:center;justify-content:center;
+        min-width:92px;min-height:32px;padding:5px 13px;
+        border:1px solid var(--border);border-radius:999px;
+        background:var(--surface-1);color:var(--text-muted);
+        font-size:12px;font-weight:750;font-family:ui-monospace,Consolas,monospace;
+    }
+    #card-rates-card .autoplay-btn {min-height:40px;padding:9px 16px;}
+}
+@media(max-width:380px) {
+    #card-rates-card {padding:18px 12px;}
+    #card-rates-card .bank-slide-inner {padding:14px 12px;}
+    #card-rates-card .bank-rate-card {padding:12px;}
+}
+</style>
 </head>
 <body>
 <aside class="fx-ad-rail left" aria-label="Рекламне місце зліва"><div class="fx-ad-slot" id="adsense-left"><span>Рекламне місце</span>Google AdSense · ліворуч</div></aside><aside class="fx-ad-rail right" aria-label="Рекламне місце справа"><div class="fx-ad-slot" id="adsense-right"><span>Рекламне місце</span>Google AdSense · праворуч</div></aside>
@@ -1752,6 +1800,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                             <span data-i18n="autoplay_15s">Авто 15с</span>
                         </button>
                         <div class="carousel-dots" id="bank-dots"></div>
+                        <span class="bank-mobile-counter" id="bank-mobile-counter" aria-label="Номер банку"></span>
                     </div>
                 </div>
             </div>
@@ -3427,6 +3476,11 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             if (!track) return;
 
             bankCarouselState.current = index;
+            const bankCounter = document.getElementById('bank-mobile-counter');
+            if (bankCounter) {
+                const label = currentLang === 'en' ? 'Bank' : 'Банк';
+                bankCounter.textContent = `${label} ${index + 1} / ${bankCarouselState.total}`;
+            }
             track.style.transform = `translateX(-${index * 100}%)`;
 
             track.querySelectorAll('.bank-slide').forEach((slide, i) => {
@@ -4237,7 +4291,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
         }
         function fxInitPWA() {
             if('serviceWorker' in navigator && (window.isSecureContext || location.hostname==='localhost')){
-                navigator.serviceWorker.register('./sw.js').catch(()=>{});
+                navigator.serviceWorker.register('./sw.js', {scope:'./'}).catch(()=>{});
             }
             const install=$('#fx-install'),status=$('#fx-install-status');
             install.addEventListener('click',async()=>{
