@@ -1,5 +1,5 @@
 const CACHE = 'nbu-rate-shell-v15-20261124';
-const FILES = ['./index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
+const FILES = ['./index.html', './manifest.webmanifest', './icons/web-app-manifest-192x192.png', './favicon/web-app-manifest-512x512.png', './favicon/apple-touch-icon.png'];
 const MAIN_PAGE = new URL('./index.html', self.registration.scope).href;
 
 self.addEventListener('install', event => {
@@ -45,7 +45,7 @@ self.addEventListener('fetch', event => {
         return cached || Response.error();
       }
     })());
-  } else if (/\/(manifest\.webmanifest|icons\/[^/]+\.png)$/.test(url.pathname)) {
+  } else if (/\/(manifest\.webmanifest|favicon\/[^/]+\.png)$/.test(url.pathname)) {
     event.respondWith(caches.match(request).then(cached => cached || fetch(request)));
   }
 });
