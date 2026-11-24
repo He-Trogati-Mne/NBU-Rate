@@ -4276,7 +4276,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             if(!crossed)return;
             fxAlertTriggered=true;fxAlertNotice=fxT('alertCrossed');fxBadgeFavicon();fxRenderAlert();
             if('Notification' in window && Notification.permission==='granted'){
-                try {new Notification('Курс НБУ',{body:`${fxAlert.curr}/UAH: ${fxNum(value,4)} ₴ · ${fxT('alertCrossed')}`,icon:'./icons/icon-192.png',tag:'nbu-rate-threshold'});}catch(_){}
+                try {new Notification('Курс НБУ',{body:`${fxAlert.curr}/UAH: ${fxNum(value,4)} ₴ · ${fxT('alertCrossed')}`,icon:'favicon/icon-192.png',tag:'nbu-rate-threshold'});}catch(_){}
             }
         }
         async function fxPollRates() {
