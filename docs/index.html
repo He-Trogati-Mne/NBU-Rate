@@ -8,8 +8,6 @@
     <meta name="theme-color" content="#1a73e8" />
     <title>Курс НБУ</title>
     <script>
-    // One-time migration from the earlier PWA build to this standalone HTML edition.
-    // No SW or manifest is required to load the website.
     (function () {
         if (!('serviceWorker' in navigator)) return;
         var siteScope = new URL('./', location.href).href;
@@ -22,7 +20,7 @@
                     if (sessionStorage.getItem(key)) return;
                     sessionStorage.setItem(key, '1');
                     location.reload();
-                } catch (_) { /* Reload manually if storage is restricted. */ }
+                } catch (_) {}
             });
         }).catch(function () {});
     })();
