@@ -1,4 +1,3 @@
-/* NBU Rate · v15. Files are relative to /NBU-Rate/ even when hosted from /docs. */
 const CACHE = 'nbu-rate-shell-v15-20261124';
 const FILES = ['./index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 const MAIN_PAGE = new URL('./index.html', self.registration.scope).href;
@@ -6,7 +5,6 @@ const MAIN_PAGE = new URL('./index.html', self.registration.scope).href;
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
-    // Never fail installation because one asset is missing or a request is temporarily offline.
     await Promise.all(FILES.map(async file => {
       try {
         const url = new URL(file, self.registration.scope);
