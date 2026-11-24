@@ -64,7 +64,6 @@
     <link rel="dns-prefetch" href="https://raw.githubusercontent.com">
     <link rel="dns-prefetch" href="https://bank.gov.ua">
 
-    <link rel="preload" href="chart.umd.min.js" as="script">
 
     <script>
     var safeLS = (function() {
@@ -1120,7 +1119,9 @@
             content: '';
             position: absolute;
             left: 0; top: 0; bottom: 0;
-            width: 0%;
+            width: 100%;
+            transform: scaleX(0);
+            transform-origin: left center;
             background: var(--accent);
             border-radius: 4px;
         }
@@ -1128,8 +1129,8 @@
             animation: dotProgress 15s linear forwards;
         }
         @keyframes dotProgress {
-            0% { width: 0%; }
-            100% { width: 100%; }
+            0% { transform: scaleX(0); }
+            100% { transform: scaleX(1); }
         }
 
         .autoplay-btn {
@@ -1765,11 +1766,11 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             </div>
             <div class="converter-grid">
                 <div class="converter-field">
-                    <label data-i18n="label_from">З валюти</label>
+                    <label for="conv-from" data-i18n="label_from">З валюти</label>
                     <div class="converter-input-wrap">
                         <input type="number" id="conv-from" value="1" min="0" step="any" inputmode="decimal" />
                         <div class="currency-picker" id="conv-from-picker" data-value="USD">
-                            <img class="flag-mini" src="https://flagcdn.com/w40/us.png" alt="" width="28" height="20" loading="lazy" decoding="async" onerror="this.style.display='none'">
+                            <img class="flag-mini" src="https://flagcdn.com/w40/us.png" alt="" width="28" height="20" loading="eager" decoding="async" onerror="this.style.display='none'">
                             <span class="code">USD</span>
                             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                         </div>
@@ -1781,11 +1782,11 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                     </svg>
                 </button>
                 <div class="converter-field">
-                    <label data-i18n="label_to">У валюту</label>
+                    <label for="conv-to" data-i18n="label_to">У валюту</label>
                     <div class="converter-input-wrap">
                         <input type="number" id="conv-to" value="0" readonly />
                         <div class="currency-picker" id="conv-to-picker" data-value="UAH">
-                            <img class="flag-mini" src="https://flagcdn.com/w40/ua.png" alt="" width="28" height="20" loading="lazy" decoding="async" onerror="this.style.display='none'">
+                            <img class="flag-mini" src="https://flagcdn.com/w40/ua.png" alt="" width="28" height="20" loading="eager" decoding="async" onerror="this.style.display='none'">
                             <span class="code">UAH</span>
                             <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                         </div>
@@ -2363,7 +2364,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 })();
 </script>
 
-    <script src="chart.umd.min.js"></script>
+    <script src="chart.umd.min.js" defer></script>
     <script>
 /* Small offline canvas chart fallback. The original Chart.js is used when present. */
 (function () {
@@ -3224,8 +3225,14 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             const container = $('#current-rates');
             setStatus(t('status_loading'), 'loading');
 
-            loadCrypto();
-            initBankCarousel();
+            // Lower-page modules are independent of the converter; let the initial
+            // screen paint first on slow phones without losing any functionality.
+            const loadSecondarySections = () => { loadCrypto(); initBankCarousel(); };
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(loadSecondarySections, { timeout: 1300 });
+            } else {
+                setTimeout(loadSecondarySections, 100);
+            }
 
             const stale = loadLiveCache('nbu', true);
             if (stale && Array.isArray(stale)) {
@@ -3711,8 +3718,10 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 d.classList.toggle('active', isActive);
                 d.classList.remove('animating');
                 if (isActive && bankCarouselState.autoplay) {
-                    void d.offsetWidth;
-                    d.classList.add('animating');
+                    // Restart progress without synchronous layout reads.
+                    requestAnimationFrame(() => requestAnimationFrame(() => {
+                        if (d.isConnected && d.classList.contains('active') && bankCarouselState.autoplay) d.classList.add('animating');
+                    }));
                 }
             });
         }
@@ -3732,8 +3741,9 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             const activeDot = $('#bank-dots .carousel-dot.active');
             if (activeDot) {
                 activeDot.classList.remove('animating');
-                void activeDot.offsetWidth;
-                activeDot.classList.add('animating');
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    if (activeDot.isConnected && activeDot.classList.contains('active') && bankCarouselState.autoplay) activeDot.classList.add('animating');
+                }));
             }
 
             bankCarouselState.timer = setInterval(() => {
@@ -4684,7 +4694,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             document.addEventListener('visibilitychange',()=>{if(!document.hidden)fxPollRates();});
         }
         // Visual annotations remain chart-native and adapt to existing theme and zoom.
-        if (typeof Chart.register === 'function') Chart.register({
+        const historicEventsPlugin = {
             id:'nbuHistoricEvents',
             afterDatasetsDraw(chart){
                 if(chart.canvas.id!=='rateChart' || !chart.getDatasetMeta(0)?.data.length)return;
@@ -4707,7 +4717,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 });
                 ctx.restore();
             }
-        });
+        };
         function fxChartSelect(event, elements, chart){
             if(!chart?.scales?.x)return;
             const dates=getFilteredData(currentPeriod).filter(d=>Number(historicalRates[d]?.[currentCurrency])>0);
@@ -4716,6 +4726,9 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // The deferred Chart.js script has finished before DOMContentLoaded.
+            // If it could not load, the existing canvas fallback handles the charts.
+            if (typeof Chart.register === 'function') Chart.register(historicEventsPlugin);
             initTheme(); initA11y(); initLanguage(); initPreciseRate(); applyTranslations(); fxInit(); handlePrivacyAnchor();
             window.addEventListener('hashchange', handlePrivacyAnchor);
 
