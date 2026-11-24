@@ -1131,8 +1131,452 @@
             .bank-slide-logo { max-height: 48px; }
         }
     </style>
+    <style>
+
+/* ===== NBU RATE • CONNECTED TOOLS (uses the website's existing design tokens) ===== */
+.fx-section{margin-top:22px;padding-top:20px;border-top:1px solid var(--border)}
+.fx-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.fx-eyebrow{font-weight:800;text-transform:uppercase;letter-spacing:.7px;font-size:11px;color:var(--text-muted)}
+.fx-h3{font-size:16px;font-weight:800;letter-spacing:-.25px;color:var(--text)}
+.fx-help{font-size:12px;line-height:1.55;color:var(--text-muted)}
+.fx-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.fx-quick{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.fx-chip,.fx-button{border:1px solid var(--border);background:var(--surface-1);color:var(--text);padding:8px 12px;min-height:36px;border-radius:10px;font:700 12px inherit;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+.fx-chip{font-family:inherit;font-size:12px;font-weight:700}
+.fx-chip:hover,.fx-button:hover{border-color:var(--accent);background:var(--hover)}
+.fx-chip:active,.fx-button:active{transform:scale(.96)}
+.fx-chip.is-active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 11%,var(--surface-1));color:var(--accent)}
+.fx-button{font-family:inherit;font-size:13px;font-weight:700}
+.fx-button.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.fx-input,.fx-select{font:700 14px inherit;font-family:inherit;font-weight:700;background:var(--surface-1);color:var(--text);border:1.5px solid var(--border);border-radius:10px;padding:11px 12px;min-height:43px;min-width:0;outline:none;width:100%;accent-color:var(--accent)}
+.fx-input:focus,.fx-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.fx-control{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
+.fx-control>label{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);font-weight:800}
+.fx-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:end}
+.fx-tile{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px}
+.fx-fee{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);margin-top:15px;flex-wrap:wrap}
+.fx-fee-label{font-size:12px;font-weight:700;color:var(--text-muted);flex:1;min-width:115px}
+.fx-fee input[type=range]{accent-color:var(--accent);width:125px;max-width:36vw;cursor:pointer}
+.fx-fee strong{font:800 13px ui-monospace,Consolas,monospace;color:var(--accent);min-width:42px;text-align:right}
+.fx-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:13px}
+.fx-list-item{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface-1);border:1px solid var(--border);border-radius:12px;min-width:0}
+.fx-list-item .fx-symbol{display:flex;gap:9px;align-items:center;font:800 13px ui-monospace,monospace}
+.fx-list-item .fx-num{font:800 15px ui-monospace,Consolas,monospace;color:var(--accent);overflow:hidden;text-overflow:ellipsis;text-align:right}
+.fx-flag{font-size:17px;line-height:1}
+.fx-whatif{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:14px}
+.fx-result-panel{margin-top:12px;background:color-mix(in srgb,var(--accent) 6%,var(--surface-1));border:1px solid color-mix(in srgb,var(--accent) 23%,var(--border));border-radius:14px;padding:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.fx-stat{min-width:0}.fx-stat-label{font-size:11px;color:var(--text-muted);font-weight:700;margin-bottom:5px}
+.fx-stat-value{font:800 clamp(14px,2.7vw,21px) ui-monospace,Consolas,monospace;word-break:break-word}.fx-stat-value.accent{color:var(--accent)}
+.fx-events{margin:12px 0 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fx-event{font:700 11px inherit;font-family:inherit;font-weight:700;border:1px dashed var(--border-strong);background:transparent;color:var(--text-muted);border-radius:999px;padding:6px 10px;cursor:pointer}
+.fx-event:hover,.fx-event.active{color:var(--accent);border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.fx-table-wrap{overflow:auto;border:1px solid var(--border);border-radius:14px;margin-top:13px}
+.fx-table{border-collapse:collapse;width:100%;min-width:485px;font-size:13px}
+.fx-table th{background:var(--surface-1);text-align:right;color:var(--text-muted);font-size:11px;letter-spacing:.4px;text-transform:uppercase;padding:13px;white-space:nowrap}
+.fx-table th:first-child,.fx-table td:first-child{text-align:left}
+.fx-table td{padding:12px 13px;text-align:right;border-top:1px solid var(--border);font:700 13px ui-monospace,Consolas,monospace}
+.fx-table td:first-child{font:700 13px system-ui,-apple-system,'Segoe UI',sans-serif}
+.fx-table tr:hover td{background:var(--hover)}
+.fx-best{display:inline-block;border-radius:7px;background:color-mix(in srgb,var(--positive) 14%,transparent);color:var(--positive);padding:5px 7px;font-weight:900}
+.fx-mini-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.fx-mini-stats .fx-tile{padding:13px}
+.fx-mini-stats strong{display:block;font:800 17px ui-monospace,Consolas,monospace;margin-top:5px;word-break:break-word}
+.fx-small-link{color:var(--accent);font-weight:700;text-decoration:none}.fx-small-link:hover{text-decoration:underline}
+.fx-tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fx-tools-grid .fx-tile{padding:19px;display:flex;flex-direction:column;gap:12px}
+.fx-install-head{display:flex;align-items:center;gap:10px}.fx-tool-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 12%,var(--surface-2));color:var(--accent);font-size:20px}
+.fx-notification-line{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.fx-banner{display:grid;grid-template-columns:1fr 230px;gap:16px;align-items:center;padding:18px;background:linear-gradient(130deg,color-mix(in srgb,var(--accent) 8%,var(--surface-1)),var(--surface-1));border:1px solid var(--border);border-radius:16px}
+.fx-browser{border:1px solid var(--border-strong);border-radius:13px;overflow:hidden;box-shadow:var(--shadow-md);background:var(--bg-elev)}
+.fx-browser-top{background:var(--surface-2);border-bottom:1px solid var(--border);padding:8px 11px;display:flex;gap:5px;align-items:center}
+.fx-dot{width:7px;height:7px;border-radius:50%;background:var(--border-strong)}.fx-browser-top span:last-child{margin-left:auto;color:var(--text-muted);font-size:11px}
+.fx-browser-body{padding:12px}.fx-browser-body strong{display:block;font:800 19px ui-monospace,Consolas,monospace;color:var(--accent);padding:7px 0}
+.fx-banner-links{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.fx-banner-links a{text-decoration:none}
+.fx-inline-note{font-size:11px;color:var(--text-faint);margin-top:8px}
+.fx-message{font-size:12px;color:var(--text-muted)}
+.fx-statusline{font-size:12px;color:var(--text-muted);margin-top:9px}
+@media(max-width:700px){.fx-tools-grid{grid-template-columns:1fr}.fx-banner{grid-template-columns:1fr}.fx-form{grid-template-columns:repeat(2,minmax(0,1fr))}.fx-form .fx-control:last-child{grid-column:1/-1}.fx-result-panel{grid-template-columns:1fr 1fr}.fx-result-panel .fx-stat:last-child{grid-column:1/-1}.fx-mini-stats{grid-template-columns:1fr 1fr}}
+@media(max-width:470px){.fx-list{grid-template-columns:1fr}.fx-whatif{grid-template-columns:1fr 1fr}.fx-whatif .fx-control:last-child{grid-column:1/-1}.fx-form{grid-template-columns:1fr}.fx-form .fx-control:last-child{grid-column:auto}.fx-mini-stats{grid-template-columns:1fr}.fx-fee{align-items:stretch}.fx-fee input[type=range]{width:100%;max-width:none;flex:1}.fx-banner-links .fx-chip{flex:1;text-align:center}}
+
+
+/* ===== UI REFINEMENTS: clear visual rhythm, readable chart and bank section ===== */
+main.container > section.card { margin-bottom:32px; }
+main.container > section.card:last-of-type { margin-bottom:26px; }
+.fx-section { margin-top:30px; padding-top:28px; }
+.fx-feature-heading {align-items:center;gap:16px;}
+.fx-heading-group {display:flex;align-items:center;gap:12px;min-width:0;flex:1;}
+.fx-heading-group > div {min-width:0;}
+.fx-heading-icon {flex:0 0 44px;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:13px;background:color-mix(in srgb,var(--accent) 12%,var(--surface-1));
+  border:1px solid color-mix(in srgb,var(--accent) 24%,var(--border));color:var(--accent);}
+.fx-heading-svg {width:23px;height:23px;display:block;}
+.fx-heading-group .fx-h3 {font-size:16px;line-height:1.35;letter-spacing:-.3px;}
+.fx-heading-group .fx-help {margin-top:4px;max-width:550px;}
+#fx-bank-panel {padding-top:28px;margin-top:30px;}
+#fx-bank-panel > .fx-section.fx-feature-panel {
+  margin-top:24px;padding:22px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 2.8%,var(--surface-1)),var(--surface-1));
+  border:1px solid var(--border);border-radius:var(--radius-lg);
+}
+#fx-bank-panel .fx-table-wrap {margin-top:20px;}
+#fx-bank-panel .fx-feature-panel .fx-form {margin-top:20px !important;}
+#fx-bank-panel .fx-feature-panel .fx-input,
+#fx-bank-panel .fx-feature-panel .fx-select,
+#fx-bank-panel .fx-feature-panel .fx-tile {background:var(--bg-elev);}
+#fx-tools .fx-tools-grid {gap:18px;margin-bottom:10px;}
+#fx-tools .fx-tools-grid > .fx-tile {padding:21px;min-width:0;}
+#fx-tools .fx-extensions-section {margin-top:28px;padding-top:28px;border-top:1px solid var(--border);}
+#fx-tools .fx-banner {margin-top:6px;padding:22px;gap:22px;border-radius:var(--radius-lg);}
+#fx-tools .fx-banner .fx-h3 {margin:8px 0 8px !important;line-height:1.35;}
+#fx-tools .fx-install-head {align-items:flex-start;}
+#fx-tools .fx-tool-icon {flex:0 0 40px;height:40px;}
+.fx-list {row-gap:11px;column-gap:11px;margin-top:18px;margin-bottom:4px;}
+.fx-list-item {min-height:46px;}
+.chart-container > canvas {display:block;width:100% !important;height:100% !important;}
+.fx-chart-tooltip {pointer-events:none;position:absolute;top:0;left:0;max-width:min(250px,85%);border-radius:9px;
+  z-index:4;opacity:0;transition:opacity .14s;padding:9px 11px;background:var(--surface-2);color:var(--text);
+  font:600 12px system-ui,-apple-system,'Segoe UI',sans-serif;border:1px solid var(--border-strong);
+  box-shadow:var(--shadow-md);}
+.fx-chart-notice {display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  max-width:350px;width:calc(100% - 42px);z-index:2;text-align:center;padding:15px 18px;border:1px solid var(--border);
+  border-radius:12px;background:var(--bg-elev);color:var(--text-muted);font-size:13px;line-height:1.6;}
+.fx-chart-notice.visible {display:block;}
+@media(max-width:700px){
+  main.container > section.card {margin-bottom:26px;}
+  .fx-section {margin-top:24px;padding-top:24px;}
+  .fx-feature-heading {align-items:stretch;}
+  .fx-feature-heading .fx-controls {padding-left:56px;}
+  #fx-bank-panel > .fx-section.fx-feature-panel {padding:18px 14px;}
+  #fx-tools .fx-extensions-section {margin-top:24px;padding-top:24px;}
+  #fx-tools .fx-banner {padding:17px;}
+  #fx-bank-panel .fx-feature-heading .segmented {width:100%;margin-top:3px;}
+}
+@media(max-width:470px){
+  .fx-heading-icon {width:39px;height:39px;flex-basis:39px;border-radius:11px;}
+  .fx-heading-svg {width:21px;height:21px;}
+  .fx-heading-group {gap:10px;}
+  .fx-feature-heading .fx-controls {padding-left:49px;}
+  #fx-tools .fx-tools-grid > .fx-tile {padding:17px;}
+  #fx-tools .fx-banner {padding:16px;}
+  #fx-tools .fx-notification-line {gap:7px;}
+}
+
+
+.fx-bank-ident {display:inline-flex;align-items:center;gap:10px;max-width:100%;}
+.fx-bank-mark {position:relative;flex:0 0 31px;width:31px;height:31px;border-radius:9px;overflow:hidden;
+  display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 10%,var(--bg-elev));
+  border:1px solid color-mix(in srgb,var(--accent) 18%,var(--border));color:var(--accent);
+  font-size:14px;font-weight:900;}
+.fx-bank-mark img {position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--bg-elev);padding:2px;}
+.fx-bank-name {white-space:normal;line-height:1.3;}
+@media(max-width:530px){.fx-bank-ident{gap:6px}.fx-bank-mark{flex-basis:26px;width:26px;height:26px;border-radius:7px}}
+
+    </style>
+    <style>
+/* ===== v3 polish ===== */
+.fx-quick{justify-content:center;gap:9px;margin:20px auto 5px;padding:13px 14px;border:1px solid var(--border);background:var(--surface-1);border-radius:16px;width:fit-content;max-width:100%;}
+.fx-quick .fx-eyebrow{width:100%;text-align:center;margin-bottom:2px;color:var(--accent);}
+.fx-quick .fx-chip{min-width:64px;padding:10px 14px;border-radius:11px;background:var(--bg-elev);box-shadow:var(--shadow-sm);font-weight:800;}
+.fx-quick .fx-chip:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.converter-grid{align-items:end;gap:15px}.converter-input-wrap{min-height:58px;align-items:stretch;}
+.converter-input-wrap input{min-width:0;padding:13px 12px 13px 17px;line-height:1.3;}
+.currency-picker{min-width:118px;justify-content:center;gap:8px;padding:0 12px;background:color-mix(in srgb,var(--accent) 3%,var(--surface-1));}
+.currency-picker .flag-mini,.currency-picker .flag-metal-wrap{width:27px!important;height:20px!important;flex:0 0 27px;object-fit:cover;vertical-align:middle;}
+.currency-picker .code{min-width:32px;text-align:left}.currency-picker .chev{flex-shrink:0;}
+.swap-btn{margin-bottom:5px;}
+/* Custom styled dropdowns; original select stays available to existing JS */
+.fx-select-shell{position:relative;min-width:0;width:100%;}
+.fx-select-shell select.fx-select{position:absolute!important;inset:0;width:100%;height:100%;opacity:0;pointer-events:none;z-index:-1;}
+.fx-select-trigger{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:44px;padding:10px 13px;background:var(--bg-elev);color:var(--text);border:1.5px solid var(--border);border-radius:11px;font:700 13px system-ui,-apple-system,'Segoe UI',sans-serif;text-align:left;cursor:pointer;transition:all .2s;}
+.fx-select-trigger:hover,.fx-select-trigger[aria-expanded=true]{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 10%,transparent);}
+.fx-select-trigger .fx-select-arrow{width:9px;height:9px;border-right:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(45deg) translateY(-2px);flex-shrink:0;transition:transform .2s;}
+.fx-select-trigger[aria-expanded=true] .fx-select-arrow{transform:rotate(225deg) translate(-2px,-1px)}
+.fx-select-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:1000;max-height:260px;overflow-y:auto;overscroll-behavior:contain;padding:6px;border:1px solid var(--border-strong);border-radius:13px;background:var(--bg-elev);box-shadow:var(--shadow-lg);}
+.fx-select-shell.open .fx-select-menu{display:block;animation:fxMenuIn .17s ease-out}
+@keyframes fxMenuIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.fx-select-option{width:100%;display:flex;align-items:center;justify-content:space-between;gap:9px;padding:10px 11px;border:0;border-radius:8px;background:transparent;color:var(--text);font:600 13px system-ui,-apple-system,'Segoe UI',sans-serif;text-align:left;cursor:pointer;}
+.fx-select-option:hover,.fx-select-option:focus-visible{background:var(--hover);outline:none}.fx-select-option[aria-selected=true]{background:color-mix(in srgb,var(--accent) 12%,var(--bg-elev));color:var(--accent);font-weight:800}
+.fx-select-option[aria-selected=true]::after{content:'✓';color:var(--accent)}
+.fx-tool-card{justify-content:flex-start;min-height:0!important;gap:13px!important}.fx-tool-card .fx-install-head{align-items:center!important}.fx-tool-card .fx-h3{line-height:1.35}.fx-tool-card .fx-message{line-height:1.55;}
+.fx-install-steps{padding:12px 13px;border-radius:11px;background:color-mix(in srgb,var(--accent) 5%,var(--bg-elev));border:1px solid var(--border);font-size:12px;line-height:1.65;color:var(--text-muted)}
+.fx-install-steps strong{color:var(--text)}
+.fx-browser-icon{display:inline-block;width:17px;height:17px;object-fit:contain;flex:0 0 17px}
+.fx-banner-links .fx-chip{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;}
+.fx-banner-links .fx-chip:hover{transform:translateY(-2px)}
+.fx-clean-footer{margin:35px auto 0;padding:20px 15px 42px;text-align:center;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);line-height:1.9}
+.fx-clean-footer strong{color:var(--text);font-weight:800}.fx-clean-footer .fx-footer-dot{color:var(--accent);padding:0 9px}
+.fx-ad-rail{display:none;position:fixed;top:50%;transform:translateY(-50%);width:clamp(120px,calc((100vw - 1000px)/2 - 24px),260px);height:min(600px,calc(100vh - 90px));z-index:3;pointer-events:none;}
+.fx-ad-rail.left{left:12px}.fx-ad-rail.right{right:12px}
+.fx-ad-slot{height:100%;width:100%;border:1px dashed var(--border);border-radius:14px;background:color-mix(in srgb,var(--text) 2%,transparent);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:7px;color:var(--text-faint);font-size:12px;pointer-events:auto;overflow:hidden;}
+.fx-ad-slot span{font-size:10px;text-transform:uppercase;letter-spacing:1px}
+@media(min-width:1340px){body.fx-ads-enabled .fx-ad-rail{display:block}}
+@media(max-width:700px){.currency-picker{min-width:112px}.swap-btn{margin:5px auto}.fx-quick{width:100%;}.fx-quick .fx-chip{flex:1 1 25%;}.fx-tools-grid .fx-tile{min-height:0}.fx-select-menu{max-height:220px}}
+@media(max-width:420px){.converter-input-wrap input{font-size:19px;padding-left:12px}.currency-picker{min-width:105px;padding:0 8px;gap:6px}.fx-quick .fx-chip{min-width:75px}}
+
+/* v4 · original browser icons, real flags, compact developer footer */
+.fx-list-item .fx-symbol{display:inline-flex;align-items:center;gap:10px;min-width:0}
+.fx-list-item .fx-flag{display:inline-flex;align-items:center;justify-content:center;width:30px;height:26px;flex:0 0 30px;line-height:1}
+.fx-list-item .fx-rate-flag{display:block;width:28px;height:20px;border-radius:5px;object-fit:cover;box-shadow:0 0 0 1px color-mix(in srgb,var(--text) 17%,transparent)}
+.fx-list-item .fx-flag .crypto-icon{width:24px;height:24px;object-fit:contain;border-radius:50%;box-shadow:none}
+.fx-list-item .fx-flag .crypto-icon-fallback{width:24px;height:24px;font-size:11px}
+.fx-banner-links .fx-chip{min-height:41px;gap:9px;}
+.fx-banner-links .fx-browser-icon{display:block;width:19px;height:19px;flex:0 0 19px;object-fit:contain;opacity:1;filter:none}
+:root[data-scheme="dark"] .fx-banner-links .fx-browser-icon{filter:none}
+.fx-clean-footer{
+    display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+    padding:18px 20px;margin:40px 0 30px;
+    background:var(--bg-elev);border:1px solid var(--border);border-radius:18px;
+    box-shadow:var(--shadow-sm);text-align:left;color:var(--text-muted);line-height:1.4;
+}
+.fx-footer-identity{display:flex;align-items:center;gap:12px;min-width:0}
+.fx-footer-sign{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;flex:0 0 42px;
+    border-radius:13px;background:color-mix(in srgb,var(--accent) 12%,var(--surface-1));
+    border:1px solid color-mix(in srgb,var(--accent) 28%,var(--border));color:var(--accent);
+    font:900 23px ui-monospace,Consolas,monospace;}
+.fx-footer-profile{display:flex;flex-direction:column;min-width:0;gap:3px}
+.fx-footer-profile strong{font-size:14px;letter-spacing:.05px;color:var(--text);overflow-wrap:anywhere;line-height:1.3}
+.fx-footer-profile > span{font-size:11px;letter-spacing:.25px;color:var(--text-muted);font-weight:600}
+.fx-footer-divider{color:var(--text-faint);margin:0 4px}
+.fx-footer-meta{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap}
+.fx-footer-date{display:inline-flex;align-items:center;gap:9px;padding:10px 12px;
+    border:1px solid var(--border);background:var(--surface-1);border-radius:10px;
+    white-space:nowrap;font-size:12px;font-weight:650;color:var(--text-muted)}
+.fx-footer-live{width:7px;height:7px;border-radius:50%;background:var(--positive);
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--positive) 15%,transparent)}
+.fx-footer-github{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:39px;
+    padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface-1);
+    font-size:12px;font-weight:750;color:var(--text);text-decoration:none;transition:border-color .2s,color .2s,transform .2s,background .2s}
+.fx-footer-github:hover{border-color:var(--accent);color:var(--accent);background:var(--hover);transform:translateY(-2px)}
+.fx-footer-github img{width:18px;height:18px;object-fit:contain;filter:none}
+:root[data-scheme="dark"] .fx-footer-github img{filter:invert(1)}
+.fx-footer-github:hover svg{transform:translate(2px,-2px)}
+.fx-footer-github svg{transition:transform .2s;flex:0 0 auto}
+@media(max-width:680px){
+    .fx-clean-footer{padding:16px;gap:16px;justify-content:center;margin:32px 0 24px}
+    .fx-footer-identity{width:100%;justify-content:center}
+    .fx-footer-meta{width:100%;justify-content:center;gap:9px}
+    .fx-footer-date{font-size:11px}
+}
+@media(max-width:380px){.fx-footer-meta{flex-direction:column}.fx-footer-github,.fx-footer-date{width:100%;justify-content:center}}
+
+</style>
+    <link rel="manifest" href="./manifest.webmanifest">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+<style>
+/* ===== v5 · accessibility and visual clarity ===== */
+/* Browser icons: reliable white silhouettes on dark backgrounds; dark on light backgrounds. */
+.fx-banner-links .fx-browser-icon { filter: grayscale(1) brightness(0) !important; opacity:1; }
+:root[data-scheme="dark"] .fx-banner-links .fx-browser-icon { filter: grayscale(1) brightness(0) invert(1) !important; }
+.fx-banner-links .fx-chip { gap:10px; }
+.fx-banner-links .fx-chip:focus-visible { outline:2px solid var(--accent);outline-offset:3px; }
+
+/* Larger crypto chart dialog: real canvas area + readable axes and tooltip. */
+#crypto-chart-modal { padding:24px 18px; align-items:flex-start; }
+#crypto-chart-modal .crypto-chart-panel { width:min(1160px,100%);max-width:none !important;padding:27px 30px 30px; }
+#crypto-chart-modal.crypto-expanded .crypto-chart-panel { width:min(1520px,100%); }
+#crypto-chart-modal .crypto-chart-heading { margin-bottom:17px !important; padding:0 58px 0 12px;justify-content:center; }
+#crypto-chart-modal .crypto-chart-heading > div { min-width:0; }
+#crypto-chart-modal .crypto-chart-heading .modal-title { font-size:clamp(19px,2.15vw,28px);letter-spacing:-.5px;line-height:1.35;overflow-wrap:anywhere; }
+#crypto-chart-modal .crypto-chart-heading .modal-close { width:42px;height:42px;padding:0;display:grid;place-items:center;border:1px solid var(--border);background:var(--surface-1);border-radius:12px; }
+#crypto-chart-modal .period-switcher { margin:15px 0 18px !important; }
+#crypto-chart-modal .period-btn { min-height:43px;font-size:14px; }
+.crypto-chart-toolbar {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.crypto-chart-hint {font-size:13px;line-height:1.5;color:var(--text-muted);flex:1 1 230px;}
+.crypto-chart-actions {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.crypto-chart-action {display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;min-height:42px;border:1px solid var(--border-strong);border-radius:11px;background:var(--surface-1);color:var(--text);font:700 13px system-ui,-apple-system,'Segoe UI',sans-serif;cursor:pointer;transition:border-color .2s,color .2s,background .2s;}
+.crypto-chart-action:hover,.crypto-chart-action[aria-pressed="true"] {border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,var(--surface-1));}
+.crypto-chart-action:focus-visible {outline:2px solid var(--accent);outline-offset:3px;}
+.crypto-chart-action > span:first-child:not(:last-child) {font-weight:900;font-size:16px;}
+#crypto-chart-stats {display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:12px!important;margin:0 0 16px!important;font-family:inherit!important;}
+#crypto-chart-stats > span {display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0;min-height:76px;padding:14px 16px;border:1px solid var(--border);border-radius:13px;background:var(--surface-1);}
+#crypto-chart-stats > span small {font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);font-weight:800;}
+#crypto-chart-stats > span strong {font:800 clamp(14px,1.7vw,20px) ui-monospace,Consolas,monospace;color:var(--text);max-width:100%;overflow-wrap:anywhere;}
+#crypto-chart-stats > span.crypto-stat-now{background:color-mix(in srgb,var(--accent) 8%,var(--surface-1));border-color:color-mix(in srgb,var(--accent) 32%,var(--border));}
+#crypto-chart-stats > span.crypto-stat-now strong {color:var(--accent);}
+#crypto-chart-modal .crypto-chart-stage {height:clamp(470px,60svh,720px)!important;border:1px solid var(--border);border-radius:17px;padding:13px;background:color-mix(in srgb,var(--bg-elev) 70%,var(--surface-1));overflow:hidden;}
+#crypto-chart-modal.crypto-expanded .crypto-chart-stage {height:clamp(560px,73svh,960px)!important;}
+#crypto-chart-modal.crypto-text-large #crypto-chart-stats > span small{font-size:15px;}
+#crypto-chart-modal.crypto-text-large #crypto-chart-stats > span strong{font-size:clamp(17px,1.9vw,25px);}
+#crypto-chart-modal .fx-chart-tooltip {font-size:15px;padding:12px 15px;}
+@media(max-width:700px){
+  #crypto-chart-modal{padding:10px;}
+  #crypto-chart-modal .crypto-chart-panel{padding:17px 14px 18px;border-radius:18px;}
+  #crypto-chart-modal .crypto-chart-heading{padding:0 45px 0 0;}
+  #crypto-chart-modal .crypto-chart-heading .modal-title{font-size:19px;}
+  #crypto-chart-modal .period-switcher{gap:4px;}
+  #crypto-chart-modal .period-btn{min-width:29%;flex:1 1 29%;padding:10px 6px;min-height:43px;}
+  #crypto-chart-stats{gap:7px!important;}
+  #crypto-chart-stats > span{min-height:67px;padding:9px 10px;}
+  #crypto-chart-stats > span strong{font-size:clamp(12px,3vw,17px);}
+  #crypto-chart-stats > span small{font-size:10px;}
+  #crypto-chart-modal .crypto-chart-stage{height:clamp(380px,57svh,560px)!important;padding:7px;}
+  #crypto-chart-modal.crypto-expanded .crypto-chart-stage{height:clamp(470px,74svh,760px)!important;}
+  .crypto-chart-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;}
+  .crypto-chart-action{padding:9px 6px;font-size:12px;}
+}
+@media(max-width:420px){#crypto-chart-stats{grid-template-columns:repeat(3,minmax(0,1fr));}#crypto-chart-modal .crypto-chart-stage{height:clamp(350px,53svh,510px)!important;}}
+
+/* Extension preview: design now resembles a polished, legible browser popover. */
+#fx-tools .fx-banner {grid-template-columns:minmax(0,1fr) minmax(255px,330px);gap:22px;padding:23px;border-radius:20px;}
+#fx-tools .fx-widget-v5 {width:100%;max-width:345px;justify-self:end;border-radius:18px;border-color:color-mix(in srgb,var(--accent) 26%,var(--border-strong));background:var(--bg-elev);box-shadow:0 14px 35px rgba(0,0,0,.15),0 0 0 1px color-mix(in srgb,var(--accent) 5%,transparent);}
+.fx-widget-v5 .fx-browser-top {justify-content:space-between;gap:8px;padding:10px 13px;background:var(--surface-2);}
+.fx-widget-window-dots{display:flex;gap:5px;align-items:center;}
+.fx-widget-window-dots i{width:7px;height:7px;border-radius:50%;background:var(--border-strong);}
+.fx-widget-window-title{flex:1;text-align:center;font-size:10px;font-weight:800;letter-spacing:.35px;color:var(--text-muted)!important;margin:0!important;}
+.fx-widget-preview-label{border:1px solid color-mix(in srgb,var(--accent) 22%,var(--border));border-radius:999px;background:color-mix(in srgb,var(--accent) 9%,var(--surface-2));color:var(--accent)!important;letter-spacing:.7px;font-size:9px!important;font-weight:900;padding:4px 7px;margin-left:0!important;}
+.fx-widget-v5 .fx-browser-body{padding:14px;}
+.fx-widget-brand{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.fx-widget-brand-mark{display:grid;place-items:center;flex:0 0 35px;width:35px;height:35px;border-radius:10px;background:linear-gradient(140deg,var(--accent),color-mix(in srgb,var(--accent) 68%,#152c5a));color:var(--accent-text);font-size:22px;font-weight:800;box-shadow:0 3px 12px color-mix(in srgb,var(--accent) 20%,transparent);}
+.fx-widget-brand-copy{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1;}
+.fx-widget-brand-copy strong{display:block!important;padding:0!important;color:var(--text)!important;font:800 12px system-ui,sans-serif!important;}
+.fx-widget-brand-copy small{font-size:10px;color:var(--text-muted);}
+.fx-widget-live{color:var(--positive);background:color-mix(in srgb,var(--positive) 9%,var(--surface-1));border-radius:100px;padding:4px 9px;font-size:12px;}
+.fx-widget-feature{border:1px solid color-mix(in srgb,var(--accent) 18%,var(--border));border-radius:14px;padding:14px 14px 13px;background:linear-gradient(125deg,color-mix(in srgb,var(--accent) 10%,var(--surface-1)),var(--surface-1));}
+.fx-widget-pair{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--text-muted);font-size:11px;font-weight:800;letter-spacing:.5px;}
+.fx-widget-currency-tag{width:27px;height:27px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 12%,var(--bg-elev));border-radius:8px;color:var(--accent);font-size:16px;font-weight:800;}
+.fx-widget-feature strong{font:900 clamp(24px,2.9vw,32px) ui-monospace,Consolas,monospace!important;display:block;padding:7px 0 4px!important;line-height:1.12;letter-spacing:-.7px;color:var(--accent)!important;white-space:nowrap;}
+.fx-widget-feature > small{color:var(--text-muted);font-size:10px;}
+.fx-widget-currency-list{display:flex;flex-direction:column;margin-top:9px;gap:8px;}
+.fx-widget-currency-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;background:var(--surface-1);border:1px solid var(--border);border-radius:11px;min-width:0;}
+.fx-widget-row-label{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:900;color:var(--text);}
+.fx-widget-row-label img{width:22px;height:16px;border-radius:3px;object-fit:cover;flex-shrink:0;}
+.fx-widget-row-label small{font-size:10px;font-weight:600;color:var(--text-muted);margin-left:1px;}
+.fx-widget-row-value{font:700 12px ui-monospace,Consolas,monospace;color:var(--text-muted);white-space:nowrap;}
+.fx-widget-row-value strong{display:inline!important;font:800 14px ui-monospace,Consolas,monospace!important;padding:0!important;color:var(--text)!important;}
+.fx-widget-bottom{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;color:var(--text-faint);font-size:10px;font-weight:650;}
+.fx-widget-indicator{width:6px;height:6px;background:var(--accent);border-radius:100%;}
+@media(max-width:700px){#fx-tools .fx-banner{grid-template-columns:1fr;gap:20px;padding:17px;}#fx-tools .fx-widget-v5{max-width:390px;justify-self:center;}}
+@media(max-width:390px){.fx-widget-row-label small{display:none;} .fx-widget-v5 .fx-browser-body{padding:12px}}
+</style>
+
+<style>
+/* ===== v6 · unified branding, balanced extension mock, calm controls ===== */
+/* The shared mark is the same ₴ and gradient as the hero branding. */
+.fx-footer-sign,
+.fx-widget-brand-mark {
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:ui-monospace,Menlo,Consolas,monospace!important;
+  font-weight:800!important;
+  background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 75%,#000))!important;
+  color:var(--accent-text)!important;
+  border:0!important;
+  box-shadow:0 5px 16px color-mix(in srgb,var(--accent) 22%,transparent)!important;
+  line-height:1!important;
+}
+.fx-footer-sign{width:44px;height:44px;flex:0 0 44px;font-size:26px!important;border-radius:13px;}
+.fx-widget-brand-mark{width:44px;height:44px;flex:0 0 44px;font-size:25px!important;border-radius:13px;}
+
+/* Crypto header: true horizontal centering, independent of its close control. */
+#crypto-chart-modal .crypto-chart-heading {
+  position:relative;display:flex;justify-content:center;align-items:center;
+  width:100%;min-height:62px;padding:0 54px!important;margin-bottom:15px!important;
+}
+#crypto-chart-modal .crypto-heading-content {
+  width:100%;min-width:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;gap:5px;
+}
+#crypto-chart-modal .crypto-heading-titleline {
+  display:flex;align-items:center;justify-content:center;gap:11px;
+  min-width:0;max-width:100%;text-align:center;
+}
+#crypto-chart-modal .crypto-heading-titleline #crypto-chart-icon {display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+#crypto-chart-modal .crypto-heading-titleline .modal-title {margin:0;text-align:center;font-size:clamp(19px,2.05vw,28px);line-height:1.3;overflow-wrap:anywhere;}
+#crypto-chart-modal .crypto-heading-change {align-self:center!important;margin:0!important;font-size:12px;white-space:nowrap;}
+#crypto-chart-modal .crypto-chart-heading .modal-close {right:0!important;top:50%!important;}
+@media(max-width:700px){
+  #crypto-chart-modal .crypto-chart-heading {padding:0 44px!important;min-height:66px;}
+  #crypto-chart-modal .crypto-heading-titleline{gap:7px;}
+  #crypto-chart-modal .crypto-heading-titleline .modal-title{font-size:clamp(16px,4.6vw,20px);}
+  #crypto-chart-modal .crypto-heading-titleline #crypto-chart-icon .crypto-icon {width:23px;height:23px;}
+}
+/* A modal close button needs translateY(-50%) for centering; never spin it. */
+.settings-btn,.settings-btn:hover,.settings-btn:active,.settings-btn.open {
+  transform:none!important;transition:none!important;
+}
+.settings-btn svg,.settings-btn.open svg {transform:none!important;transition:none!important;animation:none!important;}
+.modal-close,.modal-close:hover,.modal-close:active,
+#crypto-chart-modal .crypto-chart-heading .modal-close,
+#crypto-chart-modal .crypto-chart-heading .modal-close:hover,
+#crypto-chart-modal .crypto-chart-heading .modal-close:active {
+  transform:translateY(-50%)!important;transition:none!important;animation:none!important;
+}
+.modal-close svg,.modal-close:hover svg {transform:none!important;transition:none!important;animation:none!important;}
+
+/* A cohesive extension mock: balanced header, one featured rate and two equal supporting tiles. */
+#fx-tools .fx-banner {
+  grid-template-columns:minmax(0,1fr) minmax(275px,330px);
+  align-items:center;gap:24px;
+}
+#fx-tools .fx-widget-v5 {
+  max-width:330px;justify-self:center;
+  width:100%;border-radius:19px;
+  border:1px solid color-mix(in srgb,var(--accent) 23%,var(--border-strong));
+  background:var(--bg-elev);
+  box-shadow:0 14px 32px color-mix(in srgb,#000 14%,transparent);
+}
+.fx-widget-v5 .fx-browser-top{
+  padding:11px 15px;min-height:44px;display:grid;grid-template-columns:53px 1fr 61px;
+  gap:4px;align-items:center;
+}
+.fx-widget-v5 .fx-widget-window-dots{justify-self:start;}
+.fx-widget-v5 .fx-widget-window-title{justify-self:center;white-space:nowrap;text-align:center;font-size:11px;font-weight:800;}
+.fx-widget-v5 .fx-widget-preview-label{justify-self:end;margin:0!important;padding:4px 7px;font-size:9px!important;}
+.fx-widget-v5 .fx-browser-body{padding:17px;display:flex;flex-direction:column;gap:13px;}
+.fx-widget-v5 .fx-widget-brand {margin:0;gap:11px;min-width:0;}
+.fx-widget-v5 .fx-widget-brand-copy{flex:1;gap:3px;}
+.fx-widget-v5 .fx-widget-brand-copy strong{font-size:14px!important;line-height:1.22!important;}
+.fx-widget-v5 .fx-widget-brand-copy small{font-size:11px;line-height:1.2;}
+.fx-widget-v5 .fx-widget-live{
+  width:9px;height:9px;min-width:9px;min-height:9px;padding:0;border-radius:50%;font-size:0;
+  background:var(--positive);box-shadow:0 0 0 5px color-mix(in srgb,var(--positive) 12%,transparent);
+}
+.fx-widget-v5 .fx-widget-feature{
+  margin:0;min-width:0;padding:16px 16px 17px;border-radius:14px;
+  background:linear-gradient(140deg,color-mix(in srgb,var(--accent) 10%,var(--surface-1)),var(--surface-1));
+}
+.fx-widget-v5 .fx-widget-pair{letter-spacing:.5px;font-size:11px;}
+.fx-widget-v5 .fx-widget-feature strong{
+  font-size:clamp(23px,2vw,30px)!important;line-height:1.2!important;letter-spacing:-.9px;
+  padding:8px 0 5px!important;white-space:normal;overflow-wrap:anywhere;
+}
+.fx-widget-v5 .fx-widget-feature > small{font-size:11px;}
+.fx-widget-v5 .fx-widget-currency-list{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0;
+}
+.fx-widget-v5 .fx-widget-currency-row{
+  min-width:0;display:flex;flex-direction:column;align-items:flex-start;
+  gap:10px;padding:12px 11px;justify-content:space-between;border-radius:12px;
+  background:var(--surface-1);border:1px solid var(--border);
+}
+.fx-widget-v5 .fx-widget-row-label{gap:6px;font-size:11px;white-space:nowrap;}
+.fx-widget-v5 .fx-widget-row-label img{width:22px;height:16px;}
+.fx-widget-v5 .fx-widget-row-label small{font-size:10px;margin-left:0;}
+.fx-widget-v5 .fx-widget-row-value{
+  display:flex;align-items:baseline;gap:4px;line-height:1.2;
+  font-size:13px;font-weight:800;color:var(--text-muted);
+}
+.fx-widget-v5 .fx-widget-row-value strong{font-size:clamp(13px,1.4vw,16px)!important;line-height:1.2!important;letter-spacing:-.4px;}
+.fx-widget-v5 .fx-widget-bottom {
+  margin:1px 0 0;padding-top:13px;border-top:1px solid var(--border);
+  font-size:10px;line-height:1.4;color:var(--text-muted);text-align:center;
+}
+@media(max-width:700px){
+  #fx-tools .fx-banner{grid-template-columns:minmax(0,1fr);gap:19px;}
+  #fx-tools .fx-widget-v5{width:min(100%,345px);justify-self:center;}
+}
+@media(max-width:390px){
+  .fx-widget-v5 .fx-browser-body{padding:13px;}
+  .fx-widget-v5 .fx-widget-row-label small{display:inline;}
+  .fx-widget-v5 .fx-widget-currency-row{padding:10px 9px;}
+  .fx-widget-v5 .fx-widget-row-value strong{font-size:13px!important;}
+}
+</style>
 </head>
 <body>
+<aside class="fx-ad-rail left" aria-label="Рекламне місце зліва"><div class="fx-ad-slot" id="adsense-left"><span>Рекламне місце</span>Google AdSense · ліворуч</div></aside><aside class="fx-ad-rail right" aria-label="Рекламне місце справа"><div class="fx-ad-slot" id="adsense-right"><span>Рекламне місце</span>Google AdSense · праворуч</div></aside>
 
     <header class="hero">
         <div class="container">
@@ -1191,6 +1635,22 @@
                     </div>
                 </div>
             </div>
+
+            <div class="fx-quick" aria-label="Швидкі суми">
+                <span class="fx-eyebrow" data-fx="quick">Швидко</span>
+                <button class="fx-chip" type="button" data-quick="100">100</button>
+                <button class="fx-chip" type="button" data-quick="500">500</button>
+                <button class="fx-chip" type="button" data-quick="1000">1 000</button>
+                <button class="fx-chip" type="button" data-quick="+100">+100</button>
+                <button class="fx-chip" type="button" data-quick="+500">+500</button>
+                <button class="fx-chip" type="button" data-quick="+1000">+1 000</button>
+            </div>
+            <div class="fx-fee">
+                <span class="fx-fee-label" data-fx="fee">Додаткова комісія (вручну)</span>
+                <input id="fx-fee" type="range" min="0" max="3" step="0.1" value="0" aria-label="Комісія, відсотків">
+                <strong id="fx-fee-value">0.0%</strong>
+                <span class="fx-help" data-fx="feeHint">Враховується у банківському розрахунку</span>
+            </div>
             <div class="converter-result">
                 <button class="copy-btn" id="copy-result" title="Копіювати">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1200,6 +1660,12 @@
                 </button>
                 <div class="result-value" id="conv-result">—</div>
                 <div class="result-detail" id="conv-detail"></div>
+            </div>
+
+            <div class="fx-section">
+                <div class="fx-row fx-feature-heading"><div class="fx-heading-group"><span class="fx-heading-icon"><svg class="fx-heading-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="4.5"/><circle cx="16" cy="16" r="4.5"/><path d="M6 8h4m4 8h4"/></svg></span><div><h3 class="fx-h3" data-fx="multititle">Одразу в кількох валютах</h3><p class="fx-help" data-fx="multihelp">За офіційним курсом НБУ · USDT — індикативна спотова оцінка</p></div></div>
+                <button id="fx-share" type="button" class="fx-chip" data-fx="share">↗ Поділитися розрахунком</button></div>
+                <div class="fx-list" id="fx-multi-list" aria-live="polite"><p class="fx-help">Завантаження курсів…</p></div>
             </div>
         </section>
 
@@ -1226,8 +1692,20 @@
                 <button class="period-btn" data-period="5Y">5 Років</button>
                 <button class="period-btn active" data-period="MAX">Макс.</button>
             </div>
-            <div class="chart-container" id="chart-container">
+            <div class="chart-container" id="chart-container" role="img" aria-label="Графік історії валютного курсу">
                 <canvas id="rateChart"></canvas>
+            </div>
+
+            <div class="fx-section" id="fx-history-panel">
+                <div class="fx-row"><div><h3 class="fx-h3" data-fx="whatif">А що, якби купили тоді?</h3><p class="fx-help" data-fx="whatifhelp">Виберіть дату або натисніть на точку графіка. Розрахунок за курсами НБУ, без комісій та інфляції.</p></div></div>
+                <div class="fx-events" id="fx-events" aria-label="Економічні події"></div>
+                <div class="fx-whatif">
+                    <div class="fx-control"><label for="fx-hdate" data-fx="histdate">Дата покупки</label><input class="fx-input" type="date" id="fx-hdate" min="2003-01-01"></div>
+                    <div class="fx-control"><label for="fx-hamount" data-fx="histamount">Початково, ₴</label><input class="fx-input" type="number" id="fx-hamount" value="10000" min="0" step="100" inputmode="decimal"></div>
+                    <div class="fx-control"><label for="fx-hcurrency" data-fx="histcurrency">Валюта</label><select class="fx-select" id="fx-hcurrency"><option value="USD">USD</option><option value="EUR">EUR</option><option value="PLN">PLN</option><option value="GBP">GBP</option></select></div>
+                </div>
+                <div class="fx-result-panel" id="fx-history-result" aria-live="polite"><span class="fx-help">Історія завантажується…</span></div>
+                <p class="fx-inline-note" id="fx-history-note"></p>
             </div>
         </section>
 
@@ -1277,6 +1755,20 @@
                     </div>
                 </div>
             </div>
+
+            <div class="fx-section" id="fx-bank-panel">
+                <div class="fx-row fx-feature-heading"><div class="fx-heading-group"><span class="fx-heading-icon"><svg class="fx-heading-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h18M5 10V20m5-10v10m4-10v10m5-10v10M2 21h20M3 9l9-6 9 6"/></svg></span><div><h3 class="fx-h3" data-fx="banktitle">Порівняння курсів банків</h3><p class="fx-help" data-fx="bankhelp">Найкраща купівля — максимальний курс банку; найкращий продаж — мінімальний. Показуємо лише доступні котирування.</p></div></div>
+                <div class="fx-controls"><label class="fx-eyebrow" for="fx-bank-currency" data-fx="currency">Валюта</label><select id="fx-bank-currency" class="fx-select" style="width:105px"><option>USD</option><option>EUR</option><option>PLN</option><option>GBP</option></select></div></div>
+                <div id="fx-bank-comparison" class="fx-table-wrap"><p class="fx-help" style="padding:16px">Завантаження банків…</p></div>
+                <p class="fx-inline-note" id="fx-bank-count"></p>
+                <div class="fx-section fx-feature-panel"><div class="fx-row fx-feature-heading"><div class="fx-heading-group"><span class="fx-heading-icon"><svg class="fx-heading-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2.5" width="16" height="19" rx="2.5"/><path d="M8 7h8M8 12h2m4 0h2m-8 4h2m4 0h2"/></svg></span><h3 class="fx-h3" data-fx="bankcalc">Калькулятор за картковим курсом</h3></div><div class="segmented" id="fx-mode-switch" role="group" aria-label="Режим обміну" style="min-width:240px"><button type="button" class="active" data-mode="buy" data-fx="buycurrency">Купити валюту</button><button type="button" data-mode="sell" data-fx="sellcurrency">Продати валюту</button></div></div>
+                    <div class="fx-form" style="margin-top:14px"><div class="fx-control"><label for="fx-bank-select" data-fx="bank">Банк</label><select class="fx-select" id="fx-bank-select"><option value="">—</option></select></div><div class="fx-control"><label for="fx-bank-amount" data-fx="bankamount">Сума у валюті</label><input class="fx-input" id="fx-bank-amount" type="number" value="100" min="0" step="any"></div><div class="fx-control"><label data-fx="bankresulttitle">Разом у гривнях</label><div class="fx-tile" style="min-height:44px;padding:10px 12px"><strong id="fx-bank-result" style="font:800 17px ui-monospace,monospace;color:var(--accent)">—</strong></div></div></div>
+                    <p class="fx-statusline" id="fx-bank-formula"></p>
+                </div>
+                <div class="fx-section fx-feature-panel"><div class="fx-heading-group"><span class="fx-heading-icon"><svg class="fx-heading-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l5-5 4 3 8-9M15 6h5v5"/></svg></span><h3 class="fx-h3" data-fx="spread">Спред: НБУ, банки та USDT</h3></div><div class="fx-mini-stats" id="fx-spread-stats"></div>
+                    <div class="fx-row"><label class="fx-help" for="fx-p2p-rate" data-fx="p2p">P2P USDT/UAH — введіть реальну пропозицію для порівняння:</label><input class="fx-input" id="fx-p2p-rate" type="number" min="0" step="any" placeholder="Напр. 45.50" style="width:145px" inputmode="decimal"></div><p class="fx-statusline" id="fx-p2p-result"></p>
+                </div>
+            </div>
         </section>
 
         <section class="card" id="crypto-card">
@@ -1301,6 +1793,39 @@
             </div>
         </section>
 
+
+        <section class="card" id="fx-tools">
+            <div class="section-head"><h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 18h7m-3-4v7"/></svg><span data-fx="tools">Зручні інструменти</span></h2></div>
+            <div class="fx-tools-grid">
+                <div class="fx-tile fx-tool-card"><div class="fx-install-head"><div class="fx-tool-icon">📲</div><div><h3 class="fx-h3" data-fx="installtitle">Встановити як застосунок</h3><p class="fx-help" data-fx="installhelp">Швидкий доступ та останні збережені курси офлайн</p></div></div><button class="fx-button primary" id="fx-install" type="button" data-fx="installbtn">Встановити застосунок</button><div class="fx-install-steps"><strong>Android:</strong> Chrome → ⋮ → «Встановити застосунок» або «Додати на головний екран».<br><strong>iPhone:</strong> Safari → Поділитися → «На початковий екран».<br><strong>ПК:</strong> Chrome / Edge → значок встановлення в адресному рядку.</div><p class="fx-message" id="fx-install-status" aria-live="polite"></p></div>
+                <div class="fx-tile fx-tool-card"><div class="fx-install-head"><div class="fx-tool-icon">♧</div><div><h3 class="fx-h3" data-fx="alerttitle">Сповіщення про курс</h3><p class="fx-help" data-fx="alerthelp">Перевірка лише поки вкладка відкрита</p></div></div>
+                    <div class="fx-notification-line"><select class="fx-select" id="fx-alert-currency" aria-label="Валюта"><option>USD</option><option>EUR</option><option>PLN</option><option>GBP</option></select><select class="fx-select" id="fx-alert-rule" aria-label="Умова"><option value="above" data-fx="above">Вище або =</option><option value="below" data-fx="below">Нижче або =</option></select></div>
+                    <div class="fx-notification-line"><input class="fx-input" id="fx-alert-threshold" type="number" min="0.0001" step="any" placeholder="Курс у ₴" inputmode="decimal"><button class="fx-button primary" type="button" id="fx-alert-save" data-fx="setalert">Увімкнути</button></div>
+                    <div class="fx-row"><p class="fx-message" id="fx-alert-status"></p><button type="button" class="fx-chip" id="fx-alert-clear" data-fx="clearalert">Видалити</button></div>
+                </div>
+            </div>
+            <div class="fx-section fx-extensions-section"><div class="fx-banner"><div><div class="fx-eyebrow" data-fx="extensionlabel">Розширення для браузера</div><h3 class="fx-h3" style="font-size:18px;margin:5px 0 8px" data-fx="extensiontitle">Курс НБУ завжди під рукою</h3><p class="fx-help" data-fx="extensionhelp">Перевіряйте валюту, не відкриваючи сайт. Праворуч — схематичне прев’ю віджета.</p><div class="fx-banner-links"><a class="fx-chip" href="https://addons.mozilla.org/ru/firefox/addon/nbu-rate/" rel="noopener" target="_blank"><img class="fx-browser-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48IS0tISBGb250IEF3ZXNvbWUgRnJlZSA2LjcuMiBieSBAZm9udGF3ZXNvbWUgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbSBMaWNlbnNlIC0gaHR0cHM6Ly9mb250YXdlc29tZS5jb20vbGljZW5zZS9mcmVlIChJY29uczogQ0MgQlkgNC4wLCBGb250czogU0lMIE9GTCAxLjEsIENvZGU6IE1JVCBMaWNlbnNlKSBDb3B5cmlnaHQgMjAyNCBGb250aWNvbnMsIEluYy4gLS0+PHBhdGggZmlsbD0iI2Y3NmYzMSIgZD0iTTUwMy41MiwyNDEuNDhjLS4xMi0xLjU2LS4yNC0zLjEyLS4yNC00LjY4di0uMTJsLS4zNi00LjY4di0uMTJhMjQ1Ljg2LDI0NS44NiwwLDAsMC03LjMyLTQxLjE1YzAtLjEyLDAtLjEyLS4xMi0uMjRsLTEuMDgtNGMtLjEyLS4yNC0uMTItLjQ4LS4yNC0uNi0uMzYtMS4yLS43Mi0yLjUyLTEuMDgtMy43Mi0uMTItLjI0LS4xMi0uNi0uMjQtLjg0LS4zNi0xLjItLjcyLTIuNC0xLjA4LTMuNDgtLjEyLS4zNi0uMjQtLjYtLjM2LTEtLjM2LTEuMi0uNzItMi4yOC0xLjItMy40OGwtLjM2LTEuMDhjLS4zNi0xLjA4LS44NC0yLjI4LTEuMi0zLjM2YTguMjcsOC4yNywwLDAsMC0uMzYtMWMtLjQ4LTEuMDgtLjg0LTIuMjgtMS4zMi0zLjM2LS4xMi0uMjQtLjI0LS42LS4zNi0uODQtLjQ4LTEuMi0xLTIuMjgtMS40NC0zLjQ4LDAtLjEyLS4xMi0uMjQtLjEyLS4zNi0xLjU2LTMuODQtMy4yNC03LjY4LTUtMTEuNGwtLjM2LS43MmMtLjQ4LTEtLjg0LTEuOC0xLjMyLTIuNjQtLjI0LS40OC0uNDgtMS4wOC0uNzItMS41Ni0uMzYtLjg0LS44NC0xLjU2LTEuMi0yLjQtLjM2LS42LS42LTEuMi0xLTEuOHMtLjg0LTEuNDQtMS4yLTIuMjhjLS4zNi0uNi0uNzItMS4zMi0xLjA4LTEuOTJzLS44NC0xLjQ0LTEuMi0yLjE2YTE4LjA3LDE4LjA3LDAsMCwwLTEuMi0yYy0uMzYtLjcyLS44NC0xLjMyLTEuMi0ycy0uODQtMS4zMi0xLjItMi0uODQtMS4zMi0xLjItMS45Mi0uODQtMS40NC0xLjMyLTIuMTZhMTUuNjMsMTUuNjMsMCwwLDAtMS4yLTEuOEw0NjMuMiwxMTlhMTUuNjMsMTUuNjMsMCwwLDAtMS4yLTEuOGMtLjQ4LS43Mi0xLjA4LTEuNTYtMS41Ni0yLjI4LS4zNi0uNDgtLjcyLTEuMDgtMS4wOC0xLjU2bC0xLjgtMi41MmMtLjM2LS40OC0uNi0uODQtMS0xLjMyLTEtMS4zMi0xLjgtMi41Mi0yLjc2LTMuNzJhMjQ4Ljc2LDI0OC43NiwwLDAsMC0yMy41MS0yNi42NEExODYuODIsMTg2LjgyLDAsMCwwLDQxMiw2Mi40NmMtNC0zLjQ4LTguMTYtNi43Mi0xMi40OC05Ljg0YTE2Mi40OSwxNjIuNDksMCwwLDAtMjQuNi0xNS4xMmMtMi40LTEuMzItNC44LTIuNTItNy4yLTMuNzJhMjU0LDI1NCwwLDAsMC01NS40My0xOS41NmMtMS45Mi0uMzYtMy44NC0uODQtNS42NC0xLjJoLS4xMmMtMS0uMTItMS44LS4zNi0yLjc2LS40OGEyMzYuMzUsMjM2LjM1LDAsMCwwLTM4LTRIMjU1LjE0YTIzNC42MiwyMzQuNjIsMCwwLDAtNDUuNDgsNWMtMzMuNTksNy4wOC02My4yMywyMS4yNC04Mi45MSwzOS0xLjA4LDEtMS45MiwxLjY4LTIuNCwyLjE2bC0uNDguNDhIMTI0bC0uMTIuMTIuMTItLjEyYS4xMi4xMiwwLDAsMCwuMTItLjEybC0uMTIuMTJhLjQyLjQyLDAsMCwxLC4yNC0uMTJjMTQuNjQtOC43NiwzNC45Mi0xNiw0OS40NC0xOS41Nmw1Ljg4LTEuNDRjLjM2LS4xMi44NC0uMTIsMS4yLS4yNCwxLjY4LS4zNiwzLjM2LS43Miw1LjE2LTEuMDguMjQsMCwuNi0uMTIuODQtLjEyQzI1MC45NCwyMC45NCwzMTkuMzQsNDAuMTQsMzY3LDg1LjYxYTE3MS40OSwxNzEuNDksMCwwLDEsMjYuODgsMzIuNzZjMzAuMzYsNDkuMiwyNy40OCwxMTEuMTEsMy44NCwxNDcuNTktMzQuNDQsNTMtMTExLjM1LDcxLjI3LTE1OSwyNC44NGE4NC4xOSw4NC4xOSwwLDAsMS0yNS41Ni01OSw3NC4wNSw3NC4wNSwwLDAsMSw2LjI0LTMxYzEuNjgtMy44NCwxMy4wOC0yNS42NywxOC4yNC0yNC41OS0xMy4wOC0yLjc2LTM3LjU1LDIuNjQtNTQuNzEsMjguMTktMTUuMzYsMjIuOTItMTQuNTIsNTguMi01LDgzLjI4YTEzMi44NSwxMzIuODUsMCwwLDEtMTIuMTItMzkuMjRjLTEyLjI0LTgyLjU1LDQzLjMxLTE1Myw5NC4zMS0xNzAuNTEtMjcuNDgtMjQtOTYuNDctMjIuMzEtMTQ3LjcxLDE1LjM2LTI5Ljg4LDIyLTUxLjIzLDUzLjE2LTYyLjUxLDkwLjM2LDEuNjgtMjAuODgsOS42LTUyLjA4LDI1LjgtODMuODgtMTcuMTYsOC44OC0zOSwzNy00OS44LDYyLjg4LTE1LjYsMzcuNDMtMjEsODIuMTktMTYuMDgsMTI0Ljc5LjM2LDMuMjQuNzIsNi4zNiwxLjA4LDkuNiwxOS45MiwxMTcuMTEsMTIyLDIwNi4zOCwyNDQuNzgsMjA2LjM4QzM5Mi43Nyw1MDMuNDIsNTA0LDM5Mi4xOSw1MDQsMjU1LDUwMy44OCwyNTAuNDgsNTAzLjc2LDI0NS45Miw1MDMuNTIsMjQxLjQ4WiIvPjwvc3ZnPg==" alt="" width="19" height="19" loading="lazy" decoding="async">Firefox</a><a class="fx-chip" href="https://microsoftedge.microsoft.com/addons/detail/%D0%BA%D1%83%D1%80%D1%81-%D0%BD%D0%B1%D1%83/hjndboldkmconodmenmccdekhmnnlhbp" rel="noopener" target="_blank"><img class="fx-browser-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48IS0tISBGb250IEF3ZXNvbWUgRnJlZSA2LjcuMiBieSBAZm9udGF3ZXNvbWUgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbSBMaWNlbnNlIC0gaHR0cHM6Ly9mb250YXdlc29tZS5jb20vbGljZW5zZS9mcmVlIChJY29uczogQ0MgQlkgNC4wLCBGb250czogU0lMIE9GTCAxLjEsIENvZGU6IE1JVCBMaWNlbnNlKSBDb3B5cmlnaHQgMjAyNCBGb250aWNvbnMsIEluYy4gLS0+PHBhdGggZmlsbD0iIzIyOTZkMSIgZD0iTTEyMC4xIDM3LjQ0QzE2MS4xIDEyLjIzIDIwNy43LS43NzUzIDI1NSAuMDAxNkM0MjMgLjAwMTYgNTEyIDEyMy44IDUxMiAyMTkuNUM1MTEuOSAyNTIuMiA0OTkgMjgzLjQgNDc2LjEgMzA2LjdDNDUzLjIgMzI5LjkgNDIyLjEgMzQzLjIgMzg5LjQgMzQzLjdDMzE0LjIgMzQzLjcgMjk3LjkgMzIwLjYgMjk3LjkgMzExLjdDMjk3LjkgMzA3LjkgMjk5LjEgMzA1LjUgMzAyLjcgMzAyLjNMMzAzLjcgMzAxLjFMMzA0LjEgMjk5LjVDMzE0LjYgMjg4IDMyMCAyNzMuMyAzMjAgMjU3LjlDMzIwIDE3OS4yIDIzNy44IDExNS4yIDEzNiAxMTUuMkM5OC40NiAxMTQuOSA2MS40NiAxMjQuMSAyOC40OCAxNDIuMUM1NS40OCA4NC41OCAxMTEuMiA0NC41IDExOS44IDM4LjI4QzEyMC42IDM3LjczIDEyMC4xIDM3LjQ0IDEyMC4xIDM3LjQ0VjM3LjQ0ek0xMzUuNyAzNTUuNUMxMzQuMyAzODUuNSAxNDAuMyA0MTUuNSAxNTIuMSA0NDIuN0MxNjUuNyA0NjkuMSAxODQuOCA0OTMuNyAyMDguNiA1MTJDMTQ5LjEgNTAwLjUgOTcuMTEgNDY4LjEgNTkuMiA0MjIuN0MyMS4xMiAzNzYuMyAwIDMxOC40IDAgMjU3LjlDMCAyMDYuNyA2Mi40IDE2My41IDEzNiAxNjMuNUMxNzIuNiAxNjIuOSAyMDguNCAxNzQuNCAyMzcuOCAxOTYuMkwyMzQuMiAxOTcuNEMxODIuNyAyMTUgMTM1LjcgMjg4LjEgMTM1LjcgMzU1LjVWMzU1LjV6TTQ2OS44IDQwMEw0NjkuMSA0MDAuMUM0NTcuMyA0MTguOSA0NDMuMiA0MzUuMiA0MjYuOSA0NDkuNkMzOTYuMSA0NzcuNiAzNTguOCA0OTUuMSAzMTguMSA0OTkuNUMyOTkuNSA0OTkuOCAyODEuMyA0OTYuMyAyNjQuMyA0ODguMUMyMzguNyA0NzcuOCAyMTcuMiA0NTguMSAyMDIuNyA0MzUuMUMxODguMyA0MTEuMiAxODEuNiAzODMuNCAxODMuNyAzNTUuNUMxODMuMSAzMzUuNCAxODkuMSAzMTUuMiAxOTguNyAyOTcuM0MyMTIuNiAzMzAuNCAyMzYuMiAzNTguNiAyNjYuMyAzNzguMUMyOTYuNCAzOTcuNiAzMzEuOCA0MDcuNiAzNjcuNyA0MDYuN0MzOTguNyA0MDcgNDI5LjggNDAwIDQ1Ny45IDM4Ni4yTDQ1OS44IDM4NS4zQzQ2My43IDM4MyA0NjcuNSAzODEuNCA0NzEuNCAzODUuM0M0NzUuOSAzOTAuMiA0NzMuMiAzOTQuNSA0NzAuMiAzOTkuM0M0NzAgMzk5LjUgNDY5LjkgMzk5LjggNDY5LjggNDAwVjQwMHoiLz48L3N2Zz4=" alt="" width="19" height="19" loading="lazy" decoding="async">Edge</a><a class="fx-chip" href="https://chromewebstore.google.com/detail/%D0%BA%D1%83%D1%80%D1%81-%D0%BD%D0%B1%D1%83/llhcdbfoebdcmlfiojpjkbejdbopoggo" rel="noopener" target="_blank"><img class="fx-browser-icon" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48IS0tISBGb250IEF3ZXNvbWUgRnJlZSA2LjcuMiBieSBAZm9udGF3ZXNvbWUgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbSBMaWNlbnNlIC0gaHR0cHM6Ly9mb250YXdlc29tZS5jb20vbGljZW5zZS9mcmVlIChJY29uczogQ0MgQlkgNC4wLCBGb250czogU0lMIE9GTCAxLjEsIENvZGU6IE1JVCBMaWNlbnNlKSBDb3B5cmlnaHQgMjAyNCBGb250aWNvbnMsIEluYy4gLS0+PHBhdGggZmlsbD0iIzNkOWI3YSIgZD0iTTAgMjU2QzAgMjA5LjQgMTIuNDcgMTY1LjYgMzQuMjcgMTI3LjFMMTQ0LjEgMzE4LjNDMTY2IDM1Ny41IDIwNy45IDM4NCAyNTYgMzg0QzI3MC4zIDM4NCAyODMuMSAzODEuNyAyOTYuOCAzNzcuNEwyMjAuNSA1MDkuNkM5NS45IDQ5Mi4zIDAgMzg1LjMgMCAyNTZ6TTM2NS4xIDMyMS42QzM3Ny40IDMwMi40IDM4NCAyNzkuMSAzODQgMjU2QzM4NCAyMTcuOCAzNjcuMiAxODMuNSAzNDAuNyAxNjBINDkzLjRDNTA1LjQgMTg5LjYgNTEyIDIyMi4xIDUxMiAyNTZDNTEyIDM5Ny40IDM5Ny40IDUxMS4xIDI1NiA1MTJMMzY1LjEgMzIxLjZ6TTQ3Ny44IDEyOEgyNTZDMTkzLjEgMTI4IDE0Mi4zIDE3Mi4xIDEzMC41IDIzMC43TDU0LjE5IDk4LjQ3QzEwMSAzOC41MyAxNzQgMCAyNTYgMEMzNTAuOCAwIDQzMy41IDUxLjQ4IDQ3Ny44IDEyOFYxMjh6TTE2OCAyNTZDMTY4IDIwNy40IDIwNy40IDE2OCAyNTYgMTY4QzMwNC42IDE2OCAzNDQgMjA3LjQgMzQ0IDI1NkMzNDQgMzA0LjYgMzA0LjYgMzQ0IDI1NiAzNDRDMjA3LjQgMzQ0IDE2OCAzMDQuNiAxNjggMjU2eiIvPjwvc3ZnPg==" alt="" width="19" height="19" loading="lazy" decoding="async">Chrome</a></div></div><div class="fx-browser fx-widget-v5" aria-label="Схематичне прев’ю валютного віджета">
+                    <div class="fx-browser-top">
+                        <div class="fx-widget-window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+                        <span class="fx-widget-window-title">NBU Rate</span>
+                        <span class="fx-widget-preview-label">PREVIEW</span>
+                    </div>
+                    <div class="fx-browser-body">
+                        <div class="fx-widget-brand"><span class="fx-widget-brand-mark" aria-hidden="true">₴</span><span class="fx-widget-brand-copy"><strong>Курс НБУ</strong><small>Валютний огляд</small></span><span class="fx-widget-live" title="Дані з конвертера">●</span></div>
+                        <div class="fx-widget-feature">
+                            <div class="fx-widget-pair"><span>USD / UAH</span><span class="fx-widget-currency-tag">₴</span></div>
+                            <strong id="fx-widget-rate">— ₴</strong>
+                            <small>1 USD у гривнях</small>
+                        </div>
+                        <div class="fx-widget-currency-list">
+                            <div class="fx-widget-currency-row"><span class="fx-widget-row-label"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2060%2040%22%3E%3Crect%20width%3D%2260%22%20height%3D%2240%22%20fill%3D%22%23003399%22%2F%3E%3Cpolygon%20points%3D%2230.00%2C2.00%2030.71%2C4.03%2032.85%2C4.07%2031.14%2C5.37%2031.76%2C7.43%2030.00%2C6.20%2028.24%2C7.43%2028.86%2C5.37%2027.15%2C4.07%2029.29%2C4.03%22%20fill%3D%22%23ffcc00%22%2F%3E%3Cpolygon%20points%3D%2237.50%2C4.01%2038.21%2C6.04%2040.35%2C6.08%2038.64%2C7.38%2039.26%2C9.44%2037.50%2C8.21%2035.74%2C9.44%2036.36%2C7.38%2034.65%2C6.08%2036.79%2C6.04%22%20fill%3D%22%23ffcc00%22%2F%3E%3Cpolygon%20points%3D%2242.99%2C9.50%2043.70%2C11.53%2045.84%2C11.57%2044.13%2C12.87%2044.75%2C14.93%2042.99%2C13.70%2041.23%2C14.93%2041.85%2C12.87%2040.14%2C11.57%2042.29%2C11.53%22%20fill%3D%22%23ffcc00%22%2F%3E%3Cpolygon%20points%3D%2245.00%2C17.00%2045.71%2C19.03%2047.85%2C19.07%2046.14%2C20.37%2046.76%2C22.43%2045.00%2C21.20%2043.24%2C22.43%2043.86%2C20.37%2042.15%2C19.07%2044.29%2C19.03%22%20fill%3D%22%23ffcc00%22%2F%3E%3Cpolygon%20points%3D%2242.99%2C24.50%2043.70%2C26.53%2045.84%2C26.57%2044.13%2C27.87%2044.75%2C29.93%2042.99%2C28.70%2041.23%2C29.93%2041.85%2C27.87%2040.14%2C26.57%2042.29%2C26.53%22%20fill%3D%22%23ffcc00%22%2F%3E%3Cpolygon%20points%3D%2237.50%2C29.99%2038.21%2C32.02%2040.35%2C32.06%2038.64%2C33.36%2039.26%2C35.42%2037.50%2C34.19%2035.74%2C35.42%2036.36%2C33.36%2034.65%2C32.06%2036.79%2C32.02%22%20fill%3D%22%23ffcc00%22%2F%3E%3Cpolygon%20points%3D%2230.00%2C32.00%2030.71%2C34.03%2032.85%2C34.07%2031.14%2C35.37%2031.76%2C37.43%2030.00%2C36.20%2028.24%2C37.43%2028.86%2C35.37%2027.15%2C34.07%2029.29%2C34.03%22%20fill%3D%22%23ffcc00%22%2F%3E%3Cpolygon%20points%3D%2222.50%2C29.99%2023.21%2C32.02%2025.35%2C32.06%2023.64%2C33.36%2024.26%2C35.42%2022.50%2C34.19%2020.74%2C35.42%2021.36%2C33.36%2019.65%2C32.06%2021.79%2C32.02%22%20fill%3D%22%23ffcc00%22%2F%3E%3Cpolygon%20points%3D%2217.01%2C24.50%2017.71%2C26.53%2019.86%2C26.57%2018.15%2C27.87%2018.77%2C29.93%2017.01%2C28.70%2015.25%2C29.93%2015.87%2C27.87%2014.16%2C26.57%2016.30%2C26.53%22%20fill%3D%22%23ffcc00%22%2F%3E%3Cpolygon%20points%3D%2215.00%2C17.00%2015.71%2C19.03%2017.85%2C19.07%2016.14%2C20.37%2016.76%2C22.43%2015.00%2C21.20%2013.24%2C22.43%2013.86%2C20.37%2012.15%2C19.07%2014.29%2C19.03%22%20fill%3D%22%23ffcc00%22%2F%3E%3Cpolygon%20points%3D%2217.01%2C9.50%2017.71%2C11.53%2019.86%2C11.57%2018.15%2C12.87%2018.77%2C14.93%2017.01%2C13.70%2015.25%2C14.93%2015.87%2C12.87%2014.16%2C11.57%2016.30%2C11.53%22%20fill%3D%22%23ffcc00%22%2F%3E%3Cpolygon%20points%3D%2222.50%2C4.01%2023.21%2C6.04%2025.35%2C6.08%2023.64%2C7.38%2024.26%2C9.44%2022.50%2C8.21%2020.74%2C9.44%2021.36%2C7.38%2019.65%2C6.08%2021.79%2C6.04%22%20fill%3D%22%23ffcc00%22%2F%3E%3C%2Fsvg%3E" alt="" width="22" height="16" loading="lazy">EUR <small>Євро</small></span><span class="fx-widget-row-value"><strong id="fx-widget-eur">—</strong> ₴</span></div>
+                            <div class="fx-widget-currency-row"><span class="fx-widget-row-label"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2060%2040%22%3E%3Crect%20width%3D%2260%22%20height%3D%2240%22%20fill%3D%22%23fff%22%2F%3E%3Crect%20y%3D%2220%22%20width%3D%2260%22%20height%3D%2220%22%20fill%3D%22%23dc143c%22%2F%3E%3C%2Fsvg%3E" alt="" width="22" height="16" loading="lazy">PLN <small>Злотий</small></span><span class="fx-widget-row-value"><strong id="fx-widget-pln">—</strong> ₴</span></div>
+                        </div>
+                        <div class="fx-widget-bottom"><span class="fx-widget-indicator" aria-hidden="true"></span>Попередній перегляд розширення</div>
+                    </div>
+                </div></div></div>
+        </section>
+
         <details class="card privacy-card" id="privacy">
             <summary>
                 <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -1316,28 +1841,22 @@
             </div>
         </details>
 
-        <footer class="page-footer">
-            <a href="https://github.com/He-Trogati-Mne/NBU-Rate" target="_blank" rel="noopener" class="footer-item">
-                <img class="footer-icon" src="svg/github.svg" alt="GitHub" width="16" height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
-                <span>GitHub</span>
-            </a>
-            <span class="footer-sep">·</span>
-            <a href="https://addons.mozilla.org/ru/firefox/addon/nbu-rate/" target="_blank" rel="noopener" class="footer-item">
-                <img class="footer-icon" src="svg/firefox.svg" alt="Firefox" width="16" height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
-                <span>Firefox</span>
-            </a>
-            <span class="footer-sep">·</span>
-            <a href="https://microsoftedge.microsoft.com/addons/detail/%D0%BA%D1%83%D1%80%D1%81-%D0%BD%D0%B1%D1%83/hjndboldkmconodmenmccdekhmnnlhbp"
-               target="_blank" rel="noopener" class="footer-item">
-                <img class="footer-icon" src="svg/edge.svg" alt="Edge" width="16" height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
-                <span>Edge</span>
-            </a>
-            <span class="footer-sep">·</span>
-            <a href="https://chromewebstore.google.com/detail/%D0%BA%D1%83%D1%80%D1%81-%D0%BD%D0%B1%D1%83/llhcdbfoebdcmlfiojpjkbejdbopoggo"
-               target="_blank" rel="noopener" class="footer-item">
-                <img class="footer-icon" src="svg/chrome.svg" alt="Chrome" width="16" height="16" loading="lazy" decoding="async" onerror="this.style.display='none'">
-                <span>Chrome</span>
-            </a>
+        <footer class="fx-clean-footer" aria-label="Інформація про сайт">
+            <div class="fx-footer-identity">
+                <span class="fx-footer-sign" aria-hidden="true">₴</span>
+                <div class="fx-footer-profile">
+                    <strong>He_Trogati_Mne</strong>
+                    <span>Developer <span class="fx-footer-divider">/</span> Курс НБУ</span>
+                </div>
+            </div>
+            <div class="fx-footer-meta">
+                <span class="fx-footer-date"><span class="fx-footer-live" aria-hidden="true"></span>Оновлено 23.11.2026</span>
+                <a class="fx-footer-github" href="https://github.com/He-Trogati-Mne/NBU-Rate" target="_blank" rel="noopener noreferrer" aria-label="Проєкт Курс НБУ на GitHub">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OTYgNTEyIj48IS0tISBGb250IEF3ZXNvbWUgRnJlZSA2LjcuMiBieSBAZm9udGF3ZXNvbWUgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbSBMaWNlbnNlIC0gaHR0cHM6Ly9mb250YXdlc29tZS5jb20vbGljZW5zZS9mcmVlIChJY29uczogQ0MgQlkgNC4wLCBGb250czogU0lMIE9GTCAxLjEsIENvZGU6IE1JVCBMaWNlbnNlKSBDb3B5cmlnaHQgMjAyNCBGb250aWNvbnMsIEluYy4gLS0+PHBhdGggZmlsbD0iIzExMTgyNyIgZD0iTTE2NS45IDM5Ny40YzAgMi0yLjMgMy42LTUuMiAzLjYtMy4zLjMtNS42LTEuMy01LjYtMy42IDAtMiAyLjMtMy42IDUuMi0zLjYgMy0uMyA1LjYgMS4zIDUuNiAzLjZ6bS0zMS4xLTQuNWMtLjcgMiAxLjMgNC4zIDQuMyA0LjkgMi42IDEgNS42IDAgNi4yLTJzLTEuMy00LjMtNC4zLTUuMmMtMi42LS43LTUuNS4zLTYuMiAyLjN6bTQ0LjItMS43Yy0yLjkuNy00LjkgMi42LTQuNiA0LjkuMyAyIDIuOSAzLjMgNS45IDIuNiAyLjktLjcgNC45LTIuNiA0LjYtNC42LS4zLTEuOS0zLTMuMi01LjktMi45ek0yNDQuOCA4QzEwNi4xIDggMCAxMTMuMyAwIDI1MmMwIDExMC45IDY5LjggMjA1LjggMTY5LjUgMjM5LjIgMTIuOCAyLjMgMTcuMy01LjYgMTcuMy0xMi4xIDAtNi4yLS4zLTQwLjQtLjMtNjEuNCAwIDAtNzAgMTUtODQuNy0yOS44IDAgMC0xMS40LTI5LjEtMjcuOC0zNi42IDAgMC0yMi45LTE1LjcgMS42LTE1LjQgMCAwIDI0LjkgMiAzOC42IDI1LjggMjEuOSAzOC42IDU4LjYgMjcuNSA3Mi45IDIwLjkgMi4zLTE2IDguOC0yNy4xIDE2LTMzLjctNTUuOS02LjItMTEyLjMtMTQuMy0xMTIuMy0xMTAuNSAwLTI3LjUgNy42LTQxLjMgMjMuNi01OC45LTIuNi02LjUtMTEuMS0zMy4zIDIuNi02Ny45IDIwLjktNi41IDY5IDI3IDY5IDI3IDIwLTUuNiA0MS41LTguNSA2Mi44LTguNXM0Mi44IDIuOSA2Mi44IDguNWMwIDAgNDguMS0zMy42IDY5LTI3IDEzLjcgMzQuNyA1LjIgNjEuNCAyLjYgNjcuOSAxNiAxNy43IDI1LjggMzEuNSAyNS44IDU4LjkgMCA5Ni41LTU4LjkgMTA0LjItMTE0LjggMTEwLjUgOS4yIDcuOSAxNyAyMi45IDE3IDQ2LjQgMCAzMy43LS4zIDc1LjQtLjMgODMuNiAwIDYuNSA0LjYgMTQuNCAxNy4zIDEyLjFDNDI4LjIgNDU3LjggNDk2IDM2Mi45IDQ5NiAyNTIgNDk2IDExMy4zIDM4My41IDggMjQ0LjggOHpNOTcuMiAzNTIuOWMtMS4zIDEtMSAzLjMuNyA1LjIgMS42IDEuNiAzLjkgMi4zIDUuMiAxIDEuMy0xIDEtMy4zLS43LTUuMi0xLjYtMS42LTMuOS0yLjMtNS4yLTF6bS0xMC44LTguMWMtLjcgMS4zLjMgMi45IDIuMyAzLjkgMS42IDEgMy42LjcgNC4zLS43LjctMS4zLS4zLTIuOS0yLjMtMy45LTItLjYtMy42LS4zLTQuMy43em0zMi40IDM1LjZjLTEuNiAxLjMtMSA0LjMgMS4zIDYuMiAyLjMgMi4zIDUuMiAyLjYgNi41IDEgMS4zLTEuMy43LTQuMy0xLjMtNi4yLTIuMi0yLjMtNS4yLTIuNi02LjUtMXptLTExLjQtMTQuN2MtMS42IDEtMS42IDMuNiAwIDUuOSAxLjYgMi4zIDQuMyAzLjMgNS42IDIuMyAxLjYtMS4zIDEuNi0zLjkgMC02LjItMS40LTIuMy00LTMuMy01LjYtMnoiLz48L3N2Zz4=" alt="" width="18" height="18" loading="lazy" decoding="async">
+                    <span>GitHub</span>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+                </a>
+            </div>
         </footer>
     </main>
 
@@ -1545,17 +2064,26 @@
         </div>
     </div>
 
-    <div class="modal" id="crypto-chart-modal">
-        <div class="modal-panel" style="max-width:740px;">
-            <div class="modal-head" style="margin-bottom:16px;">
-                <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
-                    <span id="crypto-chart-icon"></span>
-                    <h2 class="modal-title" id="crypto-chart-title">Криптовалюта</h2>
-                    <span id="crypto-chart-badge" class="rate-change" style="align-self:center;"></span>
+    <div class="modal" id="crypto-chart-modal" role="dialog" aria-modal="true" aria-labelledby="crypto-chart-title">
+        <div class="modal-panel crypto-chart-panel">
+            <div class="modal-head crypto-chart-heading">
+                <div class="crypto-heading-content">
+                    <div class="crypto-heading-titleline">
+                        <span id="crypto-chart-icon" aria-hidden="true"></span>
+                        <h2 class="modal-title" id="crypto-chart-title">Криптовалюта</h2>
+                    </div>
+                    <span id="crypto-chart-badge" class="rate-change crypto-heading-change"></span>
                 </div>
                 <button class="modal-close" id="crypto-chart-close">×</button>
             </div>
-            <div class="period-switcher" id="crypto-modal-period-switcher" style="margin-bottom:14px;">
+            <div class="crypto-chart-toolbar">
+                <p class="crypto-chart-hint" id="crypto-chart-hint">Наведіть курсор або торкніться графіка, щоб побачити курс на дату.</p>
+                <div class="crypto-chart-actions">
+                    <button class="crypto-chart-action" type="button" id="crypto-chart-textsize" aria-pressed="false" aria-label="Збільшити текст на графіку"><span aria-hidden="true">A+</span><span id="crypto-chart-text-label">Більший текст</span></button>
+                    <button class="crypto-chart-action" type="button" id="crypto-chart-expand" aria-pressed="false" aria-label="Розгорнути графік"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3m13 5h3a2 2 0 0 0 2-2v-3"/></svg><span id="crypto-chart-expand-label">Розгорнути</span></button>
+                </div>
+            </div>
+            <div class="period-switcher" id="crypto-modal-period-switcher">
                 <button class="period-btn" data-period="7D">7 Днів</button>
                 <button class="period-btn" data-period="1M">1 Місяць</button>
                 <button class="period-btn" data-period="6M">6 Міс.</button>
@@ -1564,13 +2092,152 @@
                 <button class="period-btn" data-period="MAX">Макс.</button>
             </div>
             <div id="crypto-chart-stats" style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);font-family:ui-monospace,monospace;margin-bottom:12px;"></div>
-            <div class="chart-container" style="height:340px;">
-                <canvas id="cryptoChart"></canvas>
+            <div class="chart-container crypto-chart-stage">
+                <canvas id="cryptoChart" role="img" aria-label="Графік зміни вартості криптовалюти в доларах США"></canvas>
             </div>
         </div>
     </div>
 
     <script src="chart.umd.min.js"></script>
+    <script>
+/* Small offline canvas chart fallback. The original Chart.js is used when present. */
+(function () {
+    if (typeof window.Chart === 'function') return;
+    class OfflineChart {
+        static plugins = [];
+        static register(...plugins) { this.plugins.push(...plugins); }
+        constructor(ctx, configuration) {
+            this.ctx = ctx;
+            this.canvas = ctx.canvas;
+            this.data = configuration.data;
+            this.options = configuration.options || {};
+            this.chartArea = {left:0,right:0,top:0,bottom:0};
+            this.points = [];
+            this.tooltip = document.createElement('div');
+            this.tooltip.className = 'fx-chart-tooltip';
+            this.tooltip.setAttribute('role','status');
+            this.canvas.parentElement.appendChild(this.tooltip);
+            this._onMove = this.handleMove.bind(this);
+            this._onLeave = () => {this.tooltip.style.opacity='0';};
+            this._onClick = event => {
+                if (typeof this.options.onClick !== 'function') return;
+                const bounds = this.canvas.getBoundingClientRect();
+                this.options.onClick({ x: event.clientX-bounds.left, y:event.clientY-bounds.top },[],this);
+            };
+            this.canvas.addEventListener('pointermove',this._onMove);
+            this.canvas.addEventListener('pointerleave',this._onLeave);
+            this.canvas.addEventListener('click',this._onClick);
+            this._observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => this.draw()) : null;
+            if (this._observer) this._observer.observe(this.canvas.parentElement);
+            this.draw();
+        }
+        getDatasetMeta() { return {data:this.points}; }
+        update() { this.draw(); }
+        resize() { this.draw(); }
+        destroy() {
+            if(this._observer) this._observer.disconnect();
+            this.canvas.removeEventListener('pointermove',this._onMove);
+            this.canvas.removeEventListener('pointerleave',this._onLeave);
+            this.canvas.removeEventListener('click',this._onClick);
+            this.tooltip.remove();
+            this.points=[];
+        }
+        draw() {
+            const parent=this.canvas.parentElement;
+            if(!parent || parent.clientWidth<40 || parent.clientHeight<40)return;
+            const dpr=Math.min(window.devicePixelRatio||1,2), width=parent.clientWidth, height=parent.clientHeight;
+            const targetW=Math.round(width*dpr), targetH=Math.round(height*dpr);
+            if(this.canvas.width!==targetW || this.canvas.height!==targetH){this.canvas.width=targetW;this.canvas.height=targetH;}
+            const ctx=this.ctx;
+            ctx.setTransform(dpr,0,0,dpr,0,0);
+            ctx.clearRect(0,0,width,height);
+            const source=this.data.datasets && this.data.datasets[0];
+            const numbers=(source?.data||[]).map(Number);
+            const valid=numbers.filter(Number.isFinite);
+            const styles=getComputedStyle(document.documentElement);
+            const muted=styles.getPropertyValue('--text-muted').trim()||'#7c8795';
+            const border=styles.getPropertyValue('--border').trim()||'#333';
+            const ink=styles.getPropertyValue('--text').trim()||'#ddd';
+            const cryptoLarge = this.canvas.id === 'cryptoChart';
+            const enlargedText = cryptoLarge && document.getElementById('crypto-chart-modal')?.classList.contains('crypto-text-large');
+            const left= cryptoLarge ? Math.min(116,Math.max(83, Math.floor(width*.12))) : Math.min(76,Math.max(54, Math.floor(width*.14)));
+            const right=width-14, top=20, bottom=height-(cryptoLarge ? 50 : 35);
+            const plotW=Math.max(10,right-left), plotH=Math.max(10,bottom-top);
+            this.chartArea={left,right,top,bottom};
+            this.scales={x:{getValueForPixel:x => (x-left)/plotW*Math.max(0,numbers.length-1)}};
+            if(valid.length<2){
+                ctx.fillStyle=muted;ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='13px system-ui';
+                ctx.fillText('Немає даних для графіка',width/2,height/2);return;
+            }
+            let min=Math.min(...valid),max=Math.max(...valid);
+            if(!Number.isFinite(min)||!Number.isFinite(max))return;
+            const padding=(max-min||Math.abs(max)*.08||1)*.12;min-=padding;max+=padding;
+            const vertical=(max-min)||1;
+            const xp=i=>left+i/Math.max(1,numbers.length-1)*plotW;
+            const yp=v=>top+(max-v)/vertical*plotH;
+            const yformat=this.options?.scales?.y?.ticks?.callback;
+            ctx.strokeStyle=border;ctx.lineWidth=1;ctx.font=(cryptoLarge ? (enlargedText ? 'bold 17px system-ui' : '600 14px system-ui') : '11px system-ui');
+            ctx.fillStyle=muted;ctx.textAlign='right';ctx.textBaseline='middle';
+            for(let i=0;i<=4;i++){
+                const yy=top+(plotH*i/4),v=max-vertical*i/4;
+                ctx.beginPath();ctx.moveTo(left,yy);ctx.lineTo(right,yy);ctx.stroke();
+                let label=Number(v).toFixed(2);
+                if(typeof yformat==='function'){try{label=String(yformat(v));}catch(_){}}
+                if(label.length>11)label=Number(v).toFixed(2);
+                ctx.fillText(label,left-8,yy);
+            }
+            ctx.fillStyle=muted;ctx.textAlign='center';ctx.textBaseline='top';
+            const labels=this.data.labels||[];
+            const intervals=Math.min(5,labels.length-1);
+            for(let i=0;i<=intervals;i++){
+                const k=Math.round(i/intervals*(labels.length-1));
+                ctx.fillText(String(labels[k]||''),xp(k),bottom+11);
+            }
+            this.points=numbers.map((v,i)=>({x:xp(i),y:yp(v),value:v}));
+            const color=source.borderColor||styles.getPropertyValue('--accent').trim()||'#1a73e8';
+            const fill=ctx.createLinearGradient(0,top,0,bottom);
+            fill.addColorStop(0,color.startsWith('#') ? color+'44':'rgba(26,115,232,.2)');
+            fill.addColorStop(1,'rgba(26,115,232,0)');
+            ctx.beginPath();
+            let started=false;
+            numbers.forEach((v,i)=>{
+                if(!Number.isFinite(v)){started=false;return;}
+                if(!started){ctx.moveTo(xp(i),yp(v));started=true;}else ctx.lineTo(xp(i),yp(v));
+            });
+            ctx.lineWidth=2.5;ctx.strokeStyle=color;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
+            if(source.fill){
+                const idx=numbers.findIndex(Number.isFinite);
+                ctx.lineTo(xp(numbers.length-1),bottom);ctx.lineTo(xp(idx),bottom);ctx.closePath();
+                ctx.fillStyle=fill;ctx.fill();
+            }
+            for(const plugin of OfflineChart.plugins){
+                if(typeof plugin.afterDatasetsDraw==='function'){
+                    try{plugin.afterDatasetsDraw(this);}catch(e){console.warn('Chart annotation:',e);}
+                }
+            }
+        }
+        handleMove(event){
+            const box=this.canvas.getBoundingClientRect();
+            const x=event.clientX-box.left,y=event.clientY-box.top;
+            if(x<this.chartArea.left || x>this.chartArea.right || y<this.chartArea.top-5 || y>this.chartArea.bottom+10){this.tooltip.style.opacity='0';return;}
+            const idx=Math.max(0,Math.min(this.points.length-1,Math.round(this.scales.x.getValueForPixel(x))));
+            const value=this.points[idx]?.value;
+            if(!Number.isFinite(value)){this.tooltip.style.opacity='0';return;}
+            const dataset=this.data.datasets[0];
+            const tooltipOpts=this.options?.plugins?.tooltip?.callbacks||{};
+            let title=String(this.data.labels[idx]||''),label=`${dataset.label||''}: ${value.toFixed(4)}`;
+            if(typeof tooltipOpts.title==='function'){try{title=String(tooltipOpts.title([{dataIndex:idx}]));}catch(_){}}
+            if(typeof tooltipOpts.label==='function'){try{label=String(tooltipOpts.label({parsed:{y:value},dataIndex:idx}));}catch(_){}}
+            this.tooltip.textContent=title+' · '+label;
+            this.tooltip.style.opacity='1';
+            this.tooltip.style.left=Math.max(8,Math.min(box.width-205,x+14))+'px';
+            this.tooltip.style.top=Math.max(4,y-49)+'px';
+        }
+    }
+    window.Chart=OfflineChart;
+})();
+
+    </script>
     <script>
     (function() {
         'use strict';
@@ -1645,56 +2312,56 @@
 
         // =============== BANKS CONFIG ===============
         const BANKS_CONFIG = [
-            { id: 'privat',          nameUk: 'ПриватБанк',     nameEn: 'PrivatBank',      logo: 'bank//privat.png',          letter: 'П' },
-            { id: 'mono',            nameUk: 'МоноБанк',       nameEn: 'MonoBank',        logo: 'bank//mono.png',            letter: 'М', fullBleed: true },
-            { id: 'oschad',          nameUk: 'Ощадбанк',       nameEn: 'Oschadbank',      logo: 'bank//oschad.png',          letter: 'О' },
-            { id: 'pumb',            nameUk: 'ПУМБ',           nameEn: 'PUMB',            logo: 'bank//pumb.png',            letter: 'П' },
-            { id: 'raif',            nameUk: 'Райффайзен',     nameEn: 'Raiffeisen',      logo: 'bank//raif.png',            letter: 'Р' },
-            { id: 'ukrsib',          nameUk: 'УкрСиббанк',     nameEn: 'UkrSibbank',      logo: 'bank//ukrsib.png',          letter: 'У' },
-            { id: 'sense',           nameUk: 'Sense Bank',     nameEn: 'Sense Bank',      logo: 'bank//sense.png',           letter: 'S' },
-            { id: 'otp',             nameUk: 'ОТП Банк',       nameEn: 'OTP Bank',        logo: 'bank//otp.png',             letter: 'О' },
-            { id: 'ukrexim',         nameUk: 'Укрексімбанк',   nameEn: 'UkrEximBank',     logo: 'bank//ukrexim.png',         letter: 'У' },
-            { id: 'ukrgas',          nameUk: 'Укргазбанк',     nameEn: 'UkrGasBank',      logo: 'bank//ukrgas.png',          letter: 'У' },
-            { id: 'a-bank',          nameUk: 'А-Банк',         nameEn: 'A-Bank',          logo: 'bank//a-bank.png',          letter: 'А' },
-            { id: 'kredo',           nameUk: 'Кредобанк',      nameEn: 'KredoBank',       logo: 'bank//kredo.png',           letter: 'К' },
-            { id: 'tas',             nameUk: 'Таскомбанк',     nameEn: 'TAScombank',      logo: 'bank//tas.png',             letter: 'Т' },
-            { id: 'credit-agricole', nameUk: 'Креді Агріколь', nameEn: 'Credit Agricole', logo: 'bank//credit-agricole.png', letter: 'C' },
-            { id: 'pinbank',         nameUk: 'Перший інвестиційний банк', nameEn: 'First Investment Bank', logo: 'bank//pinbank.png', letter: 'П' },
-            { id: 'procredit',       nameUk: 'ПроКредит Банк', nameEn: 'ProCredit Bank',  logo: 'bank//procredit.png',       letter: 'П' },
-            { id: 'pravex',          nameUk: 'Правекс Банк',   nameEn: 'Pravex Bank',     logo: 'bank//pravex.png',          letter: 'П' },
-            { id: 'idea',            nameUk: 'Ідея Банк',      nameEn: 'Idea Bank',       logo: 'bank//idea.png',            letter: 'І' },
-            { id: 'piraeus',         nameUk: 'Піреус Банк',    nameEn: 'Piraeus Bank',    logo: 'bank//piraeus.png',         letter: 'П' },
-            { id: 'universal',       nameUk: 'Універсал Банк', nameEn: 'Universal Bank',  logo: 'bank//universal.png',       letter: 'У' },
-            { id: 'pivdenny',        nameUk: 'Банк Південний', nameEn: 'Bank Pivdenny',   logo: 'bank//pivdenny.png',        letter: 'П' },
-            { id: 'credit-dnipro',   nameUk: 'Банк Кредит Дніпро', nameEn: 'Credit Dnipro Bank', logo: 'bank//credit-dnipro.png', letter: 'К' },
-            { id: 'mtb',             nameUk: 'МТБ Банк',       nameEn: 'MTB Bank',        logo: 'bank//mtb.png',             letter: 'М' },
-            { id: 'vostok',          nameUk: 'Банк Восток',    nameEn: 'Bank Vostok',     logo: 'bank//vostok.png',          letter: 'В' },
-            { id: 'accord',          nameUk: 'Акордбанк',      nameEn: 'Accordbank',      logo: 'bank//accord.png',          letter: 'А' },
-            { id: 'lviv',            nameUk: 'Банк Львів',     nameEn: 'Bank Lviv',       logo: 'bank//lviv.png',            letter: 'Л' },
-            { id: 'globus',          nameUk: 'Глобус Банк',    nameEn: 'Globus Bank',     logo: 'bank//globus.png',          letter: 'Г' },
-            { id: 'alliance',        nameUk: 'Банк Альянс',    nameEn: 'Bank Alliance',   logo: 'bank//alliance.png',        letter: 'А' },
-            { id: 'industrial',      nameUk: 'Індустріалбанк', nameEn: 'Industrialbank',  logo: 'bank//industrial.png',      letter: 'І' },
-            { id: 'radabank',        nameUk: 'Радабанк',       nameEn: 'Radabank',        logo: 'bank//radabank.png',        letter: 'Р' },
-            { id: 'mib',             nameUk: 'Міжнародний Інвестиційний Банк', nameEn: 'International Investment Bank', logo: 'bank//mib.png', letter: 'М' },
-            { id: 'asvio',           nameUk: 'Асвіо Банк',     nameEn: 'Asvio Bank',      logo: 'bank//asvio.png',           letter: 'А' },
-            { id: 'komin',           nameUk: 'Комінбанк',      nameEn: 'Kominbank',       logo: 'bank//komin.png',           letter: 'К' },
-            { id: 'krystal',         nameUk: 'Кристалбанк',    nameEn: 'Krystalbank',     logo: 'bank//krystal.png',         letter: 'К' },
-            { id: 'agroprosperis',   nameUk: 'Агропросперіс Банк', nameEn: 'Agroprosperis Bank', logo: 'bank//agroprosperis.png', letter: 'А' },
-            { id: 'clearing',        nameUk: 'Банк Кліринговий Дім', nameEn: 'Clearing House Bank', logo: 'bank//clearing.png', letter: 'Б' },
-            { id: 'poltava',         nameUk: 'Полтава-Банк',   nameEn: 'Poltava-Bank',    logo: 'bank//poltava.png',         letter: 'П' },
-            { id: 'polikom',         nameUk: 'Полікомбанк',    nameEn: 'Polikombank',     logo: 'bank//polikom.png',         letter: 'П' },
-            { id: 'unex',            nameUk: 'Юнекс Банк',     nameEn: 'Unex Bank',       logo: 'bank//unex.png',            letter: 'Ю' },
-            { id: 'altbank',         nameUk: 'Альтбанк',       nameEn: 'Altbank',         logo: 'bank//altbank.png',         letter: 'А' },
-            { id: 'sky',             nameUk: 'Скай Банк',      nameEn: 'Sky Bank',        logo: 'bank//sky.png',             letter: 'С' },
-            { id: 'ukrcapital',      nameUk: 'Банк Український капітал', nameEn: 'Ukrainian Capital Bank', logo: 'bank//ukrcapital.png', letter: 'У' },
-            { id: 'bank34',          nameUk: 'Банк 3/4',       nameEn: 'Bank 3/4',        logo: 'bank//bank34.png',          letter: 'Б' },
-            { id: 'avangard',        nameUk: 'Банк Авангард',  nameEn: 'Bank Avangard',   logo: 'bank//avangard.png',        letter: 'А' },
-            { id: 'bizbank',         nameUk: 'Бізбанк',        nameEn: 'Bizbank',         logo: 'bank//bizbank.png',         letter: 'Б' },
-            { id: 'metabank',        nameUk: 'МетаБанк',       nameEn: 'MetaBank',        logo: 'bank//metabank.png',        letter: 'М' },
-            { id: 'oksi',            nameUk: 'Оксі Банк',      nameEn: 'Oksi Bank',       logo: 'bank//oksi.png',            letter: 'О' },
-            { id: 'grant',           nameUk: 'Банк Грант',     nameEn: 'Bank Grant',      logo: 'bank//grant.png',           letter: 'Б' },
-            { id: 'family',          nameUk: 'Банк Фамільний', nameEn: 'Family Bank',     logo: 'bank//family.png',          letter: 'Б' },
-            { id: 'trust-capital',   nameUk: 'Банк Траст-капітал', nameEn: 'Trust-Capital Bank', logo: 'bank//trust-capital.png', letter: 'Б' }
+            { id: 'privat',          nameUk: 'ПриватБанк',     nameEn: 'PrivatBank',      logo: 'privat.png',          letter: 'П' },
+            { id: 'mono',            nameUk: 'МоноБанк',       nameEn: 'MonoBank',        logo: 'mono.png',            letter: 'М', fullBleed: true },
+            { id: 'oschad',          nameUk: 'Ощадбанк',       nameEn: 'Oschadbank',      logo: 'oschad.png',          letter: 'О' },
+            { id: 'pumb',            nameUk: 'ПУМБ',           nameEn: 'PUMB',            logo: 'pumb.png',            letter: 'П' },
+            { id: 'raif',            nameUk: 'Райффайзен',     nameEn: 'Raiffeisen',      logo: 'raif.png',            letter: 'Р' },
+            { id: 'ukrsib',          nameUk: 'УкрСиббанк',     nameEn: 'UkrSibbank',      logo: 'ukrsib.png',          letter: 'У' },
+            { id: 'sense',           nameUk: 'Sense Bank',     nameEn: 'Sense Bank',      logo: 'sense.png',           letter: 'S' },
+            { id: 'otp',             nameUk: 'ОТП Банк',       nameEn: 'OTP Bank',        logo: 'otp.png',             letter: 'О' },
+            { id: 'ukrexim',         nameUk: 'Укрексімбанк',   nameEn: 'UkrEximBank',     logo: 'ukrexim.png',         letter: 'У' },
+            { id: 'ukrgas',          nameUk: 'Укргазбанк',     nameEn: 'UkrGasBank',      logo: 'ukrgas.png',          letter: 'У' },
+            { id: 'a-bank',          nameUk: 'А-Банк',         nameEn: 'A-Bank',          logo: 'a-bank.png',          letter: 'А' },
+            { id: 'kredo',           nameUk: 'Кредобанк',      nameEn: 'KredoBank',       logo: 'kredo.png',           letter: 'К' },
+            { id: 'tas',             nameUk: 'Таскомбанк',     nameEn: 'TAScombank',      logo: 'tas.png',             letter: 'Т' },
+            { id: 'credit-agricole', nameUk: 'Креді Агріколь', nameEn: 'Credit Agricole', logo: 'credit-agricole.png', letter: 'C' },
+            { id: 'pinbank',         nameUk: 'Перший інвестиційний банк', nameEn: 'First Investment Bank', logo: 'pinbank.png', letter: 'П' },
+            { id: 'procredit',       nameUk: 'ПроКредит Банк', nameEn: 'ProCredit Bank',  logo: 'procredit.png',       letter: 'П' },
+            { id: 'pravex',          nameUk: 'Правекс Банк',   nameEn: 'Pravex Bank',     logo: 'pravex.png',          letter: 'П' },
+            { id: 'idea',            nameUk: 'Ідея Банк',      nameEn: 'Idea Bank',       logo: 'idea.png',            letter: 'І' },
+            { id: 'piraeus',         nameUk: 'Піреус Банк',    nameEn: 'Piraeus Bank',    logo: 'piraeus.png',         letter: 'П' },
+            { id: 'universal',       nameUk: 'Універсал Банк', nameEn: 'Universal Bank',  logo: 'universal.png',       letter: 'У' },
+            { id: 'pivdenny',        nameUk: 'Банк Південний', nameEn: 'Bank Pivdenny',   logo: 'pivdenny.png',        letter: 'П' },
+            { id: 'credit-dnipro',   nameUk: 'Банк Кредит Дніпро', nameEn: 'Credit Dnipro Bank', logo: 'credit-dnipro.png', letter: 'К' },
+            { id: 'mtb',             nameUk: 'МТБ Банк',       nameEn: 'MTB Bank',        logo: 'mtb.png',             letter: 'М' },
+            { id: 'vostok',          nameUk: 'Банк Восток',    nameEn: 'Bank Vostok',     logo: 'vostok.png',          letter: 'В' },
+            { id: 'accord',          nameUk: 'Акордбанк',      nameEn: 'Accordbank',      logo: 'accord.png',          letter: 'А' },
+            { id: 'lviv',            nameUk: 'Банк Львів',     nameEn: 'Bank Lviv',       logo: 'lviv.png',            letter: 'Л' },
+            { id: 'globus',          nameUk: 'Глобус Банк',    nameEn: 'Globus Bank',     logo: 'globus.png',          letter: 'Г' },
+            { id: 'alliance',        nameUk: 'Банк Альянс',    nameEn: 'Bank Alliance',   logo: 'alliance.png',        letter: 'А' },
+            { id: 'industrial',      nameUk: 'Індустріалбанк', nameEn: 'Industrialbank',  logo: 'industrial.png',      letter: 'І' },
+            { id: 'radabank',        nameUk: 'Радабанк',       nameEn: 'Radabank',        logo: 'radabank.png',        letter: 'Р' },
+            { id: 'mib',             nameUk: 'Міжнародний Інвестиційний Банк', nameEn: 'International Investment Bank', logo: 'mib.png', letter: 'М' },
+            { id: 'asvio',           nameUk: 'Асвіо Банк',     nameEn: 'Asvio Bank',      logo: 'asvio.png',           letter: 'А' },
+            { id: 'komin',           nameUk: 'Комінбанк',      nameEn: 'Kominbank',       logo: 'komin.png',           letter: 'К' },
+            { id: 'krystal',         nameUk: 'Кристалбанк',    nameEn: 'Krystalbank',     logo: 'krystal.png',         letter: 'К' },
+            { id: 'agroprosperis',   nameUk: 'Агропросперіс Банк', nameEn: 'Agroprosperis Bank', logo: 'agroprosperis.png', letter: 'А' },
+            { id: 'clearing',        nameUk: 'Банк Кліринговий Дім', nameEn: 'Clearing House Bank', logo: 'clearing.png', letter: 'Б' },
+            { id: 'poltava',         nameUk: 'Полтава-Банк',   nameEn: 'Poltava-Bank',    logo: 'poltava.png',         letter: 'П' },
+            { id: 'polikom',         nameUk: 'Полікомбанк',    nameEn: 'Polikombank',     logo: 'polikom.png',         letter: 'П' },
+            { id: 'unex',            nameUk: 'Юнекс Банк',     nameEn: 'Unex Bank',       logo: 'unex.png',            letter: 'Ю' },
+            { id: 'altbank',         nameUk: 'Альтбанк',       nameEn: 'Altbank',         logo: 'altbank.png',         letter: 'А' },
+            { id: 'sky',             nameUk: 'Скай Банк',      nameEn: 'Sky Bank',        logo: 'sky.png',             letter: 'С' },
+            { id: 'ukrcapital',      nameUk: 'Банк Український капітал', nameEn: 'Ukrainian Capital Bank', logo: 'ukrcapital.png', letter: 'У' },
+            { id: 'bank34',          nameUk: 'Банк 3/4',       nameEn: 'Bank 3/4',        logo: 'bank34.png',          letter: 'Б' },
+            { id: 'avangard',        nameUk: 'Банк Авангард',  nameEn: 'Bank Avangard',   logo: 'avangard.png',        letter: 'А' },
+            { id: 'bizbank',         nameUk: 'Бізбанк',        nameEn: 'Bizbank',         logo: 'bizbank.png',         letter: 'Б' },
+            { id: 'metabank',        nameUk: 'МетаБанк',       nameEn: 'MetaBank',        logo: 'metabank.png',        letter: 'М' },
+            { id: 'oksi',            nameUk: 'Оксі Банк',      nameEn: 'Oksi Bank',       logo: 'oksi.png',            letter: 'О' },
+            { id: 'grant',           nameUk: 'Банк Грант',     nameEn: 'Bank Grant',      logo: 'grant.png',           letter: 'Б' },
+            { id: 'family',          nameUk: 'Банк Фамільний', nameEn: 'Family Bank',     logo: 'family.png',          letter: 'Б' },
+            { id: 'trust-capital',   nameUk: 'Банк Траст-капітал', nameEn: 'Trust-Capital Bank', logo: 'trust-capital.png', letter: 'Б' }
         ];
 
         const TRANSLATIONS = {
@@ -2121,6 +2788,7 @@
             if ($('#picker-modal').classList.contains('visible')) renderPickerList($('#picker-search').value);
             if ($('#crypto-chart-modal').classList.contains('visible')) renderCryptoModalChart();
             updateBankNamesForLanguage();
+            fxTranslate();
         }
         function initLanguage() {
             $$('#lang-switch button').forEach(btn => {
@@ -2306,6 +2974,7 @@
                     }
                     renderCards(liveRates);
                     initConverter(liveRates);
+                    fxRefreshAll();
                 }
             }
 
@@ -2325,6 +2994,7 @@
 
                 renderCards(liveRates);
                 initConverter(liveRates);
+                fxRefreshAll(); fxCheckAlert();
 
                 const dateNow = liveDate || formatDate(latestDate) || new Date().toLocaleDateString('uk-UA');
                 setStatus(t('status_updated', {date: dateNow}), '');
@@ -2335,11 +3005,12 @@
                         loadHistoryNBU(true)
                             .then(() => {
                                 renderChart();
+                                fxUpdateHistoric();
                                 renderCards(liveRates);
                                 const d = liveDate || formatDate(latestDate) || new Date().toLocaleDateString('uk-UA');
                                 setStatus(t('status_updated', {date: d}), '');
                             })
-                            .catch(() => {})
+                            .catch(() => { renderChart(); })
                             .finally(() => { historyLoading = false; });
                     }
                 } else {
@@ -2708,8 +3379,28 @@
 
             const availableIds = await getAvailableBankIds();
             const activeBanks = BANKS_CONFIG.filter(b => availableIds.has(b.id));
+            let bankCache = null;
+            try { bankCache = JSON.parse(safeLS.getItem('nbu_site_banks_cache_v1') || 'null'); } catch (_) {}
             const results = await Promise.all(activeBanks.map(async bank => ({ bank, data: await fetchBankData(bank) })));
+            const fetched = results.filter(r => r.data && CARD_RATE_ORDER.some(c => r.data[c]));
+            if (fetched.length) {
+                const combined = { ...(bankCache?.banks || {}) };
+                fetched.forEach(r => { combined[r.bank.id] = r.data; });
+                safeLS.setItem('nbu_site_banks_cache_v1', JSON.stringify({ timestamp: Date.now(), banks: combined }));
+            }
             const visible = results.filter(r => r.data != null && CARD_RATE_ORDER.some(c => r.data[c]));
+            if (!visible.length && bankCache?.banks) {
+                BANKS_CONFIG.forEach(bank => {
+                    const data = bankCache.banks[bank.id];
+                    if (data && CARD_RATE_ORDER.some(c => data[c])) visible.push({bank, data});
+                });
+            }
+            fxBankData = Object.fromEntries(visible.map(r => [r.bank.id, r.data]));
+            if (!fetched.length && visible.length && bankCache) {
+                const last = new Date(bankCache.timestamp).toLocaleString(currentLang === 'en' ? 'en-US' : 'uk-UA');
+                $('#fx-bank-count').dataset.cachedAt = last;
+            } else { delete $('#fx-bank-count').dataset.cachedAt; }
+            fxDrawBanks();
 
             if (visible.length === 0) {
                 track.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);">${t('no_data')}</div>`;
@@ -2886,7 +3577,7 @@
             const grid = $('#crypto-grid');
             if (!grid) return;
             try {
-                const cached = loadLiveCache('crypto');
+                const cached = loadLiveCache('crypto') || loadLiveCache('crypto', true);
                 let normalized = normalizeCryptoData(cached);
 
                 if (normalized.length === 0) {
@@ -2913,6 +3604,7 @@
                     return c;
                 });
                 renderCryptoCards();
+                fxUpdateMulti(); fxDrawSpread();
             } catch (e) {
                 console.warn('[Crypto]', e);
                 grid.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('load_error')}</p>`;
@@ -2992,6 +3684,8 @@
             const stats = $('#crypto-chart-stats');
             const canvas = $('#cryptoChart');
             const ctx = canvas.getContext('2d');
+            const cryptoLargeText = $('#crypto-chart-modal').classList.contains('crypto-text-large');
+            const cryptoTickSize = cryptoLargeText ? 17 : 14;
 
             if (iconWrap) iconWrap.innerHTML = cryptoIcon(coin.symbol, coin.image);
             title.textContent = `${coin.name} (${coin.symbol}) — ${formatCryptoUsd(coin.price)}`;
@@ -3005,7 +3699,7 @@
                 const pct = ((last - first) / first) * 100;
                 const dir = pct > 0.01 ? 'up' : pct < -0.01 ? 'down' : 'flat';
                 const sym = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '●';
-                badge.className = `rate-change ${dir}`;
+                badge.className = `rate-change crypto-heading-change ${dir}`;
                 badge.innerHTML = `<span>${sym}</span><span>${pct > 0 ? '+' : ''}${pct.toFixed(2)}%</span>`;
                 badge.style.display = 'inline-flex';
             } else {
@@ -3015,7 +3709,7 @@
             if (values.length >= 1) {
                 const minVal = Math.min(...values);
                 const maxVal = Math.max(...values);
-                stats.innerHTML = `<span>${t('min_label')}: <strong style="color:var(--text)">${formatCryptoUsd(minVal)}</strong></span><span>${t('max_label')}: <strong style="color:var(--text)">${formatCryptoUsd(maxVal)}</strong></span><span>${t('current_label')}: <strong style="color:var(--accent)">${formatCryptoUsd(coin.price)}</strong></span>`;
+                stats.innerHTML = `<span><small>${t('min_label')}</small><strong>${formatCryptoUsd(minVal)}</strong></span><span><small>${t('max_label')}</small><strong>${formatCryptoUsd(maxVal)}</strong></span><span class="crypto-stat-now"><small>${t('current_label')}</small><strong>${formatCryptoUsd(coin.price)}</strong></span>`;
             } else {
                 stats.innerHTML = '';
             }
@@ -3026,7 +3720,7 @@
             const styles = getComputedStyle(document.documentElement);
             const textMuted = styles.getPropertyValue('--text-muted').trim() || '#5a6472';
             const borderCol = styles.getPropertyValue('--border').trim() || '#e1e5ea';
-            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height || 340);
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height || 580);
             gradient.addColorStop(0, hexToRgba(color, 0.28));
             gradient.addColorStop(1, hexToRgba(color, 0));
 
@@ -3082,8 +3776,8 @@
                             border: { display: false },
                             ticks: {
                                 color: textMuted,
-                                font: { size: 11 },
-                                padding: 8,
+                                font: { size: cryptoTickSize, weight: '600' },
+                                padding: 12,
                                 callback: (v) => formatCryptoUsd(v)
                             }
                         },
@@ -3092,8 +3786,8 @@
                             border: { display: false },
                             ticks: {
                                 color: textMuted,
-                                font: { size: 11 },
-                                maxTicksLimit: 7,
+                                font: { size: cryptoTickSize, weight: '600' },
+                                maxTicksLimit: cryptoLargeText ? 6 : 9,
                                 maxRotation: 0,
                                 padding: 6
                             }
@@ -3116,9 +3810,16 @@
         }
         function renderChart() {
             const container = $('#chart-container'); if (!container) return;
+            fxUpdateHistoric();
             let cv = container.querySelector('#rateChart');
             if (!cv) { container.innerHTML = '<canvas id="rateChart"></canvas>'; cv = container.querySelector('#rateChart'); }
             const ctx = cv.getContext('2d');
+            // Avoid a completely blank graph when the historical feed is not ready.
+            const chartNotice = (() => {
+                let notice = container.querySelector('.fx-chart-notice');
+                if(!notice){ notice=document.createElement('div');notice.className='fx-chart-notice';container.appendChild(notice); }
+                return notice;
+            })();
             const styles = getComputedStyle(document.documentElement);
             const textMuted = styles.getPropertyValue('--text-muted').trim() || '#5a6472';
             const borderCol = styles.getPropertyValue('--border').trim() || '#e1e5ea';
@@ -3129,6 +3830,10 @@
                 .filter(p => p.value != null && typeof p.value === 'number' && p.value > 0);
 
             if (points.length < 2) {
+                chartNotice.textContent = currentLang === 'en'
+                    ? 'Historical chart data is not available yet. Check the connection or switch the period.'
+                    : 'Наразі немає даних для графіка. Перевірте з’єднання або змініть період.';
+                chartNotice.classList.add('visible');
                 if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
                 ctx.clearRect(0, 0, cv.width, cv.height);
                 ctx.font = '15px system-ui'; ctx.fillStyle = textMuted; ctx.textAlign = 'center';
@@ -3136,6 +3841,7 @@
                 return;
             }
 
+            chartNotice.classList.remove('visible');
             const labels = points.map(p => {
                 const [y, m, day] = p.date.split('-');
                 if (currentPeriod === 'MAX' || currentPeriod === '5Y') return `${m}.${y}`;
@@ -3162,7 +3868,7 @@
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: { labels, datasets: [{ label: `${currentCurrency} / UAH`, data, borderColor: color, backgroundColor: gradient, tension: 0.35, fill: true, pointRadius: 0, pointHoverRadius: 6, pointHoverBackgroundColor: color, pointHoverBorderColor: '#fff', pointHoverBorderWidth: 3, borderWidth: 2.5 }] },
-                options: { responsive: true, maintainAspectRatio: false, animation: { duration: 500, easing: 'easeOutQuart' }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', padding: 12, cornerRadius: 10, displayColors: false, callbacks: { label: (c) => `${c.parsed.y.toFixed(dec)} ₴` } } }, scales: { y: { beginAtZero: false, grid: { color: borderCol, drawTicks: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 11 }, padding: 8, callback: (v) => v.toFixed(dec) + ' ₴' } }, x: { grid: { display: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 11 }, maxTicksLimit: 8, padding: 6 } } } }
+                options: { responsive: true, maintainAspectRatio: false, onClick: fxChartSelect, animation: { duration: 500, easing: 'easeOutQuart' }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', padding: 12, cornerRadius: 10, displayColors: false, callbacks: { label: (c) => `${c.parsed.y.toFixed(dec)} ₴` } } }, scales: { y: { beginAtZero: false, grid: { color: borderCol, drawTicks: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 11 }, padding: 8, callback: (v) => v.toFixed(dec) + ' ₴' } }, x: { grid: { display: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 11 }, maxTicksLimit: 8, padding: 6 } } } }
             });
         }
 
@@ -3207,13 +3913,14 @@
             function rateOf(code) { if (code === 'UAH') return 1; const r = liveRates[code]; return r ? (r.rate ?? 0) : 0; }
             const rateFrom = rateOf(from), rateTo = rateOf(to);
             if (!rateFrom || !rateTo) { $('#conv-result').textContent = '—'; $('#conv-detail').textContent = t('no_data'); return; }
-            const dec = currentDecimals(); const result = (amount * rateFrom) / rateTo;
+            const dec = currentDecimals(); const result = (amount * rateFrom) / rateTo * (1 - fxFee());
             $('#conv-to').value = result.toFixed(dec); $('#conv-result').textContent = `${formatNumber(amount, 2)} ${from} = ${formatNumber(result, dec)} ${to}`;
             let detail = '';
             if (from !== 'UAH' && to !== 'UAH') detail = `1 ${from} = ${(rateFrom / rateTo).toFixed(dec)} ${to} · 1 ${to} = ${(rateTo / rateFrom).toFixed(dec)} ${from}`;
             else if (from === 'UAH' && to !== 'UAH') detail = `1 ${to} = ${rateTo.toFixed(dec)} ₴`;
             else if (from !== 'UAH' && to === 'UAH') detail = `1 ${from} = ${rateFrom.toFixed(dec)} ₴`;
-            $('#conv-detail').textContent = detail;
+            $('#conv-detail').textContent = detail + (fxFee() ? ` · ${fxT('feeApplied')} ${fxNum(fxFee()*100,1)}%` : '');
+            fxUpdateMulti(); fxSyncUrl();
         }
         function initConverter(rates) {
             ['#conv-swap','#conv-from-picker','#conv-to-picker','#copy-result'].forEach(sel => {
@@ -3236,8 +3943,387 @@
             p.open = true; setTimeout(() => p.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
         }
 
+        // ===== Connected calculators, history insights, bank comparison, PWA and alerts =====
+        // All financial data is read from the same NBU, bank and crypto sources as the original page.
+        const FX_LABELS = {
+            uk: {
+                quick:'Швидко',fee:'Додаткова комісія (вручну)',feeHint:'Для обміну та банківського розрахунку',
+                multititle:'Одразу в кількох валютах',multihelp:'Курс НБУ · USDT — спотовий орієнтир, не P2P',share:'↗ Поділитися розрахунком',
+                whatif:'А що, якби купили тоді?',whatifhelp:'Виберіть дату або натисніть на графік. Оцінка за НБУ, без комісій та інфляції.',histdate:'Дата покупки',histamount:'Початково, ₴',histcurrency:'Валюта',
+                banktitle:'Порівняння курсів банків',bankhelp:'Найкраща купівля банком — найвища; найкращий продаж банком — найнижчий. Лише доступні котирування.',currency:'Валюта',
+                bankcalc:'Калькулятор за картковим курсом',buycurrency:'Купити валюту',sellcurrency:'Продати валюту',bank:'Банк',bankamount:'Сума у валюті',bankresulttitle:'Разом у гривнях',
+                spread:'Спред: НБУ, банки та USDT',p2p:'P2P USDT/UAH — введіть реальну пропозицію для порівняння:',
+                tools:'Зручні інструменти',installtitle:'Встановити як застосунок',installhelp:'Швидкий доступ та останні збережені курси офлайн',installbtn:'Встановити PWA',
+                alerttitle:'Сповіщення про курс',alerthelp:'Перевірка лише поки вкладка відкрита',above:'Вище або =',below:'Нижче або =',setalert:'Увімкнути',clearalert:'Видалити',
+                extensionlabel:'Розширення для браузера',extensiontitle:'Курс НБУ завжди під рукою',extensionhelp:'Перевіряйте курси, не відкриваючи сайт. Праворуч — схематичне прев’ю.',
+                loading:'Завантаження курсів…',missing:'Дані поки недоступні',initial:'Початок',now:'Зараз',change:'Зміна',bought:'Куплено валюти',lastQuote:'Найближчий доступний курс на',
+                bestbuy:'Банк купує',bestsell:'Банк продає',bankname:'Банк',best:'Найкращий',
+                nbu:'НБУ',bankBuyVsNbu:'Банк купує / НБУ',bankSellVsNbu:'Банк продає / НБУ',usdtSpot:'USDT (спот), ₴',
+                statusBank:'Банків із доступним курсом',p2pCompare:'Відхилення P2P від НБУ',spotDisclaimer:'USDT/UAH оцінено як USDT/USD × USD/UAH НБУ; це НЕ котирування P2P.',
+                noBank:'Для цієї валюти поки немає підтверджених курсів банків',feeApplied:'з урахуванням комісії',
+                alertRequired:'Вкажіть коректний додатний поріг.',alertSaved:'Сповіщення налаштовано; спрацює при перетині порога у відкритій вкладці.',
+                alertRemoved:'Сповіщення вимкнено.',alertCrossed:'Курс перетнув заданий поріг!',alertPermission:'Браузер не дозволив сповіщення — показуватиметься індикатор на сторінці.',
+                installHttps:'Для PWA відкрийте сайт через HTTPS або localhost (не file://).',installManual:'У меню браузера оберіть «Встановити застосунок»; на iOS: Поділитися → На початковий екран.',
+                installed:'Застосунок уже встановлено.',installReady:'Застосунок готовий до встановлення.',shareCopied:'Посилання на розрахунок скопійовано.',shareFailed:'Скопіюйте URL з адресного рядка.',
+                evFixed:'Фіксація курсу НБУ',evRevalue:'Зміна офіційного курсу',evFlex:'Керована гнучкість'
+            },
+            en: {
+                quick:'Quick amounts',fee:'Extra fee (manual)',feeHint:'Applied to estimates and bank calculations',
+                multititle:'Multiple currencies at once',multihelp:'NBU reference · USDT spot proxy, not P2P',share:'↗ Share calculation',
+                whatif:'What if you had bought back then?',whatifhelp:'Choose a date or click the chart. NBU estimates, excluding fees and inflation.',histdate:'Purchase date',histamount:'Initial amount, ₴',histcurrency:'Currency',
+                banktitle:'Compare bank exchange rates',bankhelp:'Best bank buy is highest; best bank sell is lowest. Available quotes only.',currency:'Currency',
+                bankcalc:'Card exchange calculator',buycurrency:'Buy currency',sellcurrency:'Sell currency',bank:'Bank',bankamount:'Currency amount',bankresulttitle:'Total in hryvnia',
+                spread:'Spread: NBU, banks & USDT',p2p:'P2P USDT/UAH — enter an observed offer to compare:',
+                tools:'Useful tools',installtitle:'Install as an app',installhelp:'Quick access and cached latest rates offline',installbtn:'Install PWA',
+                alerttitle:'Rate alerts',alerthelp:'Only checked while the tab is open',above:'At or above',below:'At or below',setalert:'Enable',clearalert:'Clear',
+                extensionlabel:'Browser extensions',extensiontitle:'NBU Rate at your fingertips',extensionhelp:'See rates without opening the site. Right: schematic preview.',
+                loading:'Loading rates…',missing:'Data unavailable',initial:'Initially',now:'Today',change:'Change',bought:'Currency acquired',lastQuote:'Closest available quote on',
+                bestbuy:'Bank buys',bestsell:'Bank sells',bankname:'Bank',best:'Best',
+                nbu:'NBU',bankBuyVsNbu:'Bank buy / NBU',bankSellVsNbu:'Bank sell / NBU',usdtSpot:'USDT (spot), ₴',
+                statusBank:'Banks with available quotes',p2pCompare:'P2P vs NBU difference',spotDisclaimer:'USDT/UAH is estimated as USDT/USD × NBU USD/UAH; this is NOT a P2P offer.',
+                noBank:'No verified bank quotes available for this currency',feeApplied:'including fee',
+                alertRequired:'Enter a valid positive threshold.',alertSaved:'Alert set. It will fire on crossing while this tab is open.',
+                alertRemoved:'Alert disabled.',alertCrossed:'The exchange rate crossed your threshold!',alertPermission:'Notifications blocked; an in-page indicator will be shown.',
+                installHttps:'PWA needs HTTPS or localhost (not file://).',installManual:'Use your browser’s “Install app” menu; on iOS: Share → Add to Home Screen.',
+                installed:'App already installed.',installReady:'App is ready to install.',shareCopied:'Calculation link copied.',shareFailed:'Copy the URL from your address bar.',
+                evFixed:'NBU fixed exchange rate',evRevalue:'Official rate adjustment',evFlex:'Managed flexibility'
+            }
+        };
+        const fxT = key => (FX_LABELS[currentLang] || FX_LABELS.uk)[key] || key;
+        const FX_EVENTS = [
+            {date:'2022-02-24', key:'evFixed'},
+            {date:'2022-07-21', key:'evRevalue'},
+            {date:'2023-10-04', key:'evFlex'}
+        ];
+        let fxBankData = {};
+        let fxBankMode = 'buy';
+        let fxPwaPrompt = null;
+        let fxAlert = null;
+        let fxAlertNotice = '';
+        let fxLastPolledRate = null;
+        let fxAlertTriggered = false;
+        const FX_ALERT_KEY = 'nbu_site_rate_alert_v1';
+        const FX_FEE_KEY = 'nbu_site_manual_fee_v1';
+        const FX_P2P_KEY = 'nbu_site_manual_p2p_v1';
+        // Reuse the site's existing image-flag renderer, not platform-dependent emoji.
+        function fxMultiIcon(code) {
+            return code === 'USDT' ? cryptoIcon('USDT') : flagHtml(code, 'fx-rate-flag');
+        }
+        const fxRate = code => code === 'UAH' ? 1 : Number(liveRates[code]?.rate) || 0;
+        const fxUsdt = () => {
+            const usd = fxRate('USD'), quote = Number(cryptoDataMap.USDT?.price);
+            return usd > 0 && quote > 0 ? usd * quote : 0;
+        };
+        function fxPercent(num) { return Number.isFinite(num) ? `${num >= 0 ? '+' : ''}${num.toFixed(2)}%` : '—'; }
+        function fxFee() { return Number($('#fx-fee')?.value || 0) / 100; }
+        function fxNum(value, digits = 2) { return Number.isFinite(value) ? value.toLocaleString(currentLang === 'en' ? 'en-US' : 'uk-UA', {minimumFractionDigits:digits,maximumFractionDigits:digits}) : '—'; }
+        function fxCurrencySource(code) { return code === 'USDT' ? fxUsdt() : fxRate(code); }
+        function fxUpdateMulti() {
+            const node = $('#fx-multi-list'); if (!node) return;
+            const from = $('#conv-from-picker')?.dataset.value || 'USD';
+            const amount = Number($('#conv-from')?.value) || 0;
+            const source = fxRate(from);
+            const targets = ['UAH','USD','EUR','PLN','GBP','USDT'].filter(code => code !== from).slice(0,5);
+            node.innerHTML = targets.map(code => {
+                const r = fxCurrencySource(code);
+                const value = source > 0 && r > 0 ? amount * source / r * (1 - fxFee()) : NaN;
+                return `<div class="fx-list-item"><span class="fx-symbol"><span class="fx-flag">${fxMultiIcon(code)}</span>${code}</span><span class="fx-num">${fxNum(value,code === 'USDT' ? 3 : 2)}</span></div>`;
+            }).join('');
+        }
+        function fxSyncUrl() {
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.set('from', $('#conv-from-picker').dataset.value);
+                url.searchParams.set('to', $('#conv-to-picker').dataset.value);
+                url.searchParams.set('amount', String(Math.max(0, Number($('#conv-from').value) || 0)));
+                history.replaceState(history.state, '', url.pathname + url.search + url.hash);
+            } catch (_) {}
+        }
+        async function fxShare() {
+            fxSyncUrl();
+            const url = window.location.href;
+            try {
+                if (navigator.share) await navigator.share({title:document.title,url});
+                else if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url);
+                else throw new Error('clipboard');
+                $('#fx-share').textContent = '✓ ' + fxT('shareCopied');
+                setTimeout(() => { const btn = $('#fx-share'); if(btn) btn.textContent = fxT('share'); },1800);
+            } catch (err) {
+                if (err.name !== 'AbortError') $('#fx-share').title = fxT('shareFailed');
+            }
+        }
+        function fxRestoreUrl() {
+            try {
+                const p = new URLSearchParams(location.search);
+                const from = p.get('from'), to = p.get('to'), amount = Number(p.get('amount'));
+                if (from === 'UAH' || CURRENCIES.includes(from)) setPickerValue('from',from);
+                if (to === 'UAH' || CURRENCIES.includes(to)) setPickerValue('to',to);
+                if (p.has('amount') && Number.isFinite(amount) && amount >= 0) $('#conv-from').value = Math.min(amount,1e12);
+            } catch (_) {}
+        }
+        function fxEventsDraw() {
+            const el=$('#fx-events'); if(!el) return;
+            el.innerHTML=FX_EVENTS.map(e=>`<button class="fx-event" type="button" data-fx-date="${e.date}" title="${e.date}">${e.date.slice(0,4)} · ${fxT(e.key)}</button>`).join('');
+            el.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{
+                $('#fx-hdate').value=btn.dataset.fxDate;
+                currentPeriod='MAX';
+                $$('#period-switcher .period-btn').forEach(b=>b.classList.toggle('active',b.dataset.period==='MAX'));
+                renderChart();fxUpdateHistoric();
+            }));
+        }
+        function fxHistoryPoints(currency) {
+            return Object.keys(historicalRates).sort().filter(d=>Number(historicalRates[d]?.[currency])>0).map(d=>({date:d,rate:Number(historicalRates[d][currency])}));
+        }
+        function fxUpdateHistoric() {
+            const dest=$('#fx-history-result'); if(!dest)return;
+            const code=$('#fx-hcurrency').value, amount=Math.max(0,Number($('#fx-hamount').value)||0);
+            const available=fxHistoryPoints(code);
+            const today=fxRate(code);
+            if(!available.length || !(today>0)){
+                dest.innerHTML=`<span class="fx-help">${fxT('missing')}</span>`;
+                $('#fx-history-note').textContent='';return;
+            }
+            const date=$('#fx-hdate').value || available[0].date;
+            // Last available NBU quote on or before requested date; otherwise first known quote.
+            let lo=0,hi=available.length-1,idx=-1;
+            while(lo<=hi){const m=(lo+hi)>>1;if(available[m].date<=date){idx=m;lo=m+1;}else hi=m-1;}
+            if(idx<0)idx=0;
+            const at=available[idx];
+            const quantity=amount/at.rate;
+            const current=quantity*today;
+            const gain=current-amount;
+            const percent=amount>0?100*gain/amount:0;
+            const positive=gain>=0;
+            dest.innerHTML=`<div class="fx-stat"><div class="fx-stat-label">${fxT('initial')}</div><div class="fx-stat-value">${fxNum(amount)} ₴</div></div><div class="fx-stat"><div class="fx-stat-label">${fxT('now')}</div><div class="fx-stat-value accent">${fxNum(current)} ₴</div></div><div class="fx-stat"><div class="fx-stat-label">${fxT('change')}</div><div class="fx-stat-value" style="color:var(${positive?'--positive':'--negative'})">${fxPercent(percent)}<small style="display:block;font-size:12px">${gain>=0?'+':''}${fxNum(gain)} ₴</small></div></div>`;
+            $('#fx-history-note').textContent=`${fxT('lastQuote')} ${at.date}: 1 ${code} = ${fxNum(at.rate,4)} ₴ · ${fxT('bought')}: ${fxNum(quantity,4)} ${code}`;
+            $$('#fx-events .fx-event').forEach(b=>b.classList.toggle('active',b.dataset.fxDate===date));
+            if(chartInstance?.draw) chartInstance.draw();
+        }
+        function fxValidBankQuote(raw) {
+            const r=Number(raw);
+            return Number.isFinite(r) && r>0 ? r : null;
+        }
+        function fxBankQuotes() {
+            const code=$('#fx-bank-currency')?.value || 'USD';
+            return BANKS_CONFIG.map(b=>{
+                const r=fxBankData[b.id]?.[code];
+                const buy=fxValidBankQuote(r?.buy), sell=fxValidBankQuote(r?.sell);
+                return (buy!=null||sell!=null)?{bank:b,buy,sell}:null;
+            }).filter(Boolean);
+        }
+        function fxDrawBanks() {
+            const wrap=$('#fx-bank-comparison'); if(!wrap)return;
+            const rows=fxBankQuotes();
+            const buys=rows.filter(r=>r.buy!=null).map(r=>r.buy), sells=rows.filter(r=>r.sell!=null).map(r=>r.sell);
+            const maxBuy=buys.length?Math.max(...buys):null, minSell=sells.length?Math.min(...sells):null;
+            rows.sort((a,b)=>(a.sell??Infinity)-(b.sell??Infinity));
+            if(!rows.length){wrap.innerHTML=`<p class="fx-help" style="padding:16px">${fxT('noBank')}</p>`;$('#fx-bank-count').textContent='';fxBankSelect();fxBankCalc();fxDrawSpread();return;}
+            wrap.innerHTML=`<table class="fx-table"><thead><tr><th>${fxT('bankname')}</th><th>${fxT('bestbuy')}, ₴</th><th>${fxT('bestsell')}, ₴</th></tr></thead><tbody>${rows.map(r=>{
+                const bn=bankDisplayName(r.bank).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+                const formatted=(v,best)=>v==null?'—':(v===best?`<span class="fx-best" title="${fxT('best')}">${fxNum(v,4)} ★</span>`:fxNum(v,4));
+                return `<tr><td><span class="fx-bank-ident"><span class="fx-bank-mark"><span aria-hidden="true">${r.bank.letter || 'Б'}</span><img src="${r.bank.logo}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'" /></span><span class="fx-bank-name">${bn}</span></span></td><td>${formatted(r.buy,maxBuy)}</td><td>${formatted(r.sell,minSell)}</td></tr>`;
+            }).join('')}</tbody></table>`;
+            $('#fx-bank-count').textContent=`${fxT('statusBank')}: ${rows.length}` + ($('#fx-bank-count').dataset.cachedAt ? ` · ${currentLang==='en'?'Cached':'З кешу'}: ${$('#fx-bank-count').dataset.cachedAt}` : '');
+            fxBankSelect();fxBankCalc();fxDrawSpread();
+        }
+        function fxBankSelect() {
+            const select=$('#fx-bank-select');if(!select)return;
+            const old=select.value;
+            const quotes=fxBankQuotes();
+            select.innerHTML=quotes.map(q=>`<option value="${q.bank.id}">${bankDisplayName(q.bank)}</option>`).join('');
+            if(quotes.some(q=>q.bank.id===old))select.value=old;
+        }
+        function fxBankCalc() {
+            const dest=$('#fx-bank-result');if(!dest)return;
+            const code=$('#fx-bank-currency').value, id=$('#fx-bank-select').value;
+            const value=fxValidBankQuote(fxBankData[id]?.[code]?.[fxBankMode==='buy'?'sell':'buy']);
+            const amt=Math.max(0,Number($('#fx-bank-amount').value)||0), fee=fxFee();
+            const total=value==null?NaN:amt*value*(fxBankMode==='buy'?(1+fee):(1-fee));
+            dest.textContent=Number.isFinite(total)?fxNum(total)+' ₴':'—';
+            $('#fx-bank-formula').textContent=value==null?fxT('noBank'):`${fxNum(amt)} ${code} × ${fxNum(value,4)} ₴ ${fee?'· '+fxT('feeApplied')+' '+fxNum(fee*100,1)+'%':''}`;
+        }
+        function fxDrawSpread() {
+            const el=$('#fx-spread-stats');if(!el)return;
+            const code=$('#fx-bank-currency').value, nbu=fxRate(code);
+            const quotes=fxBankQuotes();
+            const buys=quotes.filter(q=>q.buy!=null).map(q=>q.buy), sells=quotes.filter(q=>q.sell!=null).map(q=>q.sell);
+            const bestBuy=buys.length?Math.max(...buys):NaN;
+            const bestSell=sells.length?Math.min(...sells):NaN;
+            const spot=fxUsdt();
+            const stats=[
+                {name:fxT('nbu')+' '+code, value:nbu>0?fxNum(nbu,4)+' ₴':'—'},
+                {name:fxT('bankBuyVsNbu'),value:nbu>0&&Number.isFinite(bestBuy)?fxPercent((bestBuy/nbu-1)*100):'—'},
+                {name:fxT('bankSellVsNbu'),value:nbu>0&&Number.isFinite(bestSell)?fxPercent((bestSell/nbu-1)*100):'—'},
+                {name:fxT('usdtSpot'),value:spot>0?fxNum(spot,4)+' ₴':'—'}
+            ];
+            el.innerHTML=stats.map(s=>`<div class="fx-tile"><span class="fx-help">${s.name}</span><strong>${s.value}</strong></div>`).join('');
+            const p2p=Number($('#fx-p2p-rate').value);
+            $('#fx-p2p-result').textContent=(p2p>0 && fxRate('USD')>0?`${fxT('p2pCompare')}: ${fxPercent((p2p/fxRate('USD')-1)*100)} · `:'')+fxT('spotDisclaimer');
+        }
+        function fxRefreshAll() {
+            fxUpdateMulti();fxUpdateHistoric();fxDrawBanks();fxWidgetRates();fxRenderAlert();
+        }
+        function fxWidgetRates() {
+            [['USD','#fx-widget-rate'],['EUR','#fx-widget-eur'],['PLN','#fx-widget-pln']].forEach(([code,selector])=>{
+                const r=fxRate(code), el=$(selector);if(el)el.textContent=r>0?fxNum(r,4)+(code==='USD'?' ₴':''):'—';
+            });
+        }
+        function fxTranslate() {
+            $$('[data-fx]').forEach(el=>{el.textContent=fxT(el.dataset.fx);});
+            fxEventsDraw();fxRefreshAll();
+        }
+        function fxSaveAlert() {
+            const curr=$('#fx-alert-currency').value,rule=$('#fx-alert-rule').value,threshold=Number($('#fx-alert-threshold').value);
+            if(!(threshold>0)||!Number.isFinite(threshold)){$('#fx-alert-status').textContent=fxT('alertRequired');return;}
+            fxAlert={curr,rule,threshold,lastRate:fxRate(curr)||null};
+            fxAlertTriggered=false;
+            safeLS.setItem(FX_ALERT_KEY,JSON.stringify(fxAlert));
+            fxAlertNotice=fxT('alertSaved');
+            fxRenderAlert();
+            // Browsers require a user gesture for permissions.
+            if('Notification' in window && Notification.permission==='default'){
+                Notification.requestPermission().then(permission=>{
+                    if(permission!=='granted'){$('#fx-alert-status').textContent=fxT('alertPermission');}
+                }).catch(()=>{});
+            }
+        }
+        function fxRenderAlert() {
+            if(!$('#fx-alert-status'))return;
+            if(fxAlert){
+                $('#fx-alert-currency').value=fxAlert.curr;
+                $('#fx-alert-rule').value=fxAlert.rule;
+                $('#fx-alert-threshold').value=fxAlert.threshold;
+                $('#fx-alert-status').textContent=fxAlertNotice||`${fxAlert.curr}/UAH ${fxAlert.rule==='above'?'≥':'≤'} ${fxNum(fxAlert.threshold,4)} ₴`;
+            }else $('#fx-alert-status').textContent=fxAlertNotice;
+        }
+        function fxClearAlert() {
+            fxAlert=null;fxAlertNotice=fxT('alertRemoved');fxAlertTriggered=false;
+            safeLS.removeItem(FX_ALERT_KEY);fxRenderAlert();fxRestoreFavicon();
+        }
+        function fxBadgeFavicon() {
+            try {
+                const canvas=document.createElement('canvas');canvas.width=64;canvas.height=64;
+                const c=canvas.getContext('2d');
+                c.fillStyle='#1a73e8';c.beginPath();c.roundRect(2,2,60,60,15);c.fill();
+                c.fillStyle='#fff';c.font='bold 45px sans-serif';c.textAlign='center';c.fillText('₴',32,48);
+                c.fillStyle='#ef4444';c.beginPath();c.arc(51,12,12,0,Math.PI*2);c.fill();
+                $('#favicon-link').href=canvas.toDataURL('image/png');
+            }catch(_){}
+        }
+        function fxRestoreFavicon() {try {setFavicon(safeLS.getItem(PRESET_KEY));}catch(_){$('#favicon-link').href='favicon.ico';}}
+        function fxCheckAlert() {
+            if(!fxAlert)return;
+            const value=fxRate(fxAlert.curr);
+            if(!(value>0))return;
+            const old=Number(fxAlert.lastRate);
+            const crossed=old>0&&(fxAlert.rule==='above'?(old<fxAlert.threshold&&value>=fxAlert.threshold):(old>fxAlert.threshold&&value<=fxAlert.threshold));
+            fxAlert.lastRate=value;
+            safeLS.setItem(FX_ALERT_KEY,JSON.stringify(fxAlert));
+            if(!crossed)return;
+            fxAlertTriggered=true;fxAlertNotice=fxT('alertCrossed');fxBadgeFavicon();fxRenderAlert();
+            if('Notification' in window && Notification.permission==='granted'){
+                try {new Notification('Курс НБУ',{body:`${fxAlert.curr}/UAH: ${fxNum(value,4)} ₴ · ${fxT('alertCrossed')}`,icon:'./icons/icon-192.png',tag:'nbu-rate-threshold'});}catch(_){}
+            }
+        }
+        async function fxPollRates() {
+            // Refresh from the existing cached NBU feed at modest intervals while this page is open.
+            if(document.hidden || !navigator.onLine || !fxAlert) return;
+            try {
+                safeLS.removeItem(cacheKey('nbu'));
+                await loadLiveRates('nbu');
+                fxCheckAlert();
+                renderCards(liveRates);convert();fxRefreshAll();
+            } catch (_) {}
+        }
+        function fxInitPWA() {
+            if('serviceWorker' in navigator && (window.isSecureContext || location.hostname==='localhost')){
+                navigator.serviceWorker.register('./sw.js').catch(()=>{});
+            }
+            const install=$('#fx-install'),status=$('#fx-install-status');
+            install.addEventListener('click',async()=>{
+                if(!window.isSecureContext && location.hostname!=='localhost') {status.textContent=fxT('installHttps');return;}
+                if(window.matchMedia('(display-mode: standalone)').matches || navigator.standalone){status.textContent=fxT('installed');return;}
+                if(fxPwaPrompt){const prompt=fxPwaPrompt;fxPwaPrompt=null;prompt.prompt();await prompt.userChoice.catch(()=>{});}
+                else status.textContent=fxT('installManual');
+            });
+            window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();fxPwaPrompt=event;status.textContent=fxT('installReady');});
+            window.addEventListener('appinstalled',()=>{fxPwaPrompt=null;status.textContent=fxT('installed');});
+        }
+        function fxInit() {
+            fxRestoreUrl();
+            const fee=Number(safeLS.getItem(FX_FEE_KEY));
+            if(Number.isFinite(fee) && fee>=0 && fee<=3)$('#fx-fee').value=fee;
+            $('#fx-fee-value').textContent=fxNum(Number($('#fx-fee').value),1)+'%';
+            $('#fx-fee').addEventListener('input',()=>{
+                $('#fx-fee-value').textContent=fxNum(Number($('#fx-fee').value),1)+'%';
+                safeLS.setItem(FX_FEE_KEY,$('#fx-fee').value);
+                convert();fxUpdateMulti();fxBankCalc();
+            });
+            $$('[data-quick]').forEach(btn=>btn.addEventListener('click',()=>{
+                const val=btn.dataset.quick;
+                $('#conv-from').value=Math.max(0, val.startsWith('+')?(Number($('#conv-from').value)||0)+Number(val.slice(1)):Number(val));
+                convert();
+            }));
+            $('#fx-share').addEventListener('click',fxShare);
+            $('#fx-hdate').value='2020-01-01';
+            $('#fx-hdate').max=new Date().toISOString().slice(0,10);
+            $('#fx-hcurrency').value=currentCurrency;
+            ['#fx-hdate','#fx-hamount','#fx-hcurrency'].forEach(sel=>$(sel).addEventListener('input',()=>{fxUpdateHistoric();if(chartInstance?.draw)chartInstance.draw();}));
+            $('#fx-bank-currency').addEventListener('change',fxDrawBanks);
+            $('#fx-bank-select').addEventListener('change',fxBankCalc);
+            $('#fx-bank-amount').addEventListener('input',fxBankCalc);
+            $$('#fx-mode-switch button').forEach(b=>b.addEventListener('click',()=>{
+                fxBankMode=b.dataset.mode;
+                $$('#fx-mode-switch button').forEach(x=>x.classList.toggle('active',x===b));
+                fxBankCalc();
+            }));
+            $('#fx-p2p-rate').value=safeLS.getItem(FX_P2P_KEY)||'';
+            $('#fx-p2p-rate').addEventListener('input',()=>{
+                safeLS.setItem(FX_P2P_KEY,$('#fx-p2p-rate').value);
+                fxDrawSpread();
+            });
+            try {const cached=JSON.parse(safeLS.getItem(FX_ALERT_KEY)||'null');if(cached&&['USD','EUR','PLN','GBP'].includes(cached.curr)&&['above','below'].includes(cached.rule)&&Number(cached.threshold)>0){fxAlert=cached;}}catch(_){}
+            $('#fx-alert-save').addEventListener('click',fxSaveAlert);
+            $('#fx-alert-clear').addEventListener('click',fxClearAlert);
+            fxInitPWA();fxTranslate();
+            // This is a foreground-tab monitor, not background push messaging.
+            setInterval(fxPollRates,5*60*1000);
+            document.addEventListener('visibilitychange',()=>{if(!document.hidden)fxPollRates();});
+        }
+        // Visual annotations remain chart-native and adapt to existing theme and zoom.
+        if (typeof Chart.register === 'function') Chart.register({
+            id:'nbuHistoricEvents',
+            afterDatasetsDraw(chart){
+                if(chart.canvas.id!=='rateChart' || !chart.getDatasetMeta(0)?.data.length)return;
+                const points=chart.getDatasetMeta(0).data;
+                const dates=getFilteredData(currentPeriod).filter(d=>Number(historicalRates[d]?.[currentCurrency])>0);
+                if(!dates.length || dates.length!==points.length)return;
+                const ctx=chart.ctx,area=chart.chartArea,style=getComputedStyle(document.documentElement),accent=style.getPropertyValue('--accent').trim()||'#1a73e8';
+                ctx.save();
+                const selected=$('#fx-hdate')?.value;
+                let selectedIdx=-1;
+                if(selected){for(let i=dates.length-1;i>=0;i--){if(dates[i]<=selected){selectedIdx=i;break;}}}
+                if(selectedIdx>=0){const pt=points[selectedIdx];ctx.strokeStyle=accent;ctx.setLineDash([4,5]);ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(pt.x,area.top);ctx.lineTo(pt.x,area.bottom);ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.fillStyle=accent;ctx.arc(pt.x,pt.y,4,0,Math.PI*2);ctx.fill();}
+                FX_EVENTS.forEach((ev,index)=>{
+                    if(ev.date<dates[0]||ev.date>dates[dates.length-1])return;
+                    const idx=dates.findIndex(d=>d>=ev.date);
+                    if(idx<0)return;
+                    const pt=points[idx];ctx.setLineDash([3,4]);ctx.strokeStyle=style.getPropertyValue('--text-faint').trim()||'#888';ctx.lineWidth=1;
+                    ctx.beginPath();ctx.moveTo(pt.x,area.top);ctx.lineTo(pt.x,area.bottom);ctx.stroke();ctx.setLineDash([]);
+                    ctx.beginPath();ctx.arc(pt.x,area.top+9,6,0,Math.PI*2);ctx.fillStyle=accent;ctx.fill();ctx.font='bold 9px system-ui';ctx.fillStyle=style.getPropertyValue('--accent-text').trim()||'#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(index+1),pt.x,area.top+9);
+                });
+                ctx.restore();
+            }
+        });
+        function fxChartSelect(event, elements, chart){
+            if(!chart?.scales?.x)return;
+            const dates=getFilteredData(currentPeriod).filter(d=>Number(historicalRates[d]?.[currentCurrency])>0);
+            const idx=Math.max(0,Math.min(dates.length-1,Math.round(chart.scales.x.getValueForPixel(event.x))));
+            if(dates[idx]){$('#fx-hdate').value=dates[idx];$('#fx-hcurrency').value=currentCurrency;fxUpdateHistoric();}
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
-            initTheme(); initA11y(); initLanguage(); initPreciseRate(); applyTranslations(); handlePrivacyAnchor();
+            initTheme(); initA11y(); initLanguage(); initPreciseRate(); applyTranslations(); fxInit(); handlePrivacyAnchor();
             window.addEventListener('hashchange', handlePrivacyAnchor);
 
             $$('#period-switcher .period-btn').forEach(btn => {
@@ -3280,6 +4366,31 @@
             $('#card-chart-close').addEventListener('click', () => { $('#card-chart-modal').classList.remove('visible'); if (cardChartInstance) { cardChartInstance.destroy(); cardChartInstance = null; } });
             $('#card-chart-modal').addEventListener('click', (e) => { if (e.target.id === 'card-chart-modal') { $('#card-chart-modal').classList.remove('visible'); if (cardChartInstance) { cardChartInstance.destroy(); cardChartInstance = null; } } });
 
+            // Accessible crypto chart controls. Expansion and font sizing do not change the data.
+            const cryptoModal = $('#crypto-chart-modal');
+            const cryptoExpand = $('#crypto-chart-expand');
+            const cryptoTextsize = $('#crypto-chart-textsize');
+            function updateCryptoControlLabels() {
+                const english = currentLang === 'en';
+                $('#crypto-chart-expand-label').textContent = cryptoModal.classList.contains('crypto-expanded') ? (english ? 'Restore' : 'Згорнути') : (english ? 'Expand' : 'Розгорнути');
+                $('#crypto-chart-text-label').textContent = cryptoModal.classList.contains('crypto-text-large') ? (english ? 'Normal text' : 'Звичайний текст') : (english ? 'Larger text' : 'Більший текст');
+                $('#crypto-chart-hint').textContent = english ? 'Hover or tap the chart to view exchange rates by date.' : 'Наведіть курсор або торкніться графіка, щоб побачити курс на дату.';
+                cryptoExpand.setAttribute('aria-pressed', String(cryptoModal.classList.contains('crypto-expanded')));
+                cryptoTextsize.setAttribute('aria-pressed', String(cryptoModal.classList.contains('crypto-text-large')));
+                cryptoExpand.setAttribute('aria-label', $('#crypto-chart-expand-label').textContent);
+                cryptoTextsize.setAttribute('aria-label', $('#crypto-chart-text-label').textContent);
+            }
+            cryptoExpand.addEventListener('click', () => {
+                cryptoModal.classList.toggle('crypto-expanded');
+                updateCryptoControlLabels();
+                requestAnimationFrame(() => cryptoChartInstance?.resize());
+            });
+            cryptoTextsize.addEventListener('click', () => {
+                cryptoModal.classList.toggle('crypto-text-large');
+                updateCryptoControlLabels();
+                if (activeCryptoCoin) renderCryptoModalChart();
+            });
+            updateCryptoControlLabels();
             $('#crypto-chart-close').addEventListener('click', () => { $('#crypto-chart-modal').classList.remove('visible'); if (cryptoChartInstance) { cryptoChartInstance.destroy(); cryptoChartInstance = null; } });
             $('#crypto-chart-modal').addEventListener('click', (e) => { if (e.target.id === 'crypto-chart-modal') { $('#crypto-chart-modal').classList.remove('visible'); if (cryptoChartInstance) { cryptoChartInstance.destroy(); cryptoChartInstance = null; } } });
 
@@ -3307,5 +4418,37 @@
         };
     })();
     </script>
+<script>
+(function(){
+  function enhanceSelect(select){
+    if(select.dataset.fxEnhanced==='1')return;
+    select.dataset.fxEnhanced='1';
+    const shell=document.createElement('div');shell.className='fx-select-shell';
+    select.parentNode.insertBefore(shell,select);shell.appendChild(select);
+    const trigger=document.createElement('button');trigger.type='button';trigger.className='fx-select-trigger';trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');
+    const value=document.createElement('span'),arrow=document.createElement('span');arrow.className='fx-select-arrow';trigger.append(value,arrow);
+    const menu=document.createElement('div');menu.className='fx-select-menu';menu.setAttribute('role','listbox');
+    shell.append(trigger,menu);
+    function close(){shell.classList.remove('open');trigger.setAttribute('aria-expanded','false')}
+    function render(){
+      value.textContent=select.selectedOptions[0]?.textContent.trim()||'Оберіть…';
+      menu.replaceChildren();
+      Array.from(select.options).forEach((opt,index)=>{
+        const b=document.createElement('button');b.type='button';b.className='fx-select-option';b.setAttribute('role','option');b.setAttribute('aria-selected',String(index===select.selectedIndex));b.textContent=opt.textContent;b.disabled=opt.disabled;
+        b.addEventListener('click',()=>{select.selectedIndex=index;select.dispatchEvent(new Event('change',{bubbles:true}));render();close();trigger.focus()});menu.append(b);
+      });
+    }
+    trigger.addEventListener('click',()=>{document.querySelectorAll('.fx-select-shell.open').forEach(el=>{el.classList.remove('open');el.querySelector('.fx-select-trigger')?.setAttribute('aria-expanded','false')});const open=!shell.classList.contains('open');shell.classList.toggle('open',open);trigger.setAttribute('aria-expanded',String(open));if(open)render()});
+    trigger.addEventListener('keydown',e=>{if(e.key==='Escape')close();if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const opts=[...select.options].filter(x=>!x.disabled);const current=opts.indexOf(select.selectedOptions[0]);const next=opts[(current+(e.key==='ArrowDown'?1:opts.length-1))%opts.length];if(next){select.value=next.value;select.dispatchEvent(new Event('change',{bubbles:true}));render()}}});
+    select.addEventListener('change',render);
+    new MutationObserver(render).observe(select,{childList:true,subtree:true,attributes:true,attributeFilter:['selected','disabled']});
+    render();
+  }
+  document.addEventListener('click',e=>{document.querySelectorAll('.fx-select-shell.open').forEach(el=>{if(!el.contains(e.target)){el.classList.remove('open');el.querySelector('.fx-select-trigger')?.setAttribute('aria-expanded','false')}})});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.fx-select-shell.open').forEach(el=>{el.classList.remove('open');el.querySelector('.fx-select-trigger')?.setAttribute('aria-expanded','false')})});
+  function init(){document.querySelectorAll('select.fx-select').forEach(enhanceSelect)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
 </body>
 </html>
