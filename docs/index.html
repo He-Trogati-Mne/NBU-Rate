@@ -6,14 +6,14 @@
     <meta name="google-site-verification" content="LfPlSooILG8H12Ov4mCh2Dq8bAOYDjIMN8NFanQzM6A" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" id="favicon-link" />
     <meta name="theme-color" content="#1a73e8" />
-    <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest?v=17" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./favicon/nbu-apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Курс НБУ" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
     <title>Курс НБУ</title>
-<meta name="description" content="Офіційні курси валют НБУ, конвертер, історія з 2003 року. Курси ПриватБанку, МоноБанку, криптовалют." />
+    <meta name="description" content="Офіційні курси валют НБУ, конвертер, історія з 2003 року. Курси ПриватБанку, МоноБанку, криптовалют." />
     <meta name="color-scheme" content="light dark" />
     <meta property="og:title" content="Курс НБУ" />
     <meta property="og:description" content="Офіційні курси валют НБУ, конвертер, історія з 2003 року" />
@@ -4375,7 +4375,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                     '<strong>iPhone / iPad:</strong> у Safari або Chrome натисніть «Поділитися» → «На початковий екран» → «Додати». За наявності увімкніть «Відкривати як вебзастосунок».';
             } else if (platform === 'android') {
                 guide.innerHTML = en ? '<strong>Android / Chrome:</strong> tap the button above, or open ⋮ → Install app / Add to Home screen.' :
-                    '<strong>Android / Chrome:</strong> натисніть кнопку вище або відкрийте ⋮ → «Установити застосунок» / «Додати на головний екран».';
+                    '<strong>Android / Chrome:</strong> відкрийте ⋮ → «Установити застосунок». Якщо доступний лише ярлик, перевірте оновлення сторінки та дані застосунку.';
             } else {
                 guide.innerHTML = en ? '<strong>Chrome / Edge:</strong> click the install icon in the address bar or open the browser menu → Install app.' :
                     '<strong>Chrome / Edge:</strong> натисніть значок установлення в адресному рядку або відкрийте меню браузера → «Установити застосунок».';
@@ -4392,8 +4392,28 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                     fxPwaRender();
                     const guide = document.getElementById('fx-pwa-guide');
                     guide.scrollIntoView({behavior:'smooth', block:'nearest'});
-                    document.getElementById('fx-pwa-status').textContent = currentLang === 'en' ?
-                        'Follow the steps above in your browser menu.' : 'Скористайтеся підказкою вище у меню браузера.';
+                    const pwaStatus = document.getElementById('fx-pwa-status');
+                    pwaStatus.textContent = currentLang === 'en' ? 'Checking installation files…' : 'Перевіряємо файли застосунку…';
+                    try {
+                        const m = document.querySelector('link[rel="manifest"]');
+                        if (!m) throw new Error('manifest');
+                        const result = await fetch(m.href, {cache:'no-store'});
+                        if (!result.ok) throw new Error('manifest HTTP ' + result.status);
+                        const manifest = await result.json();
+                        const base = new URL(m.href, location.href);
+                        const required = ['192x192','512x512'];
+                        for (const dimensions of required) {
+                            const icon = (manifest.icons || []).find(i => i.sizes?.split(/\s+/).includes(dimensions) && !(i.purpose || 'any').includes('maskable'));
+                            if (!icon) throw new Error('icon ' + dimensions);
+                            const response = await fetch(new URL(icon.src,base), {cache:'no-store'});
+                            if (!response.ok || !(response.headers.get('content-type') || '').startsWith('image/')) throw new Error('icon ' + dimensions + ' HTTP ' + response.status);
+                        }
+                        pwaStatus.textContent = currentLang === 'en' ?
+                            'App files are available. If Chrome still offers only a shortcut, clear this site’s saved data, reopen it and retry.' :
+                            'Файли застосунку доступні. Якщо Chrome пропонує лише ярлик, очистіть дані цього сайту, відкрийте його знову й повторіть.';
+                    } catch (err) {
+                        pwaStatus.textContent = (currentLang === 'en' ? 'Install files unavailable: ' : 'Файли для встановлення недоступні: ') + String(err.message || err);
+                    }
                     return;
                 }
                 const prompt = fxPwaDeferredPrompt;
