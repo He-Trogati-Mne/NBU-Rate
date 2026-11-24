@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="google-site-verification" content="LfPlSooILG8H12Ov4mCh2Dq8bAOYDjIMN8NFanQzM6A" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" id="favicon-link" />
-    <meta name="theme-color" content="#1a73e8" />
-    <link rel="manifest" href="./favicon/site.webmanifest">
-    <link rel="manifest" href="./manifest.webmanifest?v=17" />
+    <meta name="theme-color" content="#0e1012" />
+    <link rel="manifest" href="./manifest.webmanifest?v=18" />
     <link rel="apple-touch-icon" sizes="180x180" href="./favicon/nbu-apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Курс НБУ" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
     <title>Курс НБУ</title>
     <meta name="description" content="Офіційні курси валют НБУ, конвертер, історія з 2003 року. Курси ПриватБанку, МоноБанку, криптовалют." />
@@ -19,6 +18,31 @@
     <meta property="og:title" content="Курс НБУ" />
     <meta property="og:description" content="Офіційні курси валют НБУ, конвертер, історія з 2003 року" />
     <meta property="og:type" content="website" />
+    <script>
+    (function () {
+        var ua = navigator.userAgent || '';
+        var ipadDesktopUA = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+        var device = /iPhone|iPad|iPod/i.test(ua) || ipadDesktopUA ? 'ios' : /Android/i.test(ua) ? 'android' : 'desktop';
+        var browser = /EdgA\/|EdgiOS\/|Edg\//i.test(ua) ? 'edge' :
+                      /FxiOS\/|Firefox\//i.test(ua) ? 'firefox' :
+                      /CriOS\/|Chrome\//i.test(ua) ? 'chrome' :
+                      /Safari\//i.test(ua) ? 'safari' : 'other';
+        var root = document.documentElement;
+        root.setAttribute('data-device', device);
+        root.setAttribute('data-browser', browser);
+        window.nbuDeviceInfo = { device: device, browser: browser };
+        window.nbuUpdateSystemBars = function () {
+            var scheme = root.getAttribute('data-scheme') || 'dark';
+            var customBg = root.style.getPropertyValue('--bg').trim();
+            var background = customBg || (scheme === 'dark' ? '#0e1012' : '#f5f6f8');
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', background);
+            var apple = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+            if (apple) apple.setAttribute('content', scheme === 'dark' ? 'black' : 'default');
+        };
+        window.nbuUpdateSystemBars();
+    })();
+    </script>
 
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://flagcdn.com" crossorigin>
@@ -1649,6 +1673,31 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 .fx-pwa-instructions p+p {margin-top:6px;}
 .fx-pwa-status {color:var(--text-muted);font-size:11px;line-height:1.5;min-height:16px;}
 @media(max-width:780px){#fx-tools .fx-tools-grid {grid-template-columns:1fr;}}
+
+/* NBU Rate v18: platform-aware mobile layout, native system bars remain OS-owned. */
+.fx-pwa-device {
+    align-self:flex-start;display:inline-flex;gap:6px;align-items:center;
+    max-width:100%;padding:5px 11px;border-radius:100px;
+    color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,var(--surface-1));
+    border:1px solid color-mix(in srgb,var(--accent) 23%,var(--border));
+    font-size:11px;font-weight:700;letter-spacing:.12px;
+}
+@media (max-width: 700px) {
+    html[data-device="android"] .fx-pwa-button,
+    html[data-device="ios"] .fx-pwa-button {min-height:48px;}
+    html[data-device="ios"] .fx-pwa-button {border-radius:14px;}
+    html[data-device="ios"] .fx-pwa-instructions {border-radius:14px;}
+    html[data-device="android"] .fx-pwa-button {border-radius:12px;}
+    html[data-device="ios"] .page-footer,
+    html[data-device="android"] .page-footer {padding-bottom:max(30px,env(safe-area-inset-bottom) + 24px);}
+    html[data-device="android"] .hero,
+    html[data-device="ios"] .hero {padding-top:max(40px,env(safe-area-inset-top) + 24px);}
+    html[data-device="ios"] .modal {padding-bottom:max(28px,env(safe-area-inset-bottom) + 16px);}
+}
+@media (display-mode:standalone) {
+    html[data-device="ios"] body,
+    html[data-device="android"] body {min-height:100svh;}
+}
 </style>
 </head>
 <body>
@@ -1884,6 +1933,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 17v3h14v-3" stroke-linecap="round" stroke-linejoin="round" /></svg>
                         <span id="fx-pwa-button-label" data-fx="installbtn">Встановити застосунок</span>
                     </button>
+                    <div class="fx-pwa-device" id="fx-pwa-device" aria-label="Платформа й браузер"></div>
                     <div class="fx-pwa-instructions" id="fx-pwa-guide" role="status" aria-live="polite"></div>
                     <p class="fx-pwa-status" id="fx-pwa-status" aria-live="polite"></p>
                 </div>
@@ -2741,6 +2791,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 if (theme === 'system') scheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             }
             root.setAttribute('data-scheme', scheme);
+            if (window.nbuUpdateSystemBars) window.nbuUpdateSystemBars();
             $$('#theme-switch button').forEach(btn => btn.classList.toggle('active', btn.dataset.theme === theme));
             const panel = $('#custom-colors-panel'); if (panel) panel.style.display = theme === 'custom' ? 'block' : 'none';
             refreshBankLogosForTheme();
@@ -4343,19 +4394,23 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                    window.navigator.standalone === true;
         }
         function fxPwaPlatform() {
-            const ua = navigator.userAgent || '';
-            if (/iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
-            if (/Android/i.test(ua)) return 'android';
-            return 'desktop';
+            return window.nbuDeviceInfo?.device || 'desktop';
+        }
+        function fxPwaBrowser() {
+            return window.nbuDeviceInfo?.browser || 'other';
         }
         function fxPwaRender() {
             const guide = document.getElementById('fx-pwa-guide');
             const status = document.getElementById('fx-pwa-status');
             const button = document.getElementById('fx-pwa-install');
             const label = document.getElementById('fx-pwa-button-label');
+            const chip = document.getElementById('fx-pwa-device');
             if (!guide || !button || !label || !status) return;
             const en = currentLang === 'en';
             const platform = fxPwaPlatform();
+            const browser = fxPwaBrowser();
+            const name = ({edge:'Edge',firefox:'Firefox',chrome:'Chrome',safari:'Safari',other: en ? 'Browser':'Браузер'})[browser];
+            if (chip) chip.textContent = (platform === 'ios' ? 'iPhone / iPad' : platform === 'android' ? 'Android' : en ? 'Desktop' : 'Комп’ютер') + ' · ' + name;
             if (fxPwaIsInstalled()) {
                 button.disabled = true;
                 label.textContent = en ? 'Already installed' : 'Уже встановлено';
@@ -4364,22 +4419,38 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 return;
             }
             button.disabled = false;
-            label.textContent = fxPwaDeferredPrompt ? (en ? 'Install app' : 'Встановити застосунок') :
-                (en ? 'How to install' : 'Як встановити');
+            const hasPrompt = Boolean(fxPwaDeferredPrompt);
+            label.textContent = hasPrompt ? (en ? 'Install app' : 'Встановити застосунок') : (en ? 'How to install' : 'Як встановити');
             if (!window.isSecureContext || location.protocol === 'file:') {
-                guide.textContent = en ? 'Open the published site over HTTPS to install it. The file:// version cannot be installed.' :
-                    'Відкрийте опублікований сайт через HTTPS. Із файлу на комп’ютері встановити не вийде.';
+                guide.textContent = en ? 'Open the published site over HTTPS; a local file cannot be installed.' :
+                    'Відкрийте опублікований сайт через HTTPS. З локального файлу встановлення недоступне.';
                 return;
             }
+            // Different browsers do not necessarily support the same kind of standalone installation.
             if (platform === 'ios') {
-                guide.innerHTML = en ? '<strong>iPhone / iPad:</strong> In Safari or Chrome, open Share → Add to Home Screen → Add. If available, turn on “Open as Web App”.' :
-                    '<strong>iPhone / iPad:</strong> у Safari або Chrome натисніть «Поділитися» → «На початковий екран» → «Додати». За наявності увімкніть «Відкривати як вебзастосунок».';
+                guide.innerHTML = en ?
+                    '<strong>iOS:</strong> open Share → Add to Home Screen → Add. If this option is missing in your browser, use Safari. Choose “Open as Web App” where available.' :
+                    '<strong>iPhone / iPad:</strong> натисніть «Поділитися» → «На початковий екран» → «Додати». Якщо пункту немає, відкрийте сайт у Safari. Увімкніть «Відкрити як вебзастосунок», якщо доступно.';
+            } else if (platform === 'android' && browser === 'firefox') {
+                guide.innerHTML = en ?
+                    '<strong>Firefox for Android:</strong> open the browser menu ⋮ → Install / Add to Home screen. Firefox may create a shortcut rather than a standalone app.' :
+                    '<strong>Firefox на Android:</strong> відкрийте меню ⋮ → «Встановити» / «На головний екран». Firefox може створити ярлик замість окремого застосунку.';
+            } else if (platform === 'android' && browser === 'edge') {
+                guide.innerHTML = en ?
+                    '<strong>Edge for Android:</strong> open the ⋯ menu → Add to phone / Add to Home screen. A browser shortcut may be created instead of a standalone app.' :
+                    '<strong>Edge на Android:</strong> меню ⋯ → «Додати на телефон» / «На головний екран». Може створюватися ярлик, а не окремий застосунок.';
             } else if (platform === 'android') {
-                guide.innerHTML = en ? '<strong>Android / Chrome:</strong> tap the button above, or open ⋮ → Install app / Add to Home screen.' :
-                    '<strong>Android / Chrome:</strong> відкрийте ⋮ → «Установити застосунок». Якщо доступний лише ярлик, перевірте оновлення сторінки та дані застосунку.';
+                guide.innerHTML = en ?
+                    '<strong>Android / Chrome:</strong> tap Install above when offered, or open ⋮ → Install app. Keep Chrome up to date.' :
+                    '<strong>Android / Chrome:</strong> натисніть «Встановити застосунок» або ⋮ → «Встановити застосунок». Оновіть Chrome, якщо такого пункту немає.';
+            } else if (browser === 'firefox') {
+                guide.innerHTML = en ?
+                    '<strong>Firefox on desktop:</strong> use a bookmark or browser-supported web app feature if available. Firefox does not offer the same install prompt as Chrome/Edge on all systems.' :
+                    '<strong>Firefox на ПК:</strong> створіть закладку або використайте функцію вебзастосунків, якщо є у вашій версії. Стандартне вікно встановлення доступне не всюди.';
             } else {
-                guide.innerHTML = en ? '<strong>Chrome / Edge:</strong> click the install icon in the address bar or open the browser menu → Install app.' :
-                    '<strong>Chrome / Edge:</strong> натисніть значок установлення в адресному рядку або відкрийте меню браузера → «Установити застосунок».';
+                guide.innerHTML = en ?
+                    '<strong>Chrome / Edge on desktop:</strong> use the install icon in the address bar, or open the browser menu → Install app.' :
+                    '<strong>Chrome / Edge на ПК:</strong> натисніть значок установлення в адресному рядку або відкрийте меню браузера → «Встановити застосунок».';
             }
             if (!fxPwaChoiceHandled) status.textContent = '';
         }
