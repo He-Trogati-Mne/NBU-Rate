@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-pwa-v19-20261124';
+const CACHE_NAME = 'nbu-rate-pwa-v21-original-icons-20261124';
 
 const FILES = [
   './',
@@ -23,7 +23,7 @@ const OFFLINE_URL = new URL('./index.html', self.registration.scope).href;
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await Promise.allSettled(SHELL_FILES.map(async file => {
+    await Promise.allSettled(FILES.map(async file => {
       const url = new URL(file, self.registration.scope);
       const response = await fetch(url, {cache: 'reload'});
       if (response.ok) await cache.put(url.href, response);
