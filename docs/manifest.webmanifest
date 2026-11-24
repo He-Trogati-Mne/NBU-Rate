@@ -1,9 +1,9 @@
 {
+  "id": "./",
   "name": "Курс НБУ — NBU Rate",
   "short_name": "Курс НБУ",
-  "description": "Офіційні курси валют НБУ, конвертер, банки, криптовалюти",
+  "description": "Офіційні курси валют НБУ, конвертер, банки та криптовалюти",
   "lang": "uk",
-  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -15,19 +15,19 @@
   ],
   "icons": [
     {
-      "src": "./favicon/icon-192.png",
+      "src": "./favicon/nbu-pwa-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./favicon/icon-512.png",
+      "src": "./favicon/nbu-pwa-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./favicon/icon-512-maskable.png",
+      "src": "./favicon/nbu-pwa-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
