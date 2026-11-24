@@ -6,7 +6,15 @@
     <meta name="google-site-verification" content="LfPlSooILG8H12Ov4mCh2Dq8bAOYDjIMN8NFanQzM6A" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" id="favicon-link" />
     <meta name="theme-color" content="#0e1012" />
-    <link rel="manifest" href="./manifest.webmanifest?v=22" />
+    <script>
+    (function () {
+        var android = /Android/i.test(navigator.userAgent || '');
+        var manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = android ? './manifest-android.webmanifest?v=23' : './manifest.webmanifest?v=23';
+        document.head.appendChild(manifestLink);
+    })();
+    </script>
     <link rel="apple-touch-icon" sizes="180x180" href="./favicon/apple-touch-icon.png" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -1711,6 +1719,16 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
     html[data-device="ios"] body,
     html[data-device="android"] body {min-height:100svh;}
 }
+/* Android installed PWA uses the full display (status + navigation bars hidden). */
+@media (display-mode: fullscreen) {
+    html[data-device="android"], html[data-device="android"] body {
+        min-height: 100dvh;
+    }
+    html[data-device="android"] .hero {
+        padding-top: max(40px, env(safe-area-inset-top, 0px) + 24px);
+    }
+}
+
 </style>
 </head>
 <body>
