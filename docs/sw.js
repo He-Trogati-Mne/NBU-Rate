@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-pwa-v18-20261124';
+const CACHE_NAME = 'nbu-rate-pwa-v19-20261124';
 
 const FILES = [
   './',
