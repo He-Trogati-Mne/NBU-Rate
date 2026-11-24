@@ -1,4 +1,4 @@
-const CACHE = 'nbu-rate-static-v18';
+const CACHE_NAME = 'nbu-rate-pwa-v18-20261124';
 
 const FILES = [
   './',
@@ -18,28 +18,16 @@ const FILES = [
   './chart.min.js'
 ];
 
-const SCOPE = self.registration.scope;
-const OFFLINE = new URL('./index.html', SCOPE).href;
+const OFFLINE_URL = new URL('./index.html', self.registration.scope).href;
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
-    const cache = await caches.open(CACHE);
-
-    await Promise.all(FILES.map(async file => {
-      try {
-        const url = new URL(file, SCOPE).href;
-        const response = await fetch(url, {
-          cache: 'reload'
-        });
-
-        if (response.ok) {
-          await cache.put(url, response);
-        }
-      } catch (error) {
-        // Недоступный файл не ломает установку SW
-      }
+    const cache = await caches.open(CACHE_NAME);
+    await Promise.allSettled(SHELL_FILES.map(async file => {
+      const url = new URL(file, self.registration.scope);
+      const response = await fetch(url, {cache: 'reload'});
+      if (response.ok) await cache.put(url.href, response);
     }));
-
     await self.skipWaiting();
   })());
 });
@@ -47,71 +35,28 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-
-    await Promise.all(
-      keys
-        .filter(key =>
-          key.startsWith('nbu-rate-') && key !== CACHE
-        )
-        .map(key => caches.delete(key))
-    );
-
+    await Promise.all(keys.filter(key =>
+      (key.startsWith('nbu-rate-pwa-') || key.startsWith('nbu-rate-shell-')) && key !== CACHE_NAME
+    ).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
 
 self.addEventListener('fetch', event => {
   const request = event.request;
-
-  if (request.method !== 'GET') return;
-
+  if (request.method !== 'GET' || request.mode !== 'navigate') return;
   const url = new URL(request.url);
-  const scope = new URL(SCOPE);
-
-  if (
-    url.origin !== scope.origin ||
-    !url.pathname.startsWith(scope.pathname)
-  ) return;
-
-  if (request.mode === 'navigate') {
-    event.respondWith((async () => {
-      try {
-        const response = await fetch(request);
-
-        if (response.ok) {
-          const cache = await caches.open(CACHE);
-          await cache.put(OFFLINE, response.clone());
-        }
-
-        return response;
-      } catch (error) {
-        const cache = await caches.open(CACHE);
-        return await cache.match(OFFLINE)
-          || Response.error();
-      }
-    })());
-
-    return;
-  }
-
-  const allowed = FILES.map(file =>
-    new URL(file, SCOPE).href
-  );
-
-  if (allowed.includes(url.href)) {
-    event.respondWith((async () => {
-      const cache = await caches.open(CACHE);
-      const cached = await cache.match(request);
-
-      if (cached) return cached;
-
+  if (url.origin !== self.location.origin || !url.href.startsWith(self.registration.scope)) return;
+  event.respondWith((async () => {
+    try {
       const response = await fetch(request);
-
       if (response.ok) {
-        await cache.put(request, response.clone());
+        const copy = response.clone();
+        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(OFFLINE_URL, copy)).catch(() => {}));
       }
-
       return response;
-    })());
-  }
+    } catch (_) {
+      return (await caches.match(OFFLINE_URL)) || Response.error();
+    }
+  })());
 });
