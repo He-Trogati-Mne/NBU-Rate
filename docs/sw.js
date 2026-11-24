@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-pwa-v22-original-icons-20261124';
+const CACHE_NAME = 'nbu-rate-v24-11-07';
 
 const FILES = [
   './',
@@ -14,6 +14,7 @@ const FILES = [
   './favicon/favicon.svg',
   './favicon/browserconfig.xml',
   './manifest.webmanifest',
+  './manifest-android.webmanifest',
   './chart.umd.min.js',
   './chart.min.js'
 ];
