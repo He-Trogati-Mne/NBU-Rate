@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v27-11-25-';
+const CACHE_NAME = 'nbu-rate-v29-11-25';
 
 const FILES = [
   './',
@@ -24,13 +24,22 @@ const OFFLINE_URL = new URL('./index.html', self.registration.scope).href;
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    await Promise.allSettled(FILES.map(async file => {
+    const shell = await fetch(OFFLINE_URL, {cache: 'reload'});
+    if (!shell.ok || !/text\/html/i.test(shell.headers.get('content-type') || '')) {
+      throw new Error('Cannot install PWA: new index.html unavailable');
+    }
+    await cache.put(OFFLINE_URL, shell);
+    await Promise.allSettled(FILES.filter(file => file !== './' && file !== './index.html').map(async file => {
       const url = new URL(file, self.registration.scope);
       const response = await fetch(url, {cache: 'reload'});
       if (response.ok) await cache.put(url.href, response);
     }));
     await self.skipWaiting();
   })());
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', event => {
@@ -53,7 +62,7 @@ self.addEventListener('fetch', event => {
       const response = await fetch(request, {cache: 'no-cache'});
       if (response.ok) {
         const copy = response.clone();
-        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(OFFLINE_URL, copy)).catch(() => {}));
+        await caches.open(CACHE_NAME).then(cache => cache.put(OFFLINE_URL, copy)).catch(() => {});
       }
       return response;
     } catch (_) {
