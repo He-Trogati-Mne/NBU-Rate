@@ -35,6 +35,7 @@ jobs:
         with:
           name: github-pages
           path: ./docs
+          include-hidden-files: true
 
   deploy:
     needs: build
