@@ -274,11 +274,21 @@
         .hero h1 { font-size:clamp(28px,5vw,44px); font-weight:800; letter-spacing:-1.5px; margin-bottom:10px; }
         .hero-subtitle { font-size:16px; color:var(--text-muted); max-width:500px; margin:0 auto 20px; }
         .hero-status {
-            display:inline-flex; align-items:center; gap:8px; padding:8px 16px;
+            display:inline-flex; flex-direction:column; align-items:center; justify-content:center;
+            gap:3px; padding:9px 18px; max-width:100%; box-sizing:border-box;
             background:var(--bg-elev); border:1px solid var(--border); border-radius:100px;
             font-size:13px; font-weight:600; color:var(--text-muted); box-shadow:var(--shadow-sm);
+            text-align:center; line-height:1.45;
         }
-        .status-dot { width:8px; height:8px; border-radius:50%; background:var(--positive); box-shadow:0 0 0 3px color-mix(in srgb, var(--positive) 20%, transparent); }
+        .hero-status-main { display:flex; align-items:center; justify-content:center; gap:8px; }
+        .hero-status-details { display:flex; justify-content:center; flex-wrap:wrap; column-gap:7px; row-gap:2px; font-size:11px; font-weight:500; text-align:center; }
+        .hero-status-details[hidden], .hero-status-notice[hidden] { display:none; }
+        .hero-status-details > span { white-space:nowrap; }
+        .hero-status-details > span + span::before { content:'·'; margin-right:7px; }
+        .hero-status-notice { font-size:11px; font-weight:600; color:var(--negative); }
+        .hero-status.loading .hero-status-notice { color:var(--accent); }
+        .hero-status.error .hero-status-main { color:var(--negative); }
+        .status-dot { width:8px; height:8px; flex:0 0 8px; border-radius:50%; background:var(--positive); box-shadow:0 0 0 3px color-mix(in srgb, var(--positive) 20%, transparent); }
         .hero-status.loading .status-dot { background:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); animation: pulse 1.5s ease-in-out infinite; }
         .hero-status.error   .status-dot { background:var(--negative); box-shadow:0 0 0 3px color-mix(in srgb, var(--negative) 20%, transparent); }
         @keyframes pulse {
@@ -1761,9 +1771,10 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 <div class="hero-logo">₴</div>
                 <h1 data-i18n="hero_title">Курс НБУ</h1>
                 <p class="hero-subtitle" data-i18n="hero_subtitle">Офіційні курси валют, конвертер та історія з 2003 року</p>
-                <div class="hero-status" id="hero-status">
-                    <span class="status-dot"></span>
-                    <span style="display:flex;flex-direction:column;gap:2px;text-align:left"><span id="status-text">Завантаження...</span><small id="sync-text" style="font-size:11px;font-weight:500;color:var(--text-muted)" hidden></small></span>
+                <div class="hero-status loading" id="hero-status" role="status" aria-live="polite">
+                    <span class="hero-status-main"><span class="status-dot" aria-hidden="true"></span><span id="status-text">Завантаження...</span></span>
+                    <span class="hero-status-details" id="status-details" hidden><span id="status-sync-time"></span><span id="status-data-time"></span></span>
+                    <span class="hero-status-notice" id="status-notice" hidden></span>
                 </div>
             </div>
             <button class="settings-btn" id="open-settings" title="Налаштування">
@@ -3131,21 +3142,30 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             if (!el || !txt) return;
             el.classList.remove('loading', 'error'); if (state) el.classList.add(state);
             txt.textContent = text;
-            const sync = $('#sync-text'); if (sync && state) sync.hidden = true;
+            if (state) el.removeAttribute('title');
         }
-        function updateLiveStatus() {
-            if (!liveDate) return;
-            setStatus(t('status_updated', {date: formatDate(toRateDateIso(liveDate))}), '');
-            const el = $('#sync-text'); if (!el) return;
+        function updateLiveStatus(state = '') {
             const en = currentLang === 'en';
-            const fmt = ms => new Date(ms).toLocaleString(en ? 'en-GB' : 'uk-UA', {
-                timeZone: 'Europe/Kyiv', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'
-            });
-            el.textContent = liveFromCache
-                ? (en ? 'Saved data · live sync unavailable' : 'Збережені дані · синхронізація недоступна')
-                : `${en ? 'Synced' : 'Синхронізовано'}: ${fmt(liveSyncedAt)} · ${en ? 'Kyiv' : 'Київ'}`;
-            if (liveUpdatedAt) el.textContent += ` · ${en ? 'JSON' : 'JSON'}: ${fmt(liveUpdatedAt)}`;
-            el.hidden = false;
+            const locale = en ? 'en-GB' : 'uk-UA';
+            const zone = { timeZone: 'Europe/Kyiv' };
+            const valid = ms => Number.isFinite(ms) && ms > 0;
+            const dateKey = ms => new Intl.DateTimeFormat('en-CA', { ...zone, year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date(ms));
+            const time = ms => new Intl.DateTimeFormat(locale, { ...zone, hour:'2-digit', minute:'2-digit', hourCycle:'h23' }).format(new Date(ms));
+            const full = ms => new Intl.DateTimeFormat(locale, { ...zone, year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hourCycle:'h23' }).format(new Date(ms));
+            const short = ms => !valid(ms) ? '—' : dateKey(ms) === dateKey(Date.now()) ? time(ms) : full(ms);
+            const offline = navigator.onLine === false;
+            const checking = !offline && (state === 'loading' || !!liveLoadPromise);
+            const failed = offline || (!checking && (state === 'error' || liveFromCache || !valid(liveSyncedAt)));
+            const label = liveDate ? t('status_updated', {date: formatDate(toRateDateIso(liveDate))}) : failed ? t('status_error') : t('status_loading');
+            setStatus(label, failed ? 'error' : checking ? 'loading' : '');
+            const el = $('#hero-status'); if (!el) return;
+            const details = $('#status-details'), notice = $('#status-notice');
+            $('#status-sync-time').textContent = `${en ? 'Last sync' : 'Синхронізація'}: ${short(liveSyncedAt)}`;
+            $('#status-data-time').textContent = `${en ? 'Updated' : 'Оновлено'}: ${short(liveUpdatedAt)}`;
+            details.hidden = !liveDate && !valid(liveSyncedAt) && !valid(liveUpdatedAt);
+            notice.hidden = !failed && !checking;
+            notice.textContent = offline ? (en ? 'Offline · not synced' : 'Немає інтернету · не синхронізовано') : failed ? (en ? 'Not synced' : 'Не синхронізовано') : checking ? (en ? 'Synchronizing…' : 'Синхронізація…') : '';
+            el.title = [en ? 'Last successful sync' : 'Остання успішна синхронізація', valid(liveSyncedAt) ? full(liveSyncedAt) : '—', en ? 'Source data updated' : 'Оновлення даних у джерелі', valid(liveUpdatedAt) ? full(liveUpdatedAt) : '—', en ? 'Kyiv time' : 'Час Києва'].join('\n');
         }
         function formatDate(iso) { if (!iso) return ''; const [y, m, d] = iso.split('-'); return `${d}.${m}.${y}`; }
         function formatNumber(num, decimals = null) {
@@ -3194,6 +3214,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             liveLoadPromise = (async () => {
                 const cached = cachedSnapshot(source);
                 const local = normalizeNbuSnapshot(cached?.data, cached?.updatedAt);
+                if (local && !liveSyncedAt) liveSyncedAt = dataTimestamp(cached?.timestamp);
                 let previous = normalizeNbuSnapshot(Object.values(liveRates), liveUpdatedAt);
                 if (local && isNewerNbu(local, previous)) { previous = local; applyNbuSnapshot(local); }
                 const feeds = await fetchFeedCandidates(source);
@@ -3202,7 +3223,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                     const next = normalizeNbuSnapshot(raw);
                     if (next && (!best || next.date > best.date || (next.date === best.date && next.updatedAt > best.updatedAt))) best = next;
                 }
-                if (best && isNewerNbu(best, previous)) {
+                if (navigator.onLine !== false && best && isNewerNbu(best, previous)) {
                     applyNbuSnapshot(best);
                     liveSyncedAt = Date.now(); liveFromCache = false;
                     saveLiveCache(source, best.rates, best.updatedAt);
@@ -3369,6 +3390,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             const saved = cachedSnapshot('nbu');
             const stale = normalizeNbuSnapshot(saved?.data, saved?.updatedAt);
             if (stale) {
+                if (!liveSyncedAt) liveSyncedAt = dataTimestamp(saved?.timestamp);
                 if (isNewerNbu(stale, normalizeNbuSnapshot(Object.values(liveRates), liveUpdatedAt))) applyNbuSnapshot(stale);
                 if (Object.keys(liveRates).length > 0) {
                     const cachedHistory = loadHistoryCache();
@@ -3385,7 +3407,9 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             }
 
             try {
+                updateLiveStatus('loading');
                 await loadLiveRates('nbu');
+                updateLiveStatus();
                 if (Object.keys(liveRates).length === 0) throw new Error('Empty');
 
                 await refreshRecentHistoryIfNeeded();
@@ -3415,8 +3439,9 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                     renderCards(liveRates);
                 }
             } catch (err) {
+                updateLiveStatus();
                 if (Object.keys(liveRates).length > 0) return;
-                setStatus(err.name === 'TypeError' || /Failed to fetch/i.test(err.message) ? t('status_cors') : t('status_error'), 'error');
+                liveFromCache = true; updateLiveStatus('error');
                 container.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('status_error')}<br><small style="opacity:0.7;">${err.message}</small></p>`;
             }
         }
@@ -4644,17 +4669,20 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             }
         }
         async function fxPollRates(force = false) {
-            if (document.hidden || !navigator.onLine || initialLoadPromise) return;
+            if (navigator.onLine === false) { liveFromCache = true; updateLiveStatus('error'); return; }
+            if (document.hidden || initialLoadPromise) return;
             if (pollPromise) return pollPromise;
             pollPromise = (async () => {
                 const secondary = [loadCrypto()];
                 if (force || Date.now() - lastBankPoll >= BANK_POLL_INTERVAL) secondary.push(initBankCarousel());
                 try {
+                    updateLiveStatus('loading');
                     await loadLiveRates('nbu');
+                    updateLiveStatus();
                     await refreshRecentHistoryIfNeeded();
                     renderCards(liveRates); convert(); fxRefreshAll(); renderChart(); updateLiveStatus();
                     if (!liveFromCache) fxCheckAlert();
-                } catch (e) { console.warn('NBU sync:', e.message); }
+                } catch (e) { updateLiveStatus(); console.warn('NBU sync:', e.message); }
                 await Promise.allSettled(secondary);
             })();
             try { return await pollPromise; } finally { pollPromise = null; }
@@ -4833,6 +4861,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             // This is a foreground-tab monitor, not background push messaging.
             setInterval(() => fxPollRates(), 5 * 60 * 1000);
             document.addEventListener('visibilitychange', () => { if (!document.hidden) fxPollRates(); });
+            window.addEventListener('offline', () => { liveFromCache = true; updateLiveStatus('error'); });
             window.addEventListener('online', () => fxPollRates(true));
         }
         // Visual annotations remain chart-native and adapt to existing theme and zoom.
