@@ -1,0 +1,1 @@
+NbuPage.init();
