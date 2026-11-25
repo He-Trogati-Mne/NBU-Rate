@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v42';
+const CACHE_NAME = 'nbu-rate-v43';
 
 const MARKET_LOGOS = [
   './crypto-stocks/whitebit.svg',
@@ -69,7 +69,6 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin || !url.href.startsWith(self.registration.scope)) return;
-  // Revalidate the seven local logos online; use the cached copy when offline.
   if (MARKET_LOGO_URLS.has(url.href) && request.mode !== 'navigate') {
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_NAME);
