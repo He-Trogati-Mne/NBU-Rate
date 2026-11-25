@@ -1845,11 +1845,32 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 #about-site .privacy-body{max-width:710px;margin:0 auto;}#about-site .privacy-body p{margin-bottom:12px;}#about-site .about-links{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px;}#about-site .about-links a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;border:1px solid var(--border);border-radius:10px;padding:9px 13px;background:var(--surface-1);font-size:12px;font-weight:700;}#about-site .about-links a:hover{border-color:var(--accent);}#about-site .about-links svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 </style>
 <style id="nbu-local-market-brands">
-    /* Local SVG brand assets: docs/crypto-stocks/. */
-    .market-broker-row .market-local-brand { display:grid; place-items:center; overflow:hidden; box-sizing:border-box; padding:5px; border:1px solid var(--border); background:#fff; color:#17202c; }
-    .market-local-brand > img { display:block; width:100%; height:100%; min-width:0; min-height:0; object-fit:contain; object-position:center; }
+    /* Local logos retain the original brand artwork, without a white mat. */
+    .market-broker-row {
+        grid-template-columns:44px minmax(0,1fr) auto;
+        gap:12px; padding:12px; align-items:center;
+    }
+    .market-broker-row .market-local-brand {
+        display:grid; place-items:center; position:relative; box-sizing:border-box;
+        width:44px; height:44px; padding:0; border:0; border-radius:10px;
+        overflow:hidden; background:var(--surface-2); color:var(--accent);
+    }
+    .market-local-brand > img {
+        display:block; width:100%; height:100%; min-width:0; min-height:0;
+        object-fit:contain; object-position:center; border-radius:inherit;
+    }
+    /* Keep dark Bybit lettering legible even when its SVG is transparent. */
+    .market-local-brand:has(> img[src$="/bybit.svg"]:not([hidden])) { background:#fff; }
     .market-local-brand > [hidden] { display:none !important; }
     .market-local-brand .market-local-fallback { font-size:10px; font-weight:800; }
+    .market-broker-row strong { font-size:14px; line-height:1.35; }
+    .market-broker-row small { font-size:12px; line-height:1.45; margin-top:2px; }
+    .market-broker-row .market-broker-action { min-width:174px; min-height:42px; }
+    @media(max-width:600px) {
+        .market-broker-row { grid-template-columns:40px minmax(0,1fr); gap:10px; padding:10px; }
+        .market-broker-row .market-local-brand { width:40px; height:40px; border-radius:9px; }
+        .market-broker-row .market-broker-action { grid-column:1/-1; min-width:0; white-space:normal; }
+    }
 </style>
 </head>
 <body>
