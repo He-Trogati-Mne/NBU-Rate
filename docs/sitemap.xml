@@ -1,4 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://nbu-rate.info/</loc></url>
+  <url><loc>https://nbu-rate.info/kurs-dolara/</loc></url>
+  <url><loc>https://nbu-rate.info/kurs-yevro/</loc></url>
+  <url><loc>https://nbu-rate.info/kurs-zlotoho/</loc></url>
+  <url><loc>https://nbu-rate.info/kurs-funta/</loc></url>
+  <url><loc>https://nbu-rate.info/banks/</loc></url>
+  <url><loc>https://nbu-rate.info/crypto/</loc></url>
+  <url><loc>https://nbu-rate.info/stocks/</loc></url>
+  <url><loc>https://nbu-rate.info/widgets/</loc></url>
 </urlset>
