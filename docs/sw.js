@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v41';
+const CACHE_NAME = 'nbu-rate-v42';
 
 const MARKET_LOGOS = [
   './crypto-stocks/whitebit.svg',
@@ -86,6 +86,8 @@ self.addEventListener('fetch', event => {
     return;
   }
   if (request.mode !== 'navigate') return;
+  const root = new URL('./', self.registration.scope);
+  if (url.pathname !== root.pathname && url.pathname !== new URL(OFFLINE_URL).pathname) return;
   event.respondWith((async () => {
     try {
       const response = await fetch(request, {cache: 'no-cache'});
