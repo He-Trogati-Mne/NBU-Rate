@@ -1208,6 +1208,17 @@
         }
     }
 
+
+/* Brand marks: no stretching, preserve original proportions. */
+.market-stock-symbol{width:46px;height:46px;border-radius:12px;flex-shrink:0}
+.market-brand-img{padding:7px;object-fit:contain;background:#fff}
+.market-stock-symbol[data-brand="NVDA"] .brand-monochrome{background:transparent;filter:invert(61%) sepia(95%) saturate(1450%) hue-rotate(40deg) brightness(90%) contrast(101%)}
+.market-stock-symbol[data-brand="TSLA"] .brand-monochrome{background:transparent;filter:invert(18%) sepia(97%) saturate(4492%) hue-rotate(351deg) brightness(94%) contrast(104%)}
+.market-stock-symbol[data-brand="FXPO.L"]{width:64px}
+.market-stock-symbol[data-brand="FXPO.L"] .brand-wide{padding:3px}
+.market-stock-symbol[data-brand="MHPC.L"] .market-brand-img{padding:4px}
+@media(max-width:380px){.market-stock-symbol{width:40px;height:40px}.market-stock-symbol[data-brand="FXPO.L"]{width:49px}.market-stock-top{gap:6px}}
+
 </style>
     <style>
 
@@ -1791,6 +1802,29 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 .market-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 12px}.market-metrics>div{display:flex;flex-direction:column;gap:4px;background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;padding:10px}.market-metrics span{font-size:11px;color:var(--text-muted)}.market-metrics strong{font-size:13px;overflow-wrap:anywhere}.market-disclosure{margin-top:14px}
 @media(max-width:700px){.market-nav-inner{grid-template-columns:repeat(3,minmax(0,1fr));border-radius:14px;gap:4px}.market-nav-btn{min-height:40px;padding:7px 4px;font-size:12px}.market-nav-btn svg{width:16px;height:16px}#nbu-converter-pane,#analytics-card,#card-rates-card,#crypto-card,#nbu-stocks,#fx-tools{scroll-margin-top:130px}.market-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.market-chart-panel{padding:12px}.market-chart-wrap{height:240px}.market-periods{width:100%}.market-periods button{flex:1;padding:6px 3px}.market-chart-quote strong{font-size:17px}.market-stock{padding:11px}.market-stock-price{font-size:15px}.market-segments{flex:1}.market-segments button{flex:1;padding:7px 6px}.market-metrics>div{padding:8px}.market-metrics strong{font-size:11px}}
 @media(max-width:340px){.market-grid{grid-template-columns:1fr}.market-nav-btn{font-size:11px}.market-nav-btn svg{display:none}.market-chart-head{flex-wrap:wrap}.market-chart-quote{text-align:left}}
+
+/* Stock brands and external broker links */
+.market-stock-shell{display:flex;flex-direction:column;min-width:0;border:1px solid var(--border);border-radius:16px;background:var(--surface-1);overflow:hidden;transition:border-color .18s,box-shadow .18s}
+.market-stock-shell:focus-within,.market-stock-shell:has(.market-stock[aria-pressed=true]){border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
+.market-stock-shell .market-stock{width:100%;flex:1;border:0;border-radius:0;box-shadow:none;min-height:126px}
+.market-stock-shell .market-stock[aria-pressed=true]{box-shadow:none}
+.market-stock-symbol{position:relative;width:40px;height:40px;overflow:hidden;isolation:isolate;border-radius:11px;background:#fff;color:#263b56;border:1px solid var(--border);font-size:10px}
+.market-brand-img{position:absolute;inset:0;width:100%;height:100%;padding:6px;object-fit:contain;background:#fff;opacity:0;transition:opacity .15s}
+.market-brand-img.is-loaded{opacity:1}
+.market-stock-link{display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;margin:0 10px 10px;padding:7px 5px;border:1px solid var(--border);border-radius:9px;color:var(--text);background:var(--bg-elev);font-size:11px;font-weight:750;text-align:center;text-decoration:none;transition:background .18s,border-color .18s}
+.market-stock-link:hover,.market-broker-action:hover{border-color:var(--accent);color:var(--accent)}
+.market-stock-link svg,.market-broker-action svg{width:15px;height:15px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.market-stock-link:focus-visible,.market-broker-action:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.market-brokers{margin-top:16px;padding:16px;border:1px solid var(--border);border-radius:14px;background:var(--bg-elev);display:grid;gap:12px}
+.market-brokers h3{font-size:14px;font-weight:800}.market-broker-sub{font-size:12px;color:var(--text-muted);line-height:1.5}
+.market-broker-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:10px;padding:11px;background:var(--surface-1);border:1px solid var(--border);border-radius:11px}
+.market-broker-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;background:var(--surface-2);font-size:11px;font-weight:850;color:var(--accent)}
+.market-broker-row strong{font-size:13px;display:block}.market-broker-row small{display:block;color:var(--text-muted);font-size:11px;line-height:1.4}
+.market-broker-action{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;min-height:40px;border:1px solid var(--border);border-radius:9px;background:var(--bg-elev);text-decoration:none;color:var(--text);font-size:11px;font-weight:750;white-space:nowrap}
+.market-broker-primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}.market-broker-primary:hover{color:var(--accent-text);filter:brightness(.94)}
+.market-broker-note a{color:var(--accent);text-underline-offset:2px}.market-broker-note{font-size:11px;color:var(--text-muted);line-height:1.5}
+.market-chart-name-row{display:flex;align-items:center;gap:10px;min-width:0}.market-chart-name-row>div{min-width:0}
+@media(max-width:480px){.market-stock-shell .market-stock{min-height:120px}.market-stock-symbol{width:34px;height:34px}.market-stock-link{margin:0 7px 7px;font-size:10px}.market-brokers{padding:11px}.market-broker-row{grid-template-columns:34px minmax(0,1fr);gap:8px}.market-broker-icon{width:34px;height:34px}.market-broker-action{grid-column:1/-1;white-space:normal}.market-chart-name-row{gap:6px}}
 </style>
 </head>
 <body>
@@ -2024,12 +2058,18 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
  <p class="market-status" id="market-status" role="status">Завантаження котирувань…</p>
  <div class="market-grid" id="market-grid" role="group" aria-label="Акції / Stocks"></div>
  <div class="market-chart-panel" id="market-chart-panel">
- <div class="market-chart-head"><div><div id="market-chart-name" class="market-chart-name">KYIV</div><p id="market-chart-caption" class="market-caption"></p></div><div class="market-chart-quote"><strong id="market-chart-price">—</strong><span id="market-chart-delta"></span></div></div>
+ <div class="market-chart-head"><div class="market-chart-name-row"><span id="market-chart-brand"></span><div><div id="market-chart-name" class="market-chart-name">KYIV</div><p id="market-chart-caption" class="market-caption"></p></div></div><div class="market-chart-quote"><strong id="market-chart-price">—</strong><span id="market-chart-delta"></span></div></div>
  <div class="market-periods" role="group" aria-label="Період / Period">
  <button type="button" data-market-period="7" aria-pressed="false" data-market-uk="1Т" data-market-en="1W">1Т</button><button type="button" data-market-period="31" aria-pressed="false" data-market-uk="1М" data-market-en="1M">1М</button><button type="button" data-market-period="92" aria-pressed="false" data-market-uk="3М" data-market-en="3M">3М</button><button type="button" data-market-period="365" aria-pressed="true" data-market-uk="1Р" data-market-en="1Y">1Р</button><button type="button" data-market-period="1827" aria-pressed="false" data-market-uk="5Р" data-market-en="5Y">5Р</button><button type="button" data-market-period="all" aria-pressed="false" data-market-uk="Макс." data-market-en="Max">Макс.</button></div>
  <div class="market-chart-wrap" id="market-chart-wrap"><svg id="market-chart" role="img" aria-label="Історія цін закриття / Closing price history" viewBox="0 0 700 300" preserveAspectRatio="none"></svg><div id="market-empty" class="market-empty" hidden></div><div id="market-chart-tip" class="market-chart-tip" hidden></div></div>
  <div class="market-metrics"><div><span data-market-uk="Мінімум" data-market-en="Low">Мінімум</span><strong id="market-min">—</strong></div><div><span data-market-uk="Максимум" data-market-en="High">Максимум</span><strong id="market-max">—</strong></div><div><span data-market-uk="За період" data-market-en="Period change">За період</span><strong id="market-period-delta">—</strong></div></div>
  <p class="market-caption" id="market-history-note"></p></div>
+ <div class="market-brokers" id="market-brokers">
+  <div><h3 data-market-uk="Де купити" data-market-en="Where to buy">Де купити</h3><p class="market-broker-sub" id="market-broker-symbol"></p></div>
+  <div class="market-broker-row"><span class="market-broker-icon" aria-hidden="true">IBKR</span><div><strong>Interactive Brokers</strong><small data-market-uk="США, Лондон, Варшава · Україна у списку країн" data-market-en="US, London, Warsaw · Ukraine listed as supported">США, Лондон, Варшава · Україна у списку країн</small></div><a class="market-broker-action market-broker-primary" href="https://www.interactivebrokers.com/cgi-pub/contractSearch/symbolsearch.pl" target="_blank" rel="noopener noreferrer"><span data-market-uk="Знайти у брокера" data-market-en="Find at broker">Знайти у брокера</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a></div>
+  <div class="market-broker-row"><span class="market-broker-icon" aria-hidden="true">212</span><div><strong>Trading 212 Invest</strong><small data-market-uk="Альтернатива лише для підтримуваних країн проживання" data-market-en="Alternative only for eligible countries of residence">Альтернатива лише для підтримуваних країн проживання</small></div><a class="market-broker-action" href="https://www.trading212.com/trading-instruments/invest" target="_blank" rel="noopener noreferrer"><span data-market-uk="Переглянути акції" data-market-en="Browse shares">Переглянути акції</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a></div>
+  <p class="market-broker-note"><a href="https://www.interactivebrokers.com/en/accounts/open-account-country-list.php" target="_blank" rel="noopener noreferrer">IBKR</a> · <a href="https://helpcentre.trading212.com/hc/en-us/articles/12933782261917-What-are-the-supported-countries" target="_blank" rel="noopener noreferrer">Trading 212</a> — <span data-market-uk="перевірте країну проживання. Доступність конкретного інструмента, поповнення та комісії залежать від рахунку й валютних обмежень. Обирайте акції або GDR, не CFD. NBU Rate не є брокером; інвестиції можуть призвести до втрат." data-market-en="check residence eligibility. Instrument availability, funding and fees depend on the account and currency restrictions. Choose shares or GDRs, not CFDs. NBU Rate is not a broker; investments can lose value.">перевірте країну проживання. Доступність конкретного інструмента, поповнення та комісії залежать від рахунку й валютних обмежень. Обирайте акції або GDR, не CFD. NBU Rate не є брокером; інвестиції можуть призвести до втрат.</span></p>
+ </div>
  <p class="market-disclosure" data-market-uk="Денні ціни закриття з бази NBU Rate (Yahoo Finance, неофіційне джерело). Дані можуть бути затримані; це не торговельний термінал." data-market-en="Daily closing prices from the NBU Rate database (Yahoo Finance, unofficial source). Quotes may be delayed; this is not a trading terminal.">Денні ціни закриття з бази NBU Rate (Yahoo Finance, неофіційне джерело). Дані можуть бути затримані; це не торговельний термінал.</p>
  </section>
         <section class="card" id="fx-tools">
@@ -4861,12 +4901,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             });
             window.addEventListener('appinstalled', () => { fxPwaDeferredPrompt = null; fxPwaRender(); });
             fxPwaRender();
-            if ('serviceWorker' in navigator && window.isSecureContext) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./sw.js', {scope:'./', updateViaCache:'none'})
-                        .catch(err => console.warn('PWA cache unavailable:', err.message));
-                }, {once:true});
-            }
+            // PWA lifecycle is managed by the shared auto-updater at the end of the page.
         }
 
         function fxInit() {
@@ -5091,6 +5126,8 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
     {symbol:'TSLA',name:'Tesla',group:'world',exchange:'NASDAQ'},
     {symbol:'AMZN',name:'Amazon',group:'world',exchange:'NASDAQ'}
  ];
+ const brandLogos={"KYIV": ["https://upload.wikimedia.org/wikipedia/commons/7/7d/Kyivstar_2015_logo_-_Brandmark.svg", "https://kyivstar.ua/favicon.ico"], "MHPC.L": ["https://api.next.mhp.com.ua/images/3d944/72d18/095b5b6e.png", "https://upload.wikimedia.org/wikipedia/commons/6/69/MHP_logo_English.png"], "FXPO.L": ["https://upload.wikimedia.org/wikipedia/commons/d/d2/Ferrexpo.svg", "https://www.ferrexpo.com/favicon.ico"], "AAPL": ["https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"], "MSFT": ["https://upload.wikimedia.org/wikipedia/commons/2/25/Microsoft_icon.svg"], "NVDA": ["https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nvidia.svg", "https://cdn.jsdelivr.net/npm/simple-icons@16/icons/nvidia.svg", "https://icons.iconarchive.com/icons/simpleicons-team/simple/128/nvidia-icon.png"], "GOOGL": ["https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Favicon_2025.svg"], "TSLA": ["https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/tesla.svg", "https://cdn.jsdelivr.net/npm/simple-icons@16/icons/tesla.svg", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Tesla_T_symbol.svg"], "AMZN": ["https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg"], "AST.WA": ["https://astartaholding.com/favicon.ico", "https://cdn.freebiesupply.com/logos/large/2x/astarta-logo-png-transparent.png"]};
+ const brokerSearch='https://www.interactivebrokers.com/cgi-pub/contractSearch/symbolsearch.pl';
  const t=(uk,en)=>document.documentElement.lang==='en'?en:uk;
  const locale=()=>t('uk-UA','en-US');
  const text=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
@@ -5110,12 +5147,26 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
  try{const c=JSON.parse(safeLS.getItem(cacheKey)||'null');if(c&&typeof c.data==='object'&&c.data)quotes=c.data;}catch(_){}
  function merge(data){for(const o of options){const q=data?.[o.symbol];if(!q||typeof q!=='object'||!(num(q.price)>0)||!cash(q)||!timestamp(q.asOf))continue;const old=quotes[o.symbol];if(!old||timestamp(q.asOf)>=timestamp(old.asOf)){quotes[o.symbol]={...q,history:{...(old&&cash(old)===cash(q)?old.history:{}),...(q.history||{})}};}}}
  function make(tag,cls,txt){const x=document.createElement(tag);if(cls)x.className=cls;if(txt!==undefined)x.textContent=txt;return x;}
+ function brand(o){
+  const el=make('span','market-stock-symbol',o.symbol.split('.')[0].slice(0,4));
+  el.setAttribute('aria-hidden','true');el.dataset.brand=o.symbol;
+  const sources=brandLogos[o.symbol]||[];let i=0;
+  function next(){if(i>=sources.length)return;const src=sources[i++],im=make('img','market-brand-img');im.alt='';im.referrerPolicy='no-referrer';im.decoding='async';
+   if((o.symbol==='NVDA'||o.symbol==='TSLA')&&(src.includes('simple-icons')||src.includes('simpleicons-team')))im.classList.add('brand-monochrome');
+   if(o.symbol==='FXPO.L'&&src.endsWith('Ferrexpo.svg'))im.classList.add('brand-wide');
+   im.addEventListener('load',()=>{if(im.naturalWidth>0)im.classList.add('is-loaded');else{im.remove();next();}},{once:true});
+   im.addEventListener('error',()=>{im.remove();next();},{once:true});el.append(im);im.src=src;
+  }next();return el;
+ }
+ function externalIcon(){const svg=sv('svg',{viewBox:'0 0 24 24','aria-hidden':'true'});svg.append(sv('path',{d:'M13 5h6v6m0-6-9 9M19 13v6H5V5h6'}));return svg;}
+ function buyLink(o){const a=make('a','market-stock-link');a.href=brokerSearch;a.target='_blank';a.rel='noopener noreferrer';const ticker=o.symbol.split('.')[0];a.title=t('Знайти '+ticker+' у Interactive Brokers','Find '+ticker+' at Interactive Brokers');a.setAttribute('aria-label',a.title);a.append(make('span','',t('Купити у брокера','Buy at broker')),externalIcon());return a;}
  function press(sel,key,value){$$(sel).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[key]===value)));}
  function status(){const el=$('#market-status');if(!el)return;const available=options.filter(o=>quotes[o.symbol]).length;el.dataset.state=attempted&&!online&&!busy?'error':'ok';el.textContent=busy?t('Перевіряємо котирування…','Checking quotes…'):online?t(`Дані: ${available}/${options.length} · Перевірено ${clock(checked)}`,`Quotes: ${available}/${options.length} · Checked ${clock(checked)}`):attempted?t(available?'Не синхронізовано · збережені котирування':'Котирування недоступні',available?'Not synchronized · saved quotes':'Quotes unavailable'):t('Завантаження котирувань…','Loading quotes…');}
- function cards(){const grid=$('#market-grid');grid.replaceChildren();for(const o of options.filter(o=>o.group===region)){const q=quotes[o.symbol],price=num(q?.price),ch=delta(q);const b=make('button','market-stock');b.type='button';b.setAttribute('aria-pressed',String(symbol===o.symbol));const top=make('span','market-stock-top');top.append(make('span','market-stock-symbol',o.symbol.split('.')[0].slice(0,4)));const meta=make('span');meta.style.minWidth='0';meta.append(make('span','market-stock-ticker',o.symbol),make('span','market-stock-exchange',o.exchange));top.append(meta);b.append(top,make('span','market-stock-company',o.name),make('span','market-stock-price',fmt(price,cash(q))));const sub=make('span','market-stock-meta');const c=make('span','market-change',pct(ch));color(c,ch);sub.append(c,make('span','',q?(stale(q)?t('Застарілі · ','Stale · '):'')+date(q.asOf,true):t('Немає даних','No data')));b.append(sub);b.addEventListener('click',()=>{symbol=o.symbol;grid.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));plot();});grid.append(b);}}
+ function cards(){const grid=$('#market-grid');grid.replaceChildren();for(const o of options.filter(o=>o.group===region)){const q=quotes[o.symbol],price=num(q?.price),ch=delta(q);const b=make('button','market-stock');b.type='button';b.setAttribute('aria-pressed',String(symbol===o.symbol));const top=make('span','market-stock-top');top.append(brand(o));const meta=make('span');meta.style.minWidth='0';meta.append(make('span','market-stock-ticker',o.symbol),make('span','market-stock-exchange',o.exchange));top.append(meta);b.append(top,make('span','market-stock-company',o.name),make('span','market-stock-price',fmt(price,cash(q))));const sub=make('span','market-stock-meta');const c=make('span','market-change',pct(ch));color(c,ch);sub.append(c,make('span','',q?(stale(q)?t('Застарілі · ','Stale · '):'')+date(q.asOf,true):t('Немає даних','No data')));b.append(sub);b.addEventListener('click',()=>{symbol=o.symbol;grid.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));plot();});const shell=make('div','market-stock-shell');shell.append(b,buyLink(o));grid.append(shell);}}
  const ns='http://www.w3.org/2000/svg';
  function sv(tag,attrs={},txt){const el=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,String(v));if(txt!==undefined)el.textContent=txt;return el;}
  function plot(){const o=options.find(x=>x.symbol===symbol),q=quotes[symbol],cc=cash(q),a=history(q),last=a[a.length-1],cut=period==='all'?-Infinity:(last?timestamp(last[0]):0)-(Number(period)-1)*86400000;const series=a.filter(([d])=>timestamp(d)>=cut),first=series[0],end=series[series.length-1],p=num(q?.price),d=delta(q),pd=first&&end&&series.length>1?(end[1]/first[1]-1)*100:null;
+ const logo=$('#market-chart-brand');if(o&&logo.dataset.symbol!==symbol){logo.replaceChildren(brand(o));logo.dataset.symbol=symbol;}if(o){const ticker=o.symbol.split('.')[0];text('market-broker-symbol',t('Шукайте '+ticker+' · '+o.exchange+(ticker==='MHPC'?' · GDR':'')+'. Перехід на сайт брокера, без автоматичної купівлі.','Search '+ticker+' · '+o.exchange+(ticker==='MHPC'?' · GDR':'')+'. External broker site; no automatic purchase.'));}
  text('market-chart-name',symbol+' · '+(o?.name||''));text('market-chart-caption',q?t('Ціна закриття · ','Closing price · ')+date(q.asOf)+(stale(q)?t(' · застарілі дані',' · stale'):''):t('Котирування недоступне','Quote unavailable'));text('market-chart-price',fmt(p,cc));text('market-chart-delta',pct(d));color($('#market-chart-delta'),d);const svg=$('#market-chart'),empty=$('#market-empty');svg.replaceChildren();$('#market-chart-tip').hidden=true;chartPoints=[];
  const vals=series.map(x=>x[1]);text('market-min',fmt(vals.length?Math.min(...vals):null,cc));text('market-max',fmt(vals.length?Math.max(...vals):null,cc));text('market-period-delta',pct(pd));color($('#market-period-delta'),pd);text('market-history-note',series.length?t(`${date(first[0])} — ${date(end[0])} · ${series.length} торгових днів`,`${date(first[0])} — ${date(end[0])} · ${series.length} trading days`):'');
  empty.hidden=series.length>=2;empty.textContent=t('Недостатньо історії за цей період','Not enough history for this period');if(series.length<2)return;
@@ -5138,6 +5189,53 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
  if('ResizeObserver' in window)new ResizeObserver(()=>{plot();}).observe($('#market-chart-wrap'));else window.addEventListener('resize',plot);
  window.addEventListener('online',load);window.addEventListener('offline',()=>{online=false;status();});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(!checked||Date.now()-checked>=300000))load();});setInterval(()=>{if(!document.hidden)load();},300000);
  translate();load();
+})();
+</script>
+
+<script id="nbu-pwa-auto-update">
+(() => {
+ 'use strict';
+ if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
+ const sw=navigator.serviceWorker;
+ let registration=null, hadController=!!sw.controller, pendingReload=false, reloading=false, checking=false, lastCheck=0;
+ const interval=5*60*1000;
+ function maybeReload(){
+   if(!pendingReload||reloading||document.hidden||navigator.onLine===false)return;
+   const el=document.activeElement;
+   if(el&&(el.matches('input,textarea,select,[contenteditable=true]')||el.isContentEditable))return;
+   if(document.querySelector('.modal.visible'))return;
+   reloading=true;location.reload();
+ }
+ sw.addEventListener('controllerchange',()=>{
+   if(hadController)pendingReload=true;
+   hadController=!!sw.controller;
+   maybeReload();
+ });
+ function activateWaiting(){if(registration?.waiting)registration.waiting.postMessage({type:'SKIP_WAITING'});}
+ async function check(force=false){
+   if(!registration||checking||navigator.onLine===false||document.hidden)return;
+   if(!force&&Date.now()-lastCheck<60000)return;
+   checking=true;lastCheck=Date.now();
+   try{await registration.update();activateWaiting();}catch(e){console.debug('PWA update check:',e.message);}finally{checking=false;}
+ }
+ async function start(){
+   try{
+     registration=await sw.register('./sw.js',{scope:'./',updateViaCache:'none'});
+     registration.addEventListener('updatefound',()=>{
+       const worker=registration.installing;if(!worker)return;
+       worker.addEventListener('statechange',()=>{if(worker.state==='installed')activateWaiting();});
+     });
+     activateWaiting();await check(true);
+   }catch(e){console.warn('PWA update unavailable:',e.message);}
+ }
+ if(document.readyState==='complete')start();else window.addEventListener('load',start,{once:true});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden){maybeReload();check();}});
+ window.addEventListener('online',()=>{maybeReload();check(true);});
+ window.addEventListener('pageshow',()=>{maybeReload();check();});
+ window.addEventListener('focus',()=>{maybeReload();check();});
+ document.addEventListener('focusout',()=>setTimeout(maybeReload,0));
+ setInterval(()=>check(),interval);
+ setInterval(maybeReload,3000);
 })();
 </script>
 </body>
