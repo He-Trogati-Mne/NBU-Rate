@@ -1774,7 +1774,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 </style>
 
 <style id="market-redesign">
-.market-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:80;padding:8px 0 10px;margin:0 0 14px;background:var(--bg);background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.market-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:80;padding:8px 0 10px;margin:0 0 14px;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:none}.market-nav-inner{pointer-events:auto}
 .market-nav-inner{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;padding:6px;background:var(--bg-elev);border:1px solid var(--border);border-radius:17px;box-shadow:var(--shadow-sm)}
 .market-nav-btn{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0;padding:11px 5px;border:1px solid transparent;border-radius:11px;color:var(--text-muted);background:transparent;font:700 12px system-ui,sans-serif;cursor:pointer;transition:background .18s,color .18s,border .18s;white-space:nowrap}
 .market-nav-btn svg,.market-reload svg,.market-fee-label svg{width:18px;height:18px;flex:none}
@@ -1826,6 +1826,32 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 .market-research{display:grid;gap:10px;padding-top:14px;border-top:1px solid var(--border)}.market-investing-icon{display:flex;align-items:center;justify-content:center;background:#17202c;color:#fff;font-size:23px;letter-spacing:-1px}.market-investing-icon span{color:#ff9d27}.market-broker-note a{color:var(--accent);text-underline-offset:2px}.market-broker-note{font-size:11px;color:var(--text-muted);line-height:1.5}
 .market-chart-name-row{display:flex;align-items:center;gap:10px;min-width:0}.market-chart-name-row>div{min-width:0}
 @media(max-width:480px){.market-stock-shell .market-stock{min-height:120px}.market-stock-symbol{width:34px;height:34px}.market-stock-link{margin:0 7px 7px;font-size:10px}.market-brokers{padding:11px}.market-broker-row{grid-template-columns:34px minmax(0,1fr);gap:8px}.market-broker-icon{width:34px;height:34px}.market-broker-action{grid-column:1/-1;white-space:normal}.market-chart-name-row{gap:6px}}
+</style>
+<style id="nbu-market-polish">
+#card-rates-card .bank-rate-card.is-unavailable {position:relative;isolation:isolate;overflow:hidden;min-width:0;background:linear-gradient(145deg,var(--surface-2),var(--surface-1));border-style:solid;}
+.bank-rate-card.is-unavailable .bank-rate-head,.bank-rate-card.is-unavailable .rate-bs{position:relative;z-index:1;}
+.bank-rate-card.is-unavailable .rate-flag{opacity:.72;filter:saturate(.65)}
+.bank-rate-card.is-unavailable .bs-val{color:var(--text-muted);font-size:11px;font-family:inherit;font-weight:650;}
+.bank-rate-card .bs-val.is-missing{color:var(--text-muted);font-size:11px;font-family:inherit;font-weight:650;}
+.bank-rate-unavailable-note{position:relative;z-index:1;color:var(--text-muted);font-size:10px;line-height:1.3;display:flex;align-items:center;gap:5px;margin-top:2px;}
+.bank-rate-unavailable-note svg{width:12px;height:12px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;}
+.bank-glass-cracks{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;color:var(--text-muted);opacity:.24;}
+@media(min-width:701px){#card-rates-card .bank-slide-rates{grid-template-columns:repeat(4,minmax(0,1fr));}#card-rates-card .bank-rate-card{min-width:0;padding:12px 10px;}#card-rates-card .bank-rate-card .bs-row{flex-wrap:wrap;column-gap:5px;row-gap:2px;}}
+.crypto-market-shell{display:flex;flex-direction:column;min-width:0;background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .2s,background-color .2s;}
+.crypto-market-shell:hover{border-color:var(--accent);}.crypto-market-shell .crypto-card{flex:1;border:0;box-shadow:none;transform:none;background:transparent;border-radius:0;}
+.crypto-market-shell .crypto-card:hover,.crypto-market-shell .crypto-card:active{transform:none;box-shadow:none;background:transparent;}.crypto-market-shell .crypto-card:focus-visible{outline:2px solid var(--accent);outline-offset:-3px;}
+.crypto-market-shell .market-stock-link{margin:0 10px 10px;}
+#crypto-exchanges{scroll-margin-top:135px;}#crypto-exchanges .market-broker-icon{font-size:15px;font-weight:850;}#crypto-exchanges .market-broker-icon svg{width:23px;height:23px;}
+#about-site .privacy-body{max-width:710px;margin:0 auto;}#about-site .privacy-body p{margin-bottom:12px;}#about-site .about-links{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px;}#about-site .about-links a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;border:1px solid var(--border);border-radius:10px;padding:9px 13px;background:var(--surface-1);font-size:12px;font-weight:700;}#about-site .about-links a:hover{border-color:var(--accent);}#about-site .about-links svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+</style>
+<style>
+    /* Exchange logos — separate from stock broker styles. */
+    #crypto-exchanges .exchange-brand-icon { flex:none; overflow:hidden; background:#17191f; border:1px solid var(--border); }
+    #crypto-exchanges .exchange-brand-icon img { display:block; width:78%; height:78%; object-fit:contain; }
+    #crypto-exchanges .exchange-brand-icon img[hidden], #crypto-exchanges .exchange-logo-fallback[hidden] { display:none !important; }
+    #crypto-exchanges .exchange-logo-fallback { font-size:11px; color:var(--text); font-weight:800; }
+    #crypto-exchanges .exchange-bybit .exchange-logo-fallback { font-size:9px; color:#f7a600; }
+    /* Logo artwork: https://github.com/Aero25x/cryptocurrencies-exchanges-and-dexes (MIT); marks belong to their owners. */
 </style>
 </head>
 <body>
@@ -2047,6 +2073,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 <div class="rate-card skeleton"><div class="skeleton-shape sk-head"></div><div class="skeleton-shape sk-name"></div><div class="skeleton-shape sk-value"></div></div>
                 <div class="rate-card skeleton"><div class="skeleton-shape sk-head"></div><div class="skeleton-shape sk-name"></div><div class="skeleton-shape sk-value"></div></div>
             </div>
+<div class="market-brokers" id="crypto-exchanges"><div><h3><span data-market-uk="Де купити криптовалюту" data-market-en="Where to buy crypto">Де купити криптовалюту</span></h3><p class="market-broker-sub" id="crypto-exchange-selection"><span data-market-uk="Оберіть біржу та перевірте наявність потрібної монети." data-market-en="Choose an exchange and check whether your coin is available.">Оберіть біржу та перевірте наявність потрібної монети.</span></p></div><div class="market-broker-row"><span class="market-broker-icon exchange-brand-icon exchange-whitebit" aria-hidden="true"><img src="https://cdn.jsdelivr.net/gh/Aero25x/cryptocurrencies-exchanges-and-dexes@main/WHITEBIT.SVG" data-fallback="https://raw.githubusercontent.com/Aero25x/cryptocurrencies-exchanges-and-dexes/main/WHITEBIT.SVG" alt="" width="30" height="30" decoding="async" referrerpolicy="no-referrer" onload="this.nextElementSibling.hidden=true;this.hidden=false" onerror="if(this.dataset.fallback){const next=this.dataset.fallback;delete this.dataset.fallback;this.src=next;}else{this.hidden=true;this.nextElementSibling.hidden=false;}"><span class="exchange-logo-fallback" hidden>W</span></span><div><strong>WhiteBIT</strong><small><span data-market-uk="Спотова торгівля криптовалютами" data-market-en="Spot crypto trading">Спотова торгівля криптовалютами</span></small></div><a class="market-broker-action" href="https://whitebit.com/m/spot-trading" target="_blank" rel="noopener noreferrer"><span data-market-uk="Перейти на біржу" data-market-en="Visit exchange">Перейти на біржу</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a></div><div class="market-broker-row"><span class="market-broker-icon exchange-brand-icon exchange-binance" aria-hidden="true"><img src="https://cdn.jsdelivr.net/gh/Aero25x/cryptocurrencies-exchanges-and-dexes@main/BINANCE.SVG" data-fallback="https://raw.githubusercontent.com/Aero25x/cryptocurrencies-exchanges-and-dexes/main/BINANCE.SVG" alt="" width="30" height="30" decoding="async" referrerpolicy="no-referrer" onload="this.nextElementSibling.hidden=true;this.hidden=false" onerror="if(this.dataset.fallback){const next=this.dataset.fallback;delete this.dataset.fallback;this.src=next;}else{this.hidden=true;this.nextElementSibling.hidden=false;}"><span class="exchange-logo-fallback" hidden>B</span></span><div><strong>Binance</strong><small><span data-market-uk="Каталог криптовалют і способів купівлі" data-market-en="Crypto catalogue and purchase methods">Каталог криптовалют і способів купівлі</span></small></div><a class="market-broker-action" href="https://www.binance.com/en/how-to-buy/all-coins" target="_blank" rel="noopener noreferrer"><span data-market-uk="Перейти на біржу" data-market-en="Visit exchange">Перейти на біржу</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a></div><div class="market-broker-row"><span class="market-broker-icon exchange-brand-icon exchange-bybit" aria-hidden="true"><img src="https://cdn.jsdelivr.net/gh/Aero25x/cryptocurrencies-exchanges-and-dexes@main/BYBIT.SVG" data-fallback="https://raw.githubusercontent.com/Aero25x/cryptocurrencies-exchanges-and-dexes/main/BYBIT.SVG" alt="" width="30" height="30" decoding="async" referrerpolicy="no-referrer" onload="this.nextElementSibling.hidden=true;this.hidden=false" onerror="if(this.dataset.fallback){const next=this.dataset.fallback;delete this.dataset.fallback;this.src=next;}else{this.hidden=true;this.nextElementSibling.hidden=false;}"><span class="exchange-logo-fallback" hidden>BYBIT</span></span><div><strong>Bybit</strong><small><span data-market-uk="Спотова торгівля та P2P" data-market-en="Spot trading and P2P">Спотова торгівля та P2P</span></small></div><a class="market-broker-action" href="https://www.bybit.com/" target="_blank" rel="noopener noreferrer"><span data-market-uk="Перейти на біржу" data-market-en="Visit exchange">Перейти на біржу</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a></div><div class="market-broker-row"><span class="market-broker-icon exchange-brand-icon exchange-kraken" aria-hidden="true"><img src="https://cdn.jsdelivr.net/gh/Aero25x/cryptocurrencies-exchanges-and-dexes@main/KRAKEN.SVG" data-fallback="https://raw.githubusercontent.com/Aero25x/cryptocurrencies-exchanges-and-dexes/main/KRAKEN.SVG" alt="" width="30" height="30" decoding="async" referrerpolicy="no-referrer" onload="this.nextElementSibling.hidden=true;this.hidden=false" onerror="if(this.dataset.fallback){const next=this.dataset.fallback;delete this.dataset.fallback;this.src=next;}else{this.hidden=true;this.nextElementSibling.hidden=false;}"><span class="exchange-logo-fallback" hidden>K</span></span><div><strong>Kraken</strong><small><span data-market-uk="Купівля та обмін криптовалют" data-market-en="Buy and convert crypto">Купівля та обмін криптовалют</span></small></div><a class="market-broker-action" href="https://www.kraken.com/buy" target="_blank" rel="noopener noreferrer"><span data-market-uk="Перейти на біржу" data-market-en="Visit exchange">Перейти на біржу</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a></div><p class="market-broker-note"><span data-market-uk="NBU Rate не є біржею. Перевіряйте доступність у вашій країні, комісії та умови верифікації. Криптовалюти мають високий ризик втрат." data-market-en="NBU Rate is not an exchange. Check regional availability, fees and verification requirements. Crypto assets carry a high risk of loss.">NBU Rate не є біржею. Перевіряйте доступність у вашій країні, комісії та умови верифікації. Криптовалюти мають високий ризик втрат.</span></p></div>
         </section>
 
 
@@ -2123,6 +2150,16 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 </div></div></div>
         </section>
 
+        <details class="card privacy-card" id="about-site" open>
+            <summary><svg viewBox="0 0 24 24" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span data-market-uk="Про сайт" data-market-en="About the website">Про сайт</span></summary>
+            <div class="privacy-body">
+                <h3>NBU Rate</h3>
+                <p><span data-market-uk="NBU Rate — незалежний український фінансовий сервіс для зручного перегляду офіційних курсів НБУ, порівняння курсів банків, конвертації валют і відстеження криптовалют та акцій." data-market-en="NBU Rate is an independent Ukrainian financial service for viewing official NBU rates, comparing bank rates, converting currencies, and tracking crypto assets and stocks.">NBU Rate — незалежний український фінансовий сервіс для зручного перегляду офіційних курсів НБУ, порівняння курсів банків, конвертації валют і відстеження криптовалют та акцій.</span></p>
+                <p><span data-market-uk="Історичні графіки, калькулятори та відкриті JSON-дані допомагають аналізувати зміни курсів. Дані автоматично оновлюються через GitHub Actions; доступність і свіжість залежать від джерела. Сайт можна встановити як PWA." data-market-en="Historical charts, calculators and open JSON data help track rate changes. Data is automatically updated through GitHub Actions; availability and freshness depend on the source. The website can be installed as a PWA.">Історичні графіки, калькулятори та відкриті JSON-дані допомагають аналізувати зміни курсів. Дані автоматично оновлюються через GitHub Actions; доступність і свіжість залежать від джерела. Сайт можна встановити як PWA.</span></p>
+                <p><span data-market-uk="Проєкт не є банком, брокером чи криптобіржею та не проводить фінансових операцій. Інформація має довідковий характер." data-market-en="The project is not a bank, broker or crypto exchange and does not execute financial transactions. Information is provided for reference.">Проєкт не є банком, брокером чи криптобіржею та не проводить фінансових операцій. Інформація має довідковий характер.</span></p>
+                <div class="about-links"><a href="https://github.com/He-Trogati-Mne/NBU-Rate" target="_blank" rel="noopener noreferrer"><span data-market-uk="Код сайту" data-market-en="Website code">Код сайту</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a><a href="https://github.com/He-Trogati-Mne/nbu-rate-data" target="_blank" rel="noopener noreferrer"><span data-market-uk="Відкриті дані" data-market-en="Open data">Відкриті дані</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a></div>
+            </div>
+        </details>
         <details class="card privacy-card" id="privacy">
             <summary>
                 <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -2147,7 +2184,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 </div>
             </div>
             <div class="fx-footer-meta">
-                <span class="fx-footer-date"><span class="fx-footer-live" aria-hidden="true"></span>Оновлено 25.11.2026</span>
+                <span class="fx-footer-date"><span class="fx-footer-live" aria-hidden="true"></span>Оновлено 23.11.2026</span>
                 <a class="fx-footer-github" href="https://github.com/He-Trogati-Mne/NBU-Rate" target="_blank" rel="noopener noreferrer" aria-label="Проєкт Курс НБУ на GitHub">
                     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OTYgNTEyIj48IS0tISBGb250IEF3ZXNvbWUgRnJlZSA2LjcuMiBieSBAZm9udGF3ZXNvbWUgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbSBMaWNlbnNlIC0gaHR0cHM6Ly9mb250YXdlc29tZS5jb20vbGljZW5zZS9mcmVlIChJY29uczogQ0MgQlkgNC4wLCBGb250czogU0lMIE9GTCAxLjEsIENvZGU6IE1JVCBMaWNlbnNlKSBDb3B5cmlnaHQgMjAyNCBGb250aWNvbnMsIEluYy4gLS0+PHBhdGggZmlsbD0iIzExMTgyNyIgZD0iTTE2NS45IDM5Ny40YzAgMi0yLjMgMy42LTUuMiAzLjYtMy4zLjMtNS42LTEuMy01LjYtMy42IDAtMiAyLjMtMy42IDUuMi0zLjYgMy0uMyA1LjYgMS4zIDUuNiAzLjZ6bS0zMS4xLTQuNWMtLjcgMiAxLjMgNC4zIDQuMyA0LjkgMi42IDEgNS42IDAgNi4yLTJzLTEuMy00LjMtNC4zLTUuMmMtMi42LS43LTUuNS4zLTYuMiAyLjN6bTQ0LjItMS43Yy0yLjkuNy00LjkgMi42LTQuNiA0LjkuMyAyIDIuOSAzLjMgNS45IDIuNiAyLjktLjcgNC45LTIuNiA0LjYtNC42LS4zLTEuOS0zLTMuMi01LjktMi45ek0yNDQuOCA4QzEwNi4xIDggMCAxMTMuMyAwIDI1MmMwIDExMC45IDY5LjggMjA1LjggMTY5LjUgMjM5LjIgMTIuOCAyLjMgMTcuMy01LjYgMTcuMy0xMi4xIDAtNi4yLS4zLTQwLjQtLjMtNjEuNCAwIDAtNzAgMTUtODQuNy0yOS44IDAgMC0xMS40LTI5LjEtMjcuOC0zNi42IDAgMC0yMi45LTE1LjcgMS42LTE1LjQgMCAwIDI0LjkgMiAzOC42IDI1LjggMjEuOSAzOC42IDU4LjYgMjcuNSA3Mi45IDIwLjkgMi4zLTE2IDguOC0yNy4xIDE2LTMzLjctNTUuOS02LjItMTEyLjMtMTQuMy0xMTIuMy0xMTAuNSAwLTI3LjUgNy42LTQxLjMgMjMuNi01OC45LTIuNi02LjUtMTEuMS0zMy4zIDIuNi02Ny45IDIwLjktNi41IDY5IDI3IDY5IDI3IDIwLTUuNiA0MS41LTguNSA2Mi44LTguNXM0Mi44IDIuOSA2Mi44IDguNWMwIDAgNDguMS0zMy42IDY5LTI3IDEzLjcgMzQuNyA1LjIgNjEuNCAyLjYgNjcuOSAxNiAxNy43IDI1LjggMzEuNSAyNS44IDU4LjkgMCA5Ni41LTU4LjkgMTA0LjItMTE0LjggMTEwLjUgOS4yIDcuOSAxNyAyMi45IDE3IDQ2LjQgMCAzMy43LS4zIDc1LjQtLjMgODMuNiAwIDYuNSA0LjYgMTQuNCAxNy4zIDEyLjFDNDI4LjIgNDU3LjggNDk2IDM2Mi45IDQ5NiAyNTIgNDk2IDExMy4zIDM4My41IDggMjQ0LjggOHpNOTcuMiAzNTIuOWMtMS4zIDEtMSAzLjMuNyA1LjIgMS42IDEuNiAzLjkgMi4zIDUuMiAxIDEuMy0xIDEtMy4zLS43LTUuMi0xLjYtMS42LTMuOS0yLjMtNS4yLTF6bS0xMC44LTguMWMtLjcgMS4zLjMgMi45IDIuMyAzLjkgMS42IDEgMy42LjcgNC4zLS43LjctMS4zLS4zLTIuOS0yLjMtMy45LTItLjYtMy42LS4zLTQuMy43em0zMi40IDM1LjZjLTEuNiAxLjMtMSA0LjMgMS4zIDYuMiAyLjMgMi4zIDUuMiAyLjYgNi41IDEgMS4zLTEuMy43LTQuMy0xLjMtNi4yLTIuMi0yLjMtNS4yLTIuNi02LjUtMXptLTExLjQtMTQuN2MtMS42IDEtMS42IDMuNiAwIDUuOSAxLjYgMi4zIDQuMyAzLjMgNS42IDIuMyAxLjYtMS4zIDEuNi0zLjkgMC02LjItMS40LTIuMy00LTMuMy01LjYtMnoiLz48L3N2Zz4=" alt="" width="18" height="18" loading="lazy" decoding="async">
                     <span>GitHub</span>
@@ -2786,7 +2823,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 status_error: 'Помилка завантаження', status_rate_limited: 'Забагато запитів, спробуйте пізніше', status_cors: 'Не вдалося отримати дані (мережа/проксі)',
                 no_data: 'Дані ще не завантажені', insufficient_data: 'Недостатньо даних', buy_label: 'Купівля', sell_label: 'Продаж',
                 min_label: 'Мін', max_label: 'Макс', current_label: 'Зараз',
-                load_error: 'Не вдалося завантажити', no_data_short: 'Немає даних', bank_privat: 'ПриватБанк', bank_mono: 'МоноБанк',
+                load_error: 'Не вдалося завантажити', no_data_short: 'Немає даних', bank_unknown_rate: 'Невідомо', bank_privat: 'ПриватБанк', bank_mono: 'МоноБанк',
                 autoplay_15s: 'Авто 15с',
                 USD:'Долар США', EUR:'Євро', GBP:'Фунт стерлінгів', PLN:'Польський злотий', CNY:'Китайський юань', CHF:'Швейцарський франк', JPY:'Японська єна',
                 CAD:'Канадський долар', AUD:'Австралійський долар', TRY:'Турецька ліра', SEK:'Шведська крона', NOK:'Норвезька крона', DKK:'Данська крона',
@@ -2814,7 +2851,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 status_error: 'Loading error', status_rate_limited: 'Too many requests, try later', status_cors: 'Failed to fetch (network/proxy)',
                 no_data: 'Data not loaded yet', insufficient_data: 'Not enough data', buy_label: 'Buy', sell_label: 'Sell',
                 min_label: 'Min', max_label: 'Max', current_label: 'Now',
-                load_error: 'Failed to load', no_data_short: 'No data', bank_privat: 'PrivatBank', bank_mono: 'MonoBank',
+                load_error: 'Failed to load', no_data_short: 'No data', bank_unknown_rate: 'Unknown', bank_privat: 'PrivatBank', bank_mono: 'MonoBank',
                 autoplay_15s: 'Auto 15s',
                 USD:'US Dollar', EUR:'Euro', GBP:'British Pound', PLN:'Polish Zloty', CNY:'Chinese Yuan', CHF:'Swiss Franc', JPY:'Japanese Yen',
                 CAD:'Canadian Dollar', AUD:'Australian Dollar', TRY:'Turkish Lira', SEK:'Swedish Krona', NOK:'Norwegian Krone', DKK:'Danish Krone',
@@ -3841,27 +3878,24 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 
         function renderBankSlide(bank, data) {
             const name = bankDisplayName(bank);
-            const currencies = CARD_RATE_ORDER.filter(c => {
-                const r = data?.[c]; return r && (r.buy != null || r.sell != null);
-            });
-            if (currencies.length === 0) return '';
-            const cardsHtml = currencies.map(c => {
-                const r = data[c];
-                const buy  = r.buy  != null ? Number(r.buy).toFixed(currentDecimals())  : '—';
-                const sell = r.sell != null ? Number(r.sell).toFixed(currentDecimals()) : '—';
+            const valid = value => value != null && value !== '' && Number.isFinite(Number(value)) && Number(value) > 0;
+            if (!CARD_RATE_ORDER.some(c => valid(data?.[c]?.buy) || valid(data?.[c]?.sell))) return '';
+            const cardsHtml = CARD_RATE_ORDER.map(c => {
+                const r = data?.[c];
+                const hasBuy = valid(r?.buy), hasSell = valid(r?.sell);
+                const missing = !hasBuy && !hasSell;
+                const buy = hasBuy ? Number(r.buy).toFixed(currentDecimals()) : t('bank_unknown_rate');
+                const sell = hasSell ? Number(r.sell).toFixed(currentDecimals()) : t('bank_unknown_rate');
+                const cracks = missing ? `<svg class="bank-glass-cracks" viewBox="0 0 160 112" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width=".85" stroke-linecap="round" stroke-linejoin="round"><path d="M160 6L130 21 117 45 91 58 77 82 45 93 23 112M117 45L142 55 151 80 160 88M117 45L104 22 78 12 65 0M117 45L125 72 112 94 116 112M91 58L60 43 31 48 0 32M77 82L85 103 83 112M130 21L145 27 160 23M60 43L49 16 31 0M45 93L14 90 0 98"/><path opacity=".45" d="M117 45L133 40 142 55 125 72 91 58 104 22 117 45M60 43L77 82 45 93 31 48Z"/></g><path d="M117 45L142 55 125 72Z M77 82L45 93 60 43Z" fill="currentColor" opacity=".09"/></svg>` : '';
                 return `
-                    <div class="bank-rate-card">
+                    <div class="bank-rate-card${missing ? ' is-unavailable' : ''}">
+                        ${cracks}
                         <div class="bank-rate-head">${flagHtml(c, 'rate-flag')}<span>${c}</span></div>
                         <div class="rate-bs">
-                            <div class="bs-row">
-                                <span class="bs-label" data-i18n="buy_label">${t('buy_label')}</span>
-                                <span class="bs-val buy">${buy}</span>
-                            </div>
-                            <div class="bs-row">
-                                <span class="bs-label" data-i18n="sell_label">${t('sell_label')}</span>
-                                <span class="bs-val sell">${sell}</span>
-                            </div>
+                            <div class="bs-row"><span class="bs-label" data-i18n="buy_label">${t('buy_label')}</span><span class="bs-val ${hasBuy ? 'buy' : 'is-missing'}" ${hasBuy ? '' : 'data-i18n="bank_unknown_rate"'}>${buy}</span></div>
+                            <div class="bs-row"><span class="bs-label" data-i18n="sell_label">${t('sell_label')}</span><span class="bs-val ${hasSell ? 'sell' : 'is-missing'}" ${hasSell ? '' : 'data-i18n="bank_unknown_rate"'}>${sell}</span></div>
                         </div>
+                        ${missing ? `<span class="bank-rate-unavailable-note"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 4.5v4M8 11v.5"/></svg><span data-i18n="no_data_short">${t('no_data_short')}</span></span>` : ''}
                     </div>`;
             }).join('');
 
@@ -4172,19 +4206,36 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 const color = CRYPTO_COLORS[c.symbol] || '#F7931A';
                 const history = getCryptoHistoryForPeriod(c, currentCryptoPeriod);
                 const spark = sparklineSvg(history, color);
-                html += `<div class="rate-card crypto-card" data-crypto="${c.symbol}">
+                html += `<div class="crypto-market-shell"><div class="rate-card crypto-card" tabindex="0" role="button" data-crypto="${c.symbol}">
                     <div class="rate-card-head">${cryptoIcon(c.symbol, c.image)}<span class="rate-code">${c.symbol}</span></div>
                     <div class="rate-name">${c.name}</div>
                     <div class="rate-value ${changeClass}">${formatCryptoUsd(c.price)}</div>
                     ${spark}
                     <div class="rate-change ${changeClass}"><span>${symbol}</span><span>${ch.toFixed(2)}%</span></div>
-                </div>`;
+                </div><a class="market-stock-link crypto-buy-link" href="#crypto-exchanges" data-coin="${c.symbol}"><span>${currentLang === 'en' ? 'Buy on an exchange' : 'Купити на біржі'}</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a></div>`;
             });
             grid.innerHTML = html;
             grid.querySelectorAll('.crypto-card').forEach(card => {
                 card.addEventListener('click', () => {
                     const symbol = card.dataset.crypto; const coin = cryptoDataMap[symbol];
                     if (coin) openCryptoChart(coin);
+                });
+                card.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); card.click(); }
+                });
+            });
+            grid.querySelectorAll('.crypto-buy-link').forEach(link => {
+                link.addEventListener('click', event => {
+                    event.preventDefault();
+                    const target = $('#crypto-exchanges');
+                    const label = $('#crypto-exchange-selection');
+                    const coin = link.dataset.coin;
+                    if (label) {
+                        label.dataset.marketUk = 'Обрана монета: ' + coin + '. Перевірте її наявність на біржі.';
+                        label.dataset.marketEn = 'Selected asset: ' + coin + '. Check its availability on the exchange.';
+                        label.textContent = currentLang === 'en' ? label.dataset.marketEn : label.dataset.marketUk;
+                    }
+                    target?.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'start'});
                 });
             });
         }
