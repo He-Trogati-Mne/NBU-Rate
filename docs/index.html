@@ -1873,14 +1873,14 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 .settings-widget-link{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);text-decoration:none;text-align:left;color:var(--text);transition:background .2s,border-color .2s}.settings-widget-link:hover{border-color:var(--accent);background:var(--hover)}.settings-widget-icon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border-radius:11px;background:color-mix(in srgb,var(--accent) 12%,var(--surface-1));color:var(--accent)}.settings-widget-icon svg,.settings-widget-chevron{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.settings-widget-chevron{flex-shrink:0;color:var(--text-muted)}.settings-widget-link .toggle-text{gap:4px}.settings-widget-link .toggle-desc{font-weight:400}.settings-widget-link:focus-visible,.nbu-donate:focus-visible,.market-context-links a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .market-context-links{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:5px 13px;margin:16px 0 0;font-size:12px;color:var(--text-muted);line-height:1.6}.market-context-links a{color:var(--text-muted);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border-strong)}.market-context-links a:hover{color:var(--accent);text-decoration-color:var(--accent)}
 </style>
-</head>
+<style>.hero-logo,.fx-footer-sign,.fx-widget-brand-mark{background:transparent!important;box-shadow:none!important;border:0!important;overflow:visible}.hero-logo img,.fx-footer-sign img,.fx-widget-brand-mark img{width:100%;height:100%;object-fit:contain;display:block;filter:none!important}</style></head>
 <body>
 
 
     <header class="hero">
         <div class="container">
             <div class="hero-content">
-                <div class="hero-logo">₴</div>
+                <div class="hero-logo"><img src="./favicon/web-app-manifest-192x192.png" alt="" width="192" height="192"></div>
                 <h1 data-i18n="hero_title">Курс НБУ</h1>
                 <p class="hero-subtitle" data-i18n="hero_subtitle">Офіційні курси валют, конвертер та історія з 2003 року</p>
                 <div class="hero-status loading" id="hero-status" role="status" aria-live="polite">
@@ -2164,7 +2164,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                         <span class="fx-widget-preview-label">PREVIEW</span>
                     </div>
                     <div class="fx-browser-body">
-                        <div class="fx-widget-brand"><span class="fx-widget-brand-mark" aria-hidden="true">₴</span><span class="fx-widget-brand-copy"><strong>Курс НБУ</strong><small>Валютний огляд</small></span><span class="fx-widget-live" title="Дані з конвертера">●</span></div>
+                        <div class="fx-widget-brand"><span class="fx-widget-brand-mark" aria-hidden="true"><img src="./favicon/web-app-manifest-192x192.png" alt="" width="192" height="192"></span><span class="fx-widget-brand-copy"><strong data-market-uk="Курс НБУ" data-market-en="NBU Rate">Курс НБУ</strong><small>Валютний огляд</small></span><span class="fx-widget-live" title="Дані з конвертера">●</span></div>
                         <div class="fx-widget-feature">
                             <div class="fx-widget-pair"><span>USD / UAH</span><span class="fx-widget-currency-tag">₴</span></div>
                             <strong id="fx-widget-rate">— ₴</strong>
@@ -2209,10 +2209,10 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 
         <footer class="fx-clean-footer" aria-label="Інформація про сайт">
             <div class="fx-footer-identity">
-                <span class="fx-footer-sign" aria-hidden="true">₴</span>
+                <span class="fx-footer-sign" aria-hidden="true"><img src="./favicon/web-app-manifest-192x192.png" alt="" width="192" height="192"></span>
                 <div class="fx-footer-profile">
                     <strong>He_Trogati_Mne</strong>
-                    <span>Developer <span class="fx-footer-divider">/</span> Курс НБУ</span>
+                    <span>Developer <span class="fx-footer-divider">/</span> <span data-market-uk="Курс НБУ" data-market-en="NBU Rate">Курс НБУ</span></span>
                 </div>
             </div>
             <div class="fx-footer-meta"><a class="nbu-donate" href="https://donatello.to/He_Trogati_Mne" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0l-1 1-1-1a5.5 5.5 0 0 0-7.8 7.8l8.8 8.7 8.8-8.7a5.5 5.5 0 0 0 0-7.8Z"/></svg><span data-market-uk="Підтримати проєкт" data-market-en="Support the project">Підтримати проєкт</span></a>
@@ -5064,6 +5064,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             const modal = $('#settings-modal');
             const settingsBtn = $('#open-settings');
             settingsBtn.addEventListener('click', () => { modal.classList.add('visible'); settingsBtn.classList.add('open'); });
+            if (new URLSearchParams(location.search).get('settings') === '1') settingsBtn.click();
             function closeSettings() { modal.classList.remove('visible'); settingsBtn.classList.remove('open'); }
             $('#close-settings').addEventListener('click', closeSettings);
             modal.addEventListener('click', (e) => { if (e.target === modal) closeSettings(); });
