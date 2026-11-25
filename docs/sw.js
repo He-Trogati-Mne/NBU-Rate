@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v31-11-25';
+const CACHE_NAME = 'nbu-rate-v37-11-25';
 
 const FILES = [
   './',
