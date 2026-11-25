@@ -3330,9 +3330,32 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 
         function renderCards(rates) {
             const container = $('#current-rates');
-            const todayIso = new Date().toISOString().slice(0, 10);
-            const allDates = Object.keys(historicalRates).sort();
-            let prevDate = null;
+            const toIso = (date) => {
+             if (!date) return '';
+
+     if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return date;
+    }
+
+    const match = date.match(
+        /^(\d{2})\.(\d{2})\.(\d{4})$/
+    );
+
+    return match
+        ? `${match[3]}-${match[2]}-${match[1]}`
+        : '';
+};
+
+     const rateDateIso = toIso(liveDate);
+     const allDates = Object.keys(historicalRates).sort();
+
+     const prevDate = allDates
+    .filter(date => rateDateIso && date < rateDateIso)
+    .pop();
+
+    const prevRates = prevDate
+    ? historicalRates[prevDate]
+    : null;
             for (let i = allDates.length - 1; i >= 0; i--) {
                 if (allDates[i] < todayIso) { prevDate = allDates[i]; break; }
             }
