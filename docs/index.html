@@ -1761,6 +1761,37 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 }
 
 </style>
+
+<style id="market-redesign">
+.market-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:80;padding:8px 0 10px;margin:0 0 14px;background:var(--bg);background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.market-nav-inner{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;padding:6px;background:var(--bg-elev);border:1px solid var(--border);border-radius:17px;box-shadow:var(--shadow-sm)}
+.market-nav-btn{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0;padding:11px 5px;border:1px solid transparent;border-radius:11px;color:var(--text-muted);background:transparent;font:700 12px system-ui,sans-serif;cursor:pointer;transition:background .18s,color .18s,border .18s;white-space:nowrap}
+.market-nav-btn svg,.market-reload svg,.market-fee-label svg{width:18px;height:18px;flex:none}
+.market-nav-btn.is-current{color:var(--accent);background:var(--surface-2);border-color:var(--border-strong)}
+.market-nav-btn:hover,.market-reload:hover{color:var(--accent);background:var(--hover)}
+.market-nav-btn:focus-visible,.market-reload:focus-visible,.market-segments button:focus-visible,.market-periods button:focus-visible,.market-stock:focus-visible,.market-fee input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#nbu-converter-pane,#analytics-card,#card-rates-card,#crypto-card,#nbu-stocks,#fx-tools{scroll-margin-top:84px}
+.market-fee{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;padding:15px 18px;margin:16px auto 0;border-radius:15px;width:100%;max-width:600px}
+.market-fee-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.market-fee .fx-fee-label{display:flex;align-items:center;gap:8px;color:var(--text);font-weight:650;min-width:0}.market-fee .fx-fee-label svg{width:18px;height:18px;color:var(--accent);flex:none}
+.market-fee strong{min-width:56px;padding:5px 9px;border:1px solid var(--border);background:var(--bg-elev);border-radius:8px;text-align:center;font-size:13px}
+.market-fee input[type=range]{appearance:none;-webkit-appearance:none;width:100%;max-width:none;height:26px;background:transparent;cursor:pointer;margin:0;--fee-progress:0%}
+.market-fee input::-webkit-slider-runnable-track{height:7px;border-radius:12px;background:linear-gradient(to right,var(--accent) 0 var(--fee-progress),var(--border-strong) var(--fee-progress) 100%)}
+.market-fee input::-moz-range-track{height:7px;border-radius:12px;background:var(--border-strong)}.market-fee input::-moz-range-progress{height:7px;border-radius:12px;background:var(--accent)}
+.market-fee input::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:20px;height:20px;border:3px solid var(--bg-elev);border-radius:50%;background:var(--accent);box-shadow:0 0 0 1px var(--accent);margin-top:-6.5px}
+.market-fee input::-moz-range-thumb{width:15px;height:15px;border:3px solid var(--bg-elev);border-radius:50%;background:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.market-fee-ticks{display:flex;justify-content:space-between;font:600 10px system-ui;color:var(--text-muted);margin-top:-7px}.market-fee .fx-help{font-size:11px;line-height:1.4}
+.market-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.market-segments,.market-periods{display:flex;gap:4px;padding:4px;border:1px solid var(--border);background:var(--surface-1);border-radius:12px;min-width:0}
+.market-segments button,.market-periods button{border:1px solid transparent;border-radius:8px;padding:9px 12px;color:var(--text-muted);background:transparent;font:700 12px system-ui,sans-serif;cursor:pointer;min-height:36px}.market-segments button[aria-pressed=true],.market-periods button[aria-pressed=true]{background:var(--accent);color:var(--accent-text)}
+.market-reload{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--border);border-radius:11px;background:var(--surface-1);color:var(--text-muted);cursor:pointer}.market-reload:disabled{opacity:.5;cursor:wait}
+.market-status,.market-caption,.market-disclosure{color:var(--text-muted);font-size:12px;line-height:1.5}.market-status{margin:12px 0 16px}.market-status[data-state=error]{color:var(--negative)}
+.market-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}.market-stock{min-width:0;text-align:left;display:flex;flex-direction:column;gap:5px;padding:14px;border-radius:14px;border:1px solid var(--border);background:var(--surface-1);color:var(--text);cursor:pointer;font-family:inherit;transition:border-color .15s,background .15s}.market-stock:hover{border-color:var(--accent)}.market-stock[aria-pressed=true]{border-color:var(--accent);background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--accent)}
+.market-stock-top{display:flex;align-items:center;gap:9px;min-width:0}.market-stock-symbol{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:10px;background:var(--bg-elev);border:1px solid var(--border);font-size:11px;font-weight:800;color:var(--accent)}.market-stock-ticker{display:block;font-weight:800;font-size:13px}.market-stock-exchange,.market-stock-company{display:block;color:var(--text-muted);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.market-stock-company{margin-top:3px}.market-stock-price{font:800 18px ui-monospace,Consolas,monospace;letter-spacing:-.5px;overflow-wrap:anywhere}.market-stock-meta{display:flex;align-items:center;justify-content:space-between;gap:5px;flex-wrap:wrap;font-size:10px;color:var(--text-muted)}.market-change{font-weight:750}.market-change.up{color:var(--positive)}.market-change.down{color:var(--negative)}
+.market-chart-panel{border:1px solid var(--border);background:var(--surface-1);border-radius:18px;padding:18px;min-width:0}.market-chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.market-chart-name{font-weight:800;font-size:16px;overflow-wrap:anywhere}.market-chart-quote{text-align:right;display:flex;flex-direction:column;gap:3px}.market-chart-quote strong{font:800 22px ui-monospace,Consolas,monospace;white-space:nowrap}.market-chart-quote span{font-size:12px}.market-periods{width:fit-content;max-width:100%;margin-bottom:15px}.market-periods button{padding:6px 12px;min-height:34px}.market-chart-wrap{position:relative;height:300px;width:100%;min-width:0}.market-chart-wrap svg{width:100%;height:100%;display:block;overflow:visible}.market-empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:18px;color:var(--text-muted);font-size:13px}.market-empty[hidden],.market-chart-tip[hidden]{display:none}.market-chart-tip{position:absolute;top:6px;right:8px;padding:8px 10px;border-radius:9px;background:var(--bg-elev);border:1px solid var(--border);box-shadow:var(--shadow-sm);font-size:11px;pointer-events:none;color:var(--text)}
+.market-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 12px}.market-metrics>div{display:flex;flex-direction:column;gap:4px;background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;padding:10px}.market-metrics span{font-size:11px;color:var(--text-muted)}.market-metrics strong{font-size:13px;overflow-wrap:anywhere}.market-disclosure{margin-top:14px}
+@media(max-width:700px){.market-nav-inner{grid-template-columns:repeat(3,minmax(0,1fr));border-radius:14px;gap:4px}.market-nav-btn{min-height:40px;padding:7px 4px;font-size:12px}.market-nav-btn svg{width:16px;height:16px}#nbu-converter-pane,#analytics-card,#card-rates-card,#crypto-card,#nbu-stocks,#fx-tools{scroll-margin-top:130px}.market-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.market-chart-panel{padding:12px}.market-chart-wrap{height:240px}.market-periods{width:100%}.market-periods button{flex:1;padding:6px 3px}.market-chart-quote strong{font-size:17px}.market-stock{padding:11px}.market-stock-price{font-size:15px}.market-segments{flex:1}.market-segments button{flex:1;padding:7px 6px}.market-metrics>div{padding:8px}.market-metrics strong{font-size:11px}}
+@media(max-width:340px){.market-grid{grid-template-columns:1fr}.market-nav-btn{font-size:11px}.market-nav-btn svg{display:none}.market-chart-head{flex-wrap:wrap}.market-chart-quote{text-align:left}}
+</style>
 </head>
 <body>
 <aside class="fx-ad-rail left" aria-label="Рекламне місце зліва"><div class="fx-ad-slot" id="adsense-left"><span>Рекламне місце</span>Google AdSense · ліворуч</div></aside><aside class="fx-ad-rail right" aria-label="Рекламне місце справа"><div class="fx-ad-slot" id="adsense-right"><span>Рекламне місце</span>Google AdSense · праворуч</div></aside>
@@ -1786,8 +1817,9 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
     </header>
 
     <main class="container">
+<nav class="market-nav" aria-label="Розділи сайту"><div class="market-nav-inner"><button class="market-nav-btn is-current" type="button" data-market-nav="nbu-converter-pane" aria-current="location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16m-4-4 4 4 4-4M17 20V4m-4 4 4-4 4 4"/></svg><span data-market-uk="Конвертер" data-market-en="Converter">Конвертер</span></button><button class="market-nav-btn" type="button" data-market-nav="analytics-card" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5m0 14h16M7 14l4-4 3 3 6-7"/></svg><span data-market-uk="Курси" data-market-en="Rates">Курси</span></button><button class="market-nav-btn" type="button" data-market-nav="card-rates-card" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 8 9-5 9 5H3Zm2 3v6m5-6v6m4-6v6m5-6v6M3 21h18M3 18h18"/></svg><span data-market-uk="Банки" data-market-en="Banks">Банки</span></button><button class="market-nav-btn" type="button" data-market-nav="crypto-card" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 9-9 9-9-9 9-9Z"/><path d="m3 12 9 3 9-3M12 3v18"/></svg><span data-market-uk="Крипто" data-market-en="Crypto">Крипто</span></button><button class="market-nav-btn" type="button" data-market-nav="nbu-stocks" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5v15h16M8 15l4-4 3 3 5-7m-4 0h4v4"/></svg><span data-market-uk="Акції" data-market-en="Stocks">Акції</span></button><button class="market-nav-btn" type="button" data-market-nav="fx-tools" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span data-market-uk="Інше" data-market-en="Tools">Інше</span></button></div></nav>
 
-        <section class="card">
+        <section class="card" id="nbu-converter-pane">
             <div class="section-head">
                 <h2 class="section-title">
                     <svg viewBox="0 0 24 24"><path d="M7 16V4M7 4L3 8M7 4l4 4M17 8v12M17 20l4-4M17 20l-4-4"/></svg>
@@ -1833,12 +1865,12 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 <button class="fx-chip" type="button" data-quick="+500">+500</button>
                 <button class="fx-chip" type="button" data-quick="+1000">+1 000</button>
             </div>
-            <div class="fx-fee">
-                <span class="fx-fee-label" data-fx="fee">Додаткова комісія (вручну)</span>
-                <input id="fx-fee" type="range" min="0" max="3" step="0.1" value="0" aria-label="Комісія, відсотків">
-                <strong id="fx-fee-value">0.0%</strong>
-                <span class="fx-help" data-fx="feeHint">Враховується у банківському розрахунку</span>
-            </div>
+            <div class="fx-fee market-fee">
+  <div class="market-fee-head"><label class="fx-fee-label" for="fx-fee"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/><path d="M5 19 19 5"/></svg><span data-fx="fee">Додаткова комісія (вручну)</span></label><strong id="fx-fee-value">0,0%</strong></div>
+  <input id="fx-fee" type="range" min="0" max="3" step="0.1" value="0" aria-label="Комісія, відсотків">
+  <div class="market-fee-ticks"><span>0%</span><span>1%</span><span>2%</span><span>3%</span></div>
+  <span class="fx-help" data-fx="feeHint">Враховується у банківському розрахунку</span>
+</div>
             <div class="converter-result">
                 <button class="copy-btn" id="copy-result" title="Копіювати">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1983,6 +2015,23 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
         </section>
 
 
+        <section class="card market-section" id="nbu-stocks">
+ <div class="section-head"><h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5v15h16M8 15l4-4 3 3 5-7m-4 0h4v4"/></svg><span data-market-uk="Акції" data-market-en="Stocks">Акції</span></h2></div>
+ <div class="market-toolbar"><div class="market-segments" role="group" aria-label="Ринки / Markets">
+ <button type="button" data-market-region="ua" aria-pressed="true" data-market-uk="Українські компанії" data-market-en="Ukrainian companies">Українські компанії</button>
+ <button type="button" data-market-region="world" aria-pressed="false" data-market-uk="Світові компанії" data-market-en="Global companies">Світові компанії</button></div>
+ <button type="button" class="market-reload" id="market-reload" aria-label="Оновити / Refresh" title="Оновити / Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2 6m2-12v6h-6"/></svg></button></div>
+ <p class="market-status" id="market-status" role="status">Завантаження котирувань…</p>
+ <div class="market-grid" id="market-grid" role="group" aria-label="Акції / Stocks"></div>
+ <div class="market-chart-panel" id="market-chart-panel">
+ <div class="market-chart-head"><div><div id="market-chart-name" class="market-chart-name">KYIV</div><p id="market-chart-caption" class="market-caption"></p></div><div class="market-chart-quote"><strong id="market-chart-price">—</strong><span id="market-chart-delta"></span></div></div>
+ <div class="market-periods" role="group" aria-label="Період / Period">
+ <button type="button" data-market-period="7" aria-pressed="false" data-market-uk="1Т" data-market-en="1W">1Т</button><button type="button" data-market-period="31" aria-pressed="false" data-market-uk="1М" data-market-en="1M">1М</button><button type="button" data-market-period="92" aria-pressed="false" data-market-uk="3М" data-market-en="3M">3М</button><button type="button" data-market-period="365" aria-pressed="true" data-market-uk="1Р" data-market-en="1Y">1Р</button><button type="button" data-market-period="1827" aria-pressed="false" data-market-uk="5Р" data-market-en="5Y">5Р</button><button type="button" data-market-period="all" aria-pressed="false" data-market-uk="Макс." data-market-en="Max">Макс.</button></div>
+ <div class="market-chart-wrap" id="market-chart-wrap"><svg id="market-chart" role="img" aria-label="Історія цін закриття / Closing price history" viewBox="0 0 700 300" preserveAspectRatio="none"></svg><div id="market-empty" class="market-empty" hidden></div><div id="market-chart-tip" class="market-chart-tip" hidden></div></div>
+ <div class="market-metrics"><div><span data-market-uk="Мінімум" data-market-en="Low">Мінімум</span><strong id="market-min">—</strong></div><div><span data-market-uk="Максимум" data-market-en="High">Максимум</span><strong id="market-max">—</strong></div><div><span data-market-uk="За період" data-market-en="Period change">За період</span><strong id="market-period-delta">—</strong></div></div>
+ <p class="market-caption" id="market-history-note"></p></div>
+ <p class="market-disclosure" data-market-uk="Денні ціни закриття з бази NBU Rate (Yahoo Finance, неофіційне джерело). Дані можуть бути затримані; це не торговельний термінал." data-market-en="Daily closing prices from the NBU Rate database (Yahoo Finance, unofficial source). Quotes may be delayed; this is not a trading terminal.">Денні ціни закриття з бази NBU Rate (Yahoo Finance, неофіційне джерело). Дані можуть бути затримані; це не торговельний термінал.</p>
+ </section>
         <section class="card" id="fx-tools">
             <div class="section-head"><h2 class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 18h7m-3-4v7"/></svg><span data-fx="tools">Зручні інструменти</span></h2></div>
             <div class="fx-tools-grid">
@@ -5023,6 +5072,72 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
   document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.fx-select-shell.open').forEach(el=>{el.classList.remove('open');el.querySelector('.fx-select-trigger')?.setAttribute('aria-expanded','false')})});
   function init(){document.querySelectorAll('select.fx-select').forEach(enhanceSelect)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
+<script id="market-stocks-v27">
+(() => {
+ 'use strict';
+ const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+ const options = [
+    {symbol:'KYIV',name:'Київстар / Kyivstar Group',group:'ua',exchange:'NASDAQ'},
+    {symbol:'MHPC.L',name:'МХП / MHP SE',group:'ua',exchange:'LSE'},
+    {symbol:'FXPO.L',name:'Ferrexpo',group:'ua',exchange:'LSE'},
+    {symbol:'AST.WA',name:'Астарта / Astarta',group:'ua',exchange:'WSE'},
+    {symbol:'AAPL',name:'Apple',group:'world',exchange:'NASDAQ'},
+    {symbol:'MSFT',name:'Microsoft',group:'world',exchange:'NASDAQ'},
+    {symbol:'NVDA',name:'NVIDIA',group:'world',exchange:'NASDAQ'},
+    {symbol:'GOOGL',name:'Alphabet',group:'world',exchange:'NASDAQ'},
+    {symbol:'TSLA',name:'Tesla',group:'world',exchange:'NASDAQ'},
+    {symbol:'AMZN',name:'Amazon',group:'world',exchange:'NASDAQ'}
+ ];
+ const t=(uk,en)=>document.documentElement.lang==='en'?en:uk;
+ const locale=()=>t('uk-UA','en-US');
+ const text=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+ const num=v=>v!==null&&v!==''&&v!==undefined&&Number.isFinite(Number(v))?Number(v):null;
+ const fmt=(v,cc)=>v===null?'—':new Intl.NumberFormat(locale(),{minimumFractionDigits:2,maximumFractionDigits:4}).format(v)+(cc?' '+cc:'');
+ const pct=v=>v===null?'—':(v>0?'+':'')+new Intl.NumberFormat(locale(),{minimumFractionDigits:2,maximumFractionDigits:2}).format(v)+'%';
+ const date=(v,short=false)=>{const d=new Date(v);return Number.isFinite(+d)?d.toLocaleDateString(locale(),{day:'2-digit',month:'short',...(short?{}:{year:'numeric'}),timeZone:'UTC'}):'—';};
+ const timestamp=v=>{const x=Date.parse(v||'');return Number.isFinite(x)?x:0;};
+ const clock=v=>{const d=new Date(v);return Number.isFinite(+d)?d.toLocaleString(locale(),{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Kyiv'}):'—';};
+ const cash=q=>typeof q?.currency==='string'?q.currency:'';
+ const history=q=>Object.entries(q?.history||{}).map(([d,v])=>[d,num(v)]).filter(([d,v])=>/^\d{4}-\d{2}-\d{2}$/.test(d)&&timestamp(d)>0&&v!==null&&v>0).sort((a,b)=>a[0].localeCompare(b[0]));
+ const delta=q=>{const a=history(q);return a.length>=2?(a[a.length-1][1]/a[a.length-2][1]-1)*100:null;};
+ const stale=q=>!timestamp(q?.asOf)||Date.now()-timestamp(q.asOf)>5*86400000||timestamp(q.asOf)>Date.now()+86400000;
+ const color=(el,v)=>{el.classList.toggle('up',v!==null&&v>0);el.classList.toggle('down',v!==null&&v<0);el.classList.add('market-change');};
+ let region='ua', symbol='KYIV', period='365', quotes={}, checked=0, online=false, busy=false, attempted=false, chartPoints=[];
+ const cacheKey='nbu_stocks_quotes_v1';
+ try{const c=JSON.parse(safeLS.getItem(cacheKey)||'null');if(c&&typeof c.data==='object'&&c.data)quotes=c.data;}catch(_){}
+ function merge(data){for(const o of options){const q=data?.[o.symbol];if(!q||typeof q!=='object'||!(num(q.price)>0)||!cash(q)||!timestamp(q.asOf))continue;const old=quotes[o.symbol];if(!old||timestamp(q.asOf)>=timestamp(old.asOf)){quotes[o.symbol]={...q,history:{...(old&&cash(old)===cash(q)?old.history:{}),...(q.history||{})}};}}}
+ function make(tag,cls,txt){const x=document.createElement(tag);if(cls)x.className=cls;if(txt!==undefined)x.textContent=txt;return x;}
+ function press(sel,key,value){$$(sel).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[key]===value)));}
+ function status(){const el=$('#market-status');if(!el)return;const available=options.filter(o=>quotes[o.symbol]).length;el.dataset.state=attempted&&!online&&!busy?'error':'ok';el.textContent=busy?t('Перевіряємо котирування…','Checking quotes…'):online?t(`Дані: ${available}/${options.length} · Перевірено ${clock(checked)}`,`Quotes: ${available}/${options.length} · Checked ${clock(checked)}`):attempted?t(available?'Не синхронізовано · збережені котирування':'Котирування недоступні',available?'Not synchronized · saved quotes':'Quotes unavailable'):t('Завантаження котирувань…','Loading quotes…');}
+ function cards(){const grid=$('#market-grid');grid.replaceChildren();for(const o of options.filter(o=>o.group===region)){const q=quotes[o.symbol],price=num(q?.price),ch=delta(q);const b=make('button','market-stock');b.type='button';b.setAttribute('aria-pressed',String(symbol===o.symbol));const top=make('span','market-stock-top');top.append(make('span','market-stock-symbol',o.symbol.split('.')[0].slice(0,4)));const meta=make('span');meta.style.minWidth='0';meta.append(make('span','market-stock-ticker',o.symbol),make('span','market-stock-exchange',o.exchange));top.append(meta);b.append(top,make('span','market-stock-company',o.name),make('span','market-stock-price',fmt(price,cash(q))));const sub=make('span','market-stock-meta');const c=make('span','market-change',pct(ch));color(c,ch);sub.append(c,make('span','',q?(stale(q)?t('Застарілі · ','Stale · '):'')+date(q.asOf,true):t('Немає даних','No data')));b.append(sub);b.addEventListener('click',()=>{symbol=o.symbol;grid.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));plot();});grid.append(b);}}
+ const ns='http://www.w3.org/2000/svg';
+ function sv(tag,attrs={},txt){const el=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,String(v));if(txt!==undefined)el.textContent=txt;return el;}
+ function plot(){const o=options.find(x=>x.symbol===symbol),q=quotes[symbol],cc=cash(q),a=history(q),last=a[a.length-1],cut=period==='all'?-Infinity:(last?timestamp(last[0]):0)-(Number(period)-1)*86400000;const series=a.filter(([d])=>timestamp(d)>=cut),first=series[0],end=series[series.length-1],p=num(q?.price),d=delta(q),pd=first&&end&&series.length>1?(end[1]/first[1]-1)*100:null;
+ text('market-chart-name',symbol+' · '+(o?.name||''));text('market-chart-caption',q?t('Ціна закриття · ','Closing price · ')+date(q.asOf)+(stale(q)?t(' · застарілі дані',' · stale'):''):t('Котирування недоступне','Quote unavailable'));text('market-chart-price',fmt(p,cc));text('market-chart-delta',pct(d));color($('#market-chart-delta'),d);const svg=$('#market-chart'),empty=$('#market-empty');svg.replaceChildren();$('#market-chart-tip').hidden=true;chartPoints=[];
+ const vals=series.map(x=>x[1]);text('market-min',fmt(vals.length?Math.min(...vals):null,cc));text('market-max',fmt(vals.length?Math.max(...vals):null,cc));text('market-period-delta',pct(pd));color($('#market-period-delta'),pd);text('market-history-note',series.length?t(`${date(first[0])} — ${date(end[0])} · ${series.length} торгових днів`,`${date(first[0])} — ${date(end[0])} · ${series.length} trading days`):'');
+ empty.hidden=series.length>=2;empty.textContent=t('Недостатньо історії за цей період','Not enough history for this period');if(series.length<2)return;
+ const w=Math.max(240,Math.round(svg.clientWidth||700)),h=Math.max(180,Math.round(svg.clientHeight||300)),left=8,right=w-57,top=16,bottom=h-29;svg.setAttribute('viewBox',`0 0 ${w} ${h}`);let lo=Math.min(...vals),hi=Math.max(...vals);const pad=Math.max((hi-lo)*.10,hi*.005,.0001);lo-=pad;hi+=pad;const from=timestamp(first[0]),to=timestamp(end[0]);const x=d=>left+(timestamp(d)-from)/(to-from||1)*(right-left),y=v=>top+(hi-v)/(hi-lo)*(bottom-top);const lineColor=pd===null?'var(--accent)':pd>=0?'var(--positive)':'var(--negative)';const defs=sv('defs');const grad=sv('linearGradient',{id:'market-fill',x1:'0',x2:'0',y1:'0',y2:'1'});grad.append(sv('stop',{offset:'0%','stop-color':lineColor,'stop-opacity':.18}),sv('stop',{offset:'100%','stop-color':lineColor,'stop-opacity':0}));defs.append(grad);svg.append(defs);
+ for(let i=0;i<=4;i++){const yy=top+(bottom-top)*i/4,v=hi-(hi-lo)*i/4;svg.append(sv('line',{x1:left,y1:yy,x2:right,y2:yy,stroke:'var(--border)','stroke-dasharray':'3 4'}),sv('text',{x:right+5,y:yy+4,fill:'var(--text-muted)','font-size':10},new Intl.NumberFormat(locale(),{maximumFractionDigits:2,notation:Math.abs(v)>=10000?'compact':'standard'}).format(v)));}
+ const points=series.map(([d,v])=>({d,v,x:x(d),y:y(v)}));chartPoints=points;const path=points.map((p,i)=>(i?'L':'M')+p.x.toFixed(2)+' '+p.y.toFixed(2)).join(' ');svg.append(sv('path',{d:path+` L${points[points.length-1].x} ${bottom} L${points[0].x} ${bottom} Z`,fill:'url(#market-fill)'}),sv('path',{d:path,fill:'none',stroke:lineColor,'stroke-width':2.1,'stroke-linejoin':'round','stroke-linecap':'round','vector-effect':'non-scaling-stroke'}));
+ const ticks=w<420?3:5;for(let i=0;i<ticks;i++){const v=from+(to-from)*i/(ticks-1),xx=left+(right-left)*i/(ticks-1);svg.append(sv('text',{x:xx,y:h-7,fill:'var(--text-muted)','font-size':10,'text-anchor':i===0?'start':i===ticks-1?'end':'middle'},new Date(v).toLocaleDateString(locale(),{month:'short',day:'numeric',...(to-from>365*86400000?{year:'2-digit'}:{}),timeZone:'UTC'})));}
+ svg.append(sv('g',{id:'market-crosshair',visibility:'hidden'}));}
+ $('#market-chart').addEventListener('pointermove',e=>{if(!chartPoints.length)return;const svg=$('#market-chart'),r=svg.getBoundingClientRect(),x=(e.clientX-r.left)*svg.viewBox.baseVal.width/r.width;const p=chartPoints.reduce((a,b)=>Math.abs(b.x-x)<Math.abs(a.x-x)?b:a);const g=$('#market-crosshair');if(!g)return;g.replaceChildren(sv('line',{x1:p.x,y1:16,x2:p.x,y2:svg.viewBox.baseVal.height-29,stroke:'var(--text-muted)','stroke-dasharray':'3 4'}),sv('circle',{cx:p.x,cy:p.y,r:4,fill:'var(--accent)',stroke:'var(--bg-elev)','stroke-width':2}));g.setAttribute('visibility','visible');const tip=$('#market-chart-tip');tip.textContent=date(p.d)+' · '+fmt(p.v,cash(quotes[symbol]));tip.hidden=false;});
+ $('#market-chart').addEventListener('pointerleave',()=>{const g=$('#market-crosshair');if(g)g.setAttribute('visibility','hidden');$('#market-chart-tip').hidden=true;});
+ function render(){status();cards();plot();}
+ async function get(url){const c=new AbortController(),tm=setTimeout(()=>c.abort(),10000);try{const r=await fetch(url+'?v='+Math.floor(Date.now()/300000),{cache:'no-store',signal:c.signal});if(!r.ok)throw Error('HTTP '+r.status);const j=await r.json();if(!j?.data||typeof j.data!=='object'||Array.isArray(j.data))throw Error('Invalid feed');return j;}finally{clearTimeout(tm);}}
+ async function load(){if(busy)return;attempted=true;if(navigator.onLine===false){online=false;status();return;}busy=true;$('#market-reload').disabled=true;status();try{const urls=['https://raw.githubusercontent.com/He-Trogati-Mne/nbu-rate-data/main/data/stocks.json','https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@main/data/stocks.json'];const res=await Promise.allSettled(urls.map(get));const valid=res.filter(x=>x.status==='fulfilled').map(x=>x.value).sort((a,b)=>timestamp(a.updatedAt)-timestamp(b.updatedAt));online=valid.length>0;if(online){for(const j of valid)merge(j.data);checked=Date.now();try{safeLS.setItem(cacheKey,JSON.stringify({data:quotes}));}catch(_){}}}finally{busy=false;$('#market-reload').disabled=false;render();}}
+ $$('.market-segments button').forEach(b=>b.addEventListener('click',()=>{region=b.dataset.marketRegion;symbol=options.find(o=>o.group===region).symbol;press('[data-market-region]','marketRegion',region);render();}));
+ $$('.market-periods button').forEach(b=>b.addEventListener('click',()=>{period=b.dataset.marketPeriod;press('[data-market-period]','marketPeriod',period);plot();}));$('#market-reload').addEventListener('click',load);
+ const tabs=$$('[data-market-nav]');function navSelect(b){tabs.forEach(x=>{x.classList.toggle('is-current',x===b);if(x===b)x.setAttribute('aria-current','location');else x.removeAttribute('aria-current');});}tabs.forEach(b=>b.addEventListener('click',()=>{navSelect(b);document.getElementById(b.dataset.marketNav)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});}));
+ let pending=false;window.addEventListener('scroll',()=>{if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;const offset=($('.market-nav')?.getBoundingClientRect().height||80)+40;let b=tabs[0];for(const tab of tabs){if(document.getElementById(tab.dataset.marketNav)?.getBoundingClientRect().top<=offset)b=tab;}navSelect(b);});},{passive:true});
+ const fee=$('#fx-fee');function updateFee(){fee.style.setProperty('--fee-progress',(Number(fee.value)/Number(fee.max)*100)+'%');}fee?.addEventListener('input',updateFee);updateFee();window.addEventListener('load',updateFee);setTimeout(updateFee,300);
+ function translate(){$$('[data-market-uk]').forEach(el=>el.textContent=t(el.dataset.marketUk,el.dataset.marketEn));render();}new MutationObserver(translate).observe(document.documentElement,{attributes:true,attributeFilter:['lang','data-theme']});
+ if('ResizeObserver' in window)new ResizeObserver(()=>{plot();}).observe($('#market-chart-wrap'));else window.addEventListener('resize',plot);
+ window.addEventListener('online',load);window.addEventListener('offline',()=>{online=false;status();});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(!checked||Date.now()-checked>=300000))load();});setInterval(()=>{if(!document.hidden)load();},300000);
+ translate();load();
 })();
 </script>
 </body>
