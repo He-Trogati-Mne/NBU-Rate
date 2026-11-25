@@ -1,4 +1,4 @@
-   <!DOCTYPE html>
+    <!DOCTYPE html>
     <html lang="uk">
     <head>
     <meta charset="UTF-8">
@@ -1763,7 +1763,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 <p class="hero-subtitle" data-i18n="hero_subtitle">Офіційні курси валют, конвертер та історія з 2003 року</p>
                 <div class="hero-status" id="hero-status">
                     <span class="status-dot"></span>
-                    <span id="status-text">Завантаження...</span>
+                    <span style="display:flex;flex-direction:column;gap:2px;text-align:left"><span id="status-text">Завантаження...</span><small id="sync-text" style="font-size:11px;font-weight:500;color:var(--text-muted)" hidden></small></span>
                 </div>
             </div>
             <button class="settings-btn" id="open-settings" title="Налаштування">
@@ -2547,7 +2547,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
         // =============== CONFIG ===============
         const DATA          = 'https://raw.githubusercontent.com/He-Trogati-Mne/nbu-rate-data/main/data';
         const DATA_JSDELIVR = 'https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@main/data';
-        const BASE_DATA_URL = DATA_JSDELIVR;
+        const BASE_DATA_URL = DATA;
         const CRYPTO_ICONS  = 'https://cdn.jsdelivr.net/npm/cryptocurrency-icons@0.18.1/svg/color';
         const COINGECKO_FALLBACK = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,tether,binancecoin,solana,usd-coin,ripple,cardano,dogecoin,avalanche-2,tron,the-open-network,chainlink,polkadot,litecoin,dai,wrapped-bitcoin,uniswap,near,aptos,arbitrum,optimism,sui,stellar&order=market_cap_desc&per_page=25&page=1&sparkline=true&price_change_percentage=24h';
 
@@ -2677,7 +2677,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 a11y_underline: 'Підкреслювати зміну курсу', a11y_underline_desc: 'Стрілки ↑↓→ підкреслені — видно без кольору', a11y_font: 'Великий шрифт', a11y_font_desc: 'Розмір тексту інтерфейсу (100–150%)',
                 period_1d: '1 День', period_5d: '5 Днів', period_7d: '7 Днів', period_1m: '1 Місяць', period_6m: '6 Міс.', period_1y: '1 Рік', period_5y: '5 Років', period_max: 'Макс.',
                 picker_title_from: 'З валюти', picker_title_to: 'У валюту', picker_search: 'Пошук (USD, Долар...)',
-                status_loading: 'Завантаження курсів...', status_loading_n: 'Завантажено {n}/{total} валют...', status_updated: 'Оновлено {date}',
+                status_loading: 'Завантаження курсів...', status_loading_n: 'Завантажено {n}/{total} валют...', status_updated: 'Курс НБУ на {date}',
                 status_error: 'Помилка завантаження', status_rate_limited: 'Забагато запитів, спробуйте пізніше', status_cors: 'Не вдалося отримати дані (мережа/проксі)',
                 no_data: 'Дані ще не завантажені', insufficient_data: 'Недостатньо даних', buy_label: 'Купівля', sell_label: 'Продаж',
                 min_label: 'Мін', max_label: 'Макс', current_label: 'Зараз',
@@ -2705,7 +2705,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 a11y_underline: 'Underline rate changes', a11y_underline_desc: '↑↓→ arrows underlined', a11y_font: 'Large font', a11y_font_desc: 'Interface text size (100–150%)',
                 period_1d: '1 Day', period_5d: '5 Days', period_7d: '7 Days', period_1m: '1 Month', period_6m: '6 Mos', period_1y: '1 Year', period_5y: '5 Years', period_max: 'Max',
                 picker_title_from: 'From', picker_title_to: 'To', picker_search: 'Search (USD, Dollar...)',
-                status_loading: 'Loading rates...', status_loading_n: 'Loaded {n}/{total} currencies...', status_updated: 'Updated {date}',
+                status_loading: 'Loading rates...', status_loading_n: 'Loaded {n}/{total} currencies...', status_updated: 'NBU rate for {date}',
                 status_error: 'Loading error', status_rate_limited: 'Too many requests, try later', status_cors: 'Failed to fetch (network/proxy)',
                 no_data: 'Data not loaded yet', insufficient_data: 'Not enough data', buy_label: 'Buy', sell_label: 'Sell',
                 min_label: 'Min', max_label: 'Max', current_label: 'Now',
@@ -2771,6 +2771,12 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
         let cryptoDataMap = {};
         let latestDate = '';
         let liveDate = '';
+        let liveUpdatedAt = 0, liveSyncedAt = 0, liveFromCache = true;
+        let liveLoadPromise = null, initialLoadPromise = null, pollPromise = null;
+        let cryptoLoadPromise = null, cryptoUpdatedAt = 0;
+        let bankLoadPromise = null, lastBankPoll = 0;
+        const BANK_POLL_INTERVAL = 30 * 60 * 1000;
+        const bankMeta = {};
         let pickerTarget = null;
         let historyLoading = false;
         let fullHistoryReady = false;
@@ -2889,8 +2895,31 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 return c.data;
             } catch { return null; }
         }
-        function saveLiveCache(source, data) {
-            try { safeLS.setItem(cacheKey(source), JSON.stringify({ timestamp: Date.now(), data })); } catch (e) {}
+        function saveLiveCache(source, data, updatedAt = 0) {
+            try { safeLS.setItem(cacheKey(source), JSON.stringify({ timestamp: Date.now(), updatedAt, data })); } catch (e) {}
+        }
+        function cachedSnapshot(source) {
+            try { return JSON.parse(safeLS.getItem(cacheKey(source)) || 'null'); } catch (_) { return null; }
+        }
+        function dataTimestamp(value) {
+            if (typeof value === 'number') return Number.isFinite(value) && value > 0 ? value : 0;
+            const ms = Date.parse(value || '');
+            return Number.isFinite(ms) ? ms : 0;
+        }
+        // Fetch both mirrors independently; the primary wins ties. A CDN response
+        // is not assumed to be current just because the HTTP request succeeded.
+        async function fetchFeedCandidates(name, timeout = 12000) {
+            const urls = [`${DATA}/${name}.json`, `${DATA_JSDELIVR}/${name}.json`];
+            const results = await Promise.all(urls.map(async url => {
+                try {
+                    const res = await fetchWithTimeout(`${url}?t=${Date.now()}`, timeout, 0);
+                    return res.ok ? await res.json() : null;
+                } catch (_) { return null; }
+            }));
+            return results.filter(x => x && typeof x === 'object');
+        }
+        function chooseNewest(candidates) {
+            return candidates.reduce((best, next) => !best || next.updatedAt > best.updatedAt ? next : best, null);
         }
         function loadHistoryCache() {
             try {
@@ -3081,7 +3110,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             if (Object.keys(liveRates).length > 0) {
                 renderCards(liveRates);
                 const d = liveDate || formatDate(latestDate);
-                if (d) setStatus(t('status_updated', {date: d}), '');
+                if (d) updateLiveStatus();
             }
             if ($('#picker-modal').classList.contains('visible')) renderPickerList($('#picker-search').value);
             if ($('#crypto-chart-modal').classList.contains('visible')) renderCryptoModalChart();
@@ -3102,6 +3131,21 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             if (!el || !txt) return;
             el.classList.remove('loading', 'error'); if (state) el.classList.add(state);
             txt.textContent = text;
+            const sync = $('#sync-text'); if (sync && state) sync.hidden = true;
+        }
+        function updateLiveStatus() {
+            if (!liveDate) return;
+            setStatus(t('status_updated', {date: formatDate(toRateDateIso(liveDate))}), '');
+            const el = $('#sync-text'); if (!el) return;
+            const en = currentLang === 'en';
+            const fmt = ms => new Date(ms).toLocaleString(en ? 'en-GB' : 'uk-UA', {
+                timeZone: 'Europe/Kyiv', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'
+            });
+            el.textContent = liveFromCache
+                ? (en ? 'Saved data · live sync unavailable' : 'Збережені дані · синхронізація недоступна')
+                : `${en ? 'Synced' : 'Синхронізовано'}: ${fmt(liveSyncedAt)} · ${en ? 'Kyiv' : 'Київ'}`;
+            if (liveUpdatedAt) el.textContent += ` · ${en ? 'JSON' : 'JSON'}: ${fmt(liveUpdatedAt)}`;
+            el.hidden = false;
         }
         function formatDate(iso) { if (!iso) return ''; const [y, m, d] = iso.split('-'); return `${d}.${m}.${y}`; }
         function formatNumber(num, decimals = null) {
@@ -3120,41 +3164,55 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             return '$' + n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
         }
 
+        function normalizeNbuSnapshot(raw, updatedAt = 0) {
+            const arr = Array.isArray(raw) ? raw : raw?.data;
+            if (!Array.isArray(arr)) return null;
+            const rows = arr.map(item => ({cc:String(item?.cc || '').toUpperCase(),
+                name:t(item?.cc || '') || item?.txt, rate:Number(item?.rate),
+                date:toRateDateIso(item?.exchangedate || item?.date), hasBuySell:false}))
+                .filter(r => /^[A-Z]{3}$/.test(r.cc) && Number.isFinite(r.rate) && r.rate > 0 && r.date);
+            const dates = [...new Set(rows.map(r => r.date))].sort().reverse();
+            // Require both main currencies on the same published date; never mix dates.
+            for (const date of dates) {
+                const rates = rows.filter(r => r.date === date);
+                if (!rates.some(r => r.cc === 'USD') || !rates.some(r => r.cc === 'EUR')) continue;
+                return {date, rates, updatedAt:dataTimestamp(updatedAt || raw?.updatedAt)};
+            }
+            return null;
+        }
+        function isNewerNbu(next, previous) {
+            return !previous || next.date > previous.date ||
+                (next.date === previous.date && next.updatedAt >= previous.updatedAt);
+        }
+        function applyNbuSnapshot(snapshot) {
+            liveRates = Object.fromEntries(snapshot.rates.map(r => [r.cc, r]));
+            liveDate = formatDate(snapshot.date);
+            liveUpdatedAt = snapshot.updatedAt;
+        }
         async function loadLiveRates(source) {
-            const fresh = loadLiveCache(source, false);
-            const stale = loadLiveCache(source, true);
-            if (fresh || stale) {
-                const use = fresh || stale;
-                liveRates = {}; use.forEach(r => { liveRates[r.cc] = r; });
-                const firstWithDate = use.find(r => r.date);
-                if (firstWithDate) liveDate = firstWithDate.date;
-                saveLiveCache(source, use);
-            }
-
-            try {
-                const candidates = [URLS[source], `${DATA}/${source}.json`];
-                let json = null;
-                for (const url of candidates) {
-                    try {
-                        const res = await fetchWithTimeout(`${url}?t=${Date.now()}`, REQUEST_TIMEOUT, 1);
-                        if (!res.ok) continue;
-                        json = await res.json();
-                        if (json && (Array.isArray(json.data) || Array.isArray(json))) break;
-                    } catch (e) {}
+            if (liveLoadPromise) return liveLoadPromise;
+            liveLoadPromise = (async () => {
+                const cached = cachedSnapshot(source);
+                const local = normalizeNbuSnapshot(cached?.data, cached?.updatedAt);
+                let previous = normalizeNbuSnapshot(Object.values(liveRates), liveUpdatedAt);
+                if (local && isNewerNbu(local, previous)) { previous = local; applyNbuSnapshot(local); }
+                const feeds = await fetchFeedCandidates(source);
+                let best = null;
+                for (const raw of feeds) {
+                    const next = normalizeNbuSnapshot(raw);
+                    if (next && (!best || next.date > best.date || (next.date === best.date && next.updatedAt > best.updatedAt))) best = next;
                 }
-                if (!json) throw new Error('Failed to load live rates');
-                const arr = Array.isArray(json) ? json : (json.data || []);
-                const rates = arr.map(item => ({ cc: item.cc, name: t(item.cc) || item.txt, rate: item.rate, date: item.exchangedate, hasBuySell: false }));
-                if (rates.length === 0) throw new Error('Empty');
-                liveRates = {}; rates.forEach(r => { liveRates[r.cc] = r; });
-                const firstWithDate = rates.find(r => r.date);
-                if (firstWithDate) liveDate = firstWithDate.date;
-                saveLiveCache(source, rates);
+                if (best && isNewerNbu(best, previous)) {
+                    applyNbuSnapshot(best);
+                    liveSyncedAt = Date.now(); liveFromCache = false;
+                    saveLiveCache(source, best.rates, best.updatedAt);
+                } else {
+                    liveFromCache = true;
+                    if (!previous) throw new Error('No valid NBU snapshot');
+                }
                 return liveRates;
-            } catch (e) {
-                if (Object.keys(liveRates).length === 0) throw e;
-                return liveRates;
-            }
+            })();
+            try { return await liveLoadPromise; } finally { liveLoadPromise = null; }
         }
 
         async function fetchHistoryForCurrency(valcode) {
@@ -3192,18 +3250,27 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             return base;
         }
 
+        function mergeLiveIntoHistory() {
+            const iso = toRateDateIso(liveDate);
+            if (!iso) return;
+            const current = {};
+            Object.values(liveRates).forEach(r => {
+                if (toRateDateIso(r.date) === iso && Number(r.rate) > 0) current[r.cc] = Number(r.rate);
+            });
+            mergeHistory(historicalRates, {[iso]:current});
+            latestDate = Object.keys(historicalRates).sort().pop() || '';
+        }
         async function refreshRecentHistoryIfNeeded() {
             const iso = toRateDateIso(liveDate);
             if (!iso) return;
             const previousDay = new Date(Date.parse(iso + 'T00:00:00Z') - 86400000).toISOString().slice(0, 10);
-            if (historicalRates[previousDay] && Number(historicalRates[previousDay].USD) > 0 && Number(historicalRates[previousDay].EUR) > 0) return;
-            try {
-                const recent = await fetchRecentHistory();
-                if (!Object.keys(recent).length) return;
-                mergeHistory(historicalRates, recent);
-                latestDate = Object.keys(historicalRates).sort().pop() || '';
-                if (fullHistoryReady) saveHistoryCache(historicalRates);
-            } catch (e) { console.warn('NBU recent history unavailable:', e.message); }
+            const prev = historicalRates[previousDay];
+            if (!prev || Object.keys(liveRates).some(code => !(Number(prev[code]) > 0))) {
+                try { mergeHistory(historicalRates, await fetchRecentHistory()); }
+                catch (e) { console.warn('NBU recent history unavailable:', e.message); }
+            }
+            mergeLiveIntoHistory();
+            if (fullHistoryReady) saveHistoryCache(historicalRates);
         }
 
         async function fetchRecentHistory() {
@@ -3249,7 +3316,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 return;
             }
 
-            for (const urlBase of [URLS_RAW.history, URLS.history]) {
+            for (const urlBase of [URLS_RAW.history, `${DATA_JSDELIVR}/nbu-history.json`]) {
                 try {
                     const res = await fetchWithTimeout(`${urlBase}?t=${Date.now()}`, REQUEST_TIMEOUT, 1);
                     if (!res.ok) continue;
@@ -3282,6 +3349,11 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
         }
 
         async function loadAll() {
+            if (initialLoadPromise) return initialLoadPromise;
+            initialLoadPromise = loadAllInternal();
+            try { return await initialLoadPromise; } finally { initialLoadPromise = null; }
+        }
+        async function loadAllInternal() {
             const container = $('#current-rates');
             setStatus(t('status_loading'), 'loading');
 
@@ -3294,11 +3366,10 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 setTimeout(loadSecondarySections, 100);
             }
 
-            const stale = loadLiveCache('nbu', true);
-            if (stale && Array.isArray(stale)) {
-                stale.forEach(r => { liveRates[r.cc] = r; });
-                const firstWithDate = stale.find(r => r.date);
-                if (firstWithDate) liveDate = firstWithDate.date;
+            const saved = cachedSnapshot('nbu');
+            const stale = normalizeNbuSnapshot(saved?.data, saved?.updatedAt);
+            if (stale) {
+                if (isNewerNbu(stale, normalizeNbuSnapshot(Object.values(liveRates), liveUpdatedAt))) applyNbuSnapshot(stale);
                 if (Object.keys(liveRates).length > 0) {
                     const cachedHistory = loadHistoryCache();
                     if (cachedHistory && Object.keys(cachedHistory).length > 0) {
@@ -3321,10 +3392,9 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 
                 renderCards(liveRates);
                 initConverter(liveRates);
-                fxRefreshAll(); fxCheckAlert();
+                fxRefreshAll(); if (!liveFromCache) fxCheckAlert();
 
-                const dateNow = liveDate || formatDate(latestDate) || new Date().toLocaleDateString('uk-UA');
-                setStatus(t('status_updated', {date: dateNow}), '');
+                updateLiveStatus();
 
                 if (!fullHistoryReady) {
                     if (!historyLoading) {
@@ -3335,8 +3405,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                                 renderChart();
                                 fxUpdateHistoric();
                                 renderCards(liveRates);
-                                const d = liveDate || formatDate(latestDate) || new Date().toLocaleDateString('uk-UA');
-                                setStatus(t('status_updated', {date: d}), '');
+                                updateLiveStatus();
                             })
                             .catch(() => { renderChart(); })
                             .finally(() => { historyLoading = false; });
@@ -3631,21 +3700,24 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 }
             } catch {}
 
-            return new Set(['privat', 'mono']);
+            return new Set(BANKS_CONFIG.map(b => b.id));
         }
 
-        async function fetchBankData(bank) {
-            const urls = [`${DATA}/${bank.id}.json`, `${BASE_DATA_URL}/${bank.id}.json`];
-            for (const url of urls) {
-                try {
-                    const res = await fetchWithTimeout(`${url}?t=${Date.now()}`, 8000, 0);
-                    if (!res.ok) continue;
-                    const json = await res.json();
-                    const norm = normalizeBankData(bank.id, json.data || json);
-                    if (norm) return norm;
-                } catch (e) {}
+        async function fetchBankData(bank, previous = null, previousMeta = {}) {
+            const feeds = await fetchFeedCandidates(bank.id, 8000);
+            const candidates = feeds.map(json => {
+                const data = normalizeBankData(bank.id, json.data || json);
+                if (!data || !CARD_RATE_ORDER.some(c => Number(data[c]?.buy) > 0 && Number(data[c]?.sell) > 0)) return null;
+                return {data, updatedAt:dataTimestamp(json.updatedAt), rateType:json.rateType || null};
+            }).filter(Boolean);
+            const best = chooseNewest(candidates);
+            const oldStamp = dataTimestamp(previousMeta.updatedAt);
+            if (best && (!previous || best.updatedAt >= oldStamp)) {
+                bankMeta[bank.id] = {updatedAt:best.updatedAt, rateType:best.rateType, cached:false};
+                return best.data;
             }
-            return null;
+            if (previous) bankMeta[bank.id] = {...previousMeta, updatedAt:oldStamp, cached:true};
+            return previous;
         }
 
         function renderBankSlide(bank, data) {
@@ -3697,34 +3769,37 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
         }
 
         async function initBankCarousel() {
+            if (bankLoadPromise) return bankLoadPromise;
+            bankLoadPromise = refreshBankCarousel();
+            try { return await bankLoadPromise; } finally { bankLoadPromise = null; }
+        }
+        async function refreshBankCarousel() {
             const track = $('#bank-track');
             if (!track) return;
 
-            track.innerHTML = `<div class="bank-slide active"><div class="bank-slide-inner"><div class="bank-slide-header"><div class="skeleton-shape" style="width:54px;height:54px;border-radius:14px;"></div><div class="skeleton-shape" style="width:140px;height:18px;"></div></div><div class="bank-slide-rates"><div class="skeleton-shape" style="height:82px;"></div><div class="skeleton-shape" style="height:82px;"></div></div></div></div>`;
+            if (!bankCarouselState.total) track.innerHTML = `<div class="bank-slide active"><div class="bank-slide-inner"><div class="bank-slide-header"><div class="skeleton-shape" style="width:54px;height:54px;border-radius:14px;"></div><div class="skeleton-shape" style="width:140px;height:18px;"></div></div><div class="bank-slide-rates"><div class="skeleton-shape" style="height:82px;"></div><div class="skeleton-shape" style="height:82px;"></div></div></div></div>`;
 
             const availableIds = await getAvailableBankIds();
-            const activeBanks = BANKS_CONFIG.filter(b => availableIds.has(b.id));
             let bankCache = null;
             try { bankCache = JSON.parse(safeLS.getItem('nbu_site_banks_cache_v1') || 'null'); } catch (_) {}
-            const results = await Promise.all(activeBanks.map(async bank => ({ bank, data: await fetchBankData(bank) })));
-            const fetched = results.filter(r => r.data && CARD_RATE_ORDER.some(c => r.data[c]));
-            if (fetched.length) {
-                const combined = { ...(bankCache?.banks || {}) };
-                fetched.forEach(r => { combined[r.bank.id] = r.data; });
-                safeLS.setItem('nbu_site_banks_cache_v1', JSON.stringify({ timestamp: Date.now(), banks: combined }));
-            }
-            const visible = results.filter(r => r.data != null && CARD_RATE_ORDER.some(c => r.data[c]));
-            if (!visible.length && bankCache?.banks) {
-                BANKS_CONFIG.forEach(bank => {
-                    const data = bankCache.banks[bank.id];
-                    if (data && CARD_RATE_ORDER.some(c => data[c])) visible.push({bank, data});
-                });
-            }
+            const activeBanks = BANKS_CONFIG.filter(b => availableIds.has(b.id) || bankCache?.banks?.[b.id] || fxBankData[b.id]);
+            const results = [];
+            await loadWithConcurrency(activeBanks, 6, async bank => {
+                const previous = fxBankData[bank.id] || bankCache?.banks?.[bank.id] || null;
+                const meta = bankMeta[bank.id] || bankCache?.meta?.[bank.id] || {};
+                const data = await fetchBankData(bank, previous, meta);
+                if (data) results.push({bank,data});
+            });
+            const visible = activeBanks.map(bank => results.find(r => r.bank.id === bank.id)).filter(r => r && CARD_RATE_ORDER.some(c => r.data[c]));
             fxBankData = Object.fromEntries(visible.map(r => [r.bank.id, r.data]));
-            if (!fetched.length && visible.length && bankCache) {
-                const last = new Date(bankCache.timestamp).toLocaleString(currentLang === 'en' ? 'en-US' : 'uk-UA');
-                $('#fx-bank-count').dataset.cachedAt = last;
-            } else { delete $('#fx-bank-count').dataset.cachedAt; }
+            if (visible.length) safeLS.setItem('nbu_site_banks_cache_v1', JSON.stringify({timestamp:Date.now(), banks:fxBankData, meta:bankMeta}));
+            const count = $('#fx-bank-count');
+            if (count) {
+                delete count.dataset.cachedAt;
+                const cachedCount = visible.filter(r => bankMeta[r.bank.id]?.cached).length;
+                count.dataset.cachedCount = String(cachedCount);
+            }
+            lastBankPoll = Date.now();
             fxDrawBanks();
 
             if (visible.length === 0) {
@@ -3907,40 +3982,39 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
         }
 
         async function loadCrypto() {
-            const grid = $('#crypto-grid');
-            if (!grid) return;
+            if (cryptoLoadPromise) return cryptoLoadPromise;
+            cryptoLoadPromise = refreshCrypto();
+            try { return await cryptoLoadPromise; } finally { cryptoLoadPromise = null; }
+        }
+        async function refreshCrypto() {
+            const grid = $('#crypto-grid'); if (!grid) return;
             try {
-                const cached = loadLiveCache('crypto') || loadLiveCache('crypto', true);
-                let normalized = normalizeCryptoData(cached);
-
-                if (normalized.length === 0) {
-                    const sources = [URLS.crypto, `${DATA}/crypto.json`, COINGECKO_FALLBACK];
-                    for (const url of sources) {
-                        try {
-                            const res = await fetchWithTimeout(`${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`, REQUEST_TIMEOUT, 1);
-                            if (!res.ok) continue;
-                            const json = await res.json();
-                            normalized = normalizeCryptoData(json);
-                            if (normalized.length > 0) {
-                                saveLiveCache('crypto', json.data || json);
-                                break;
-                            }
-                        } catch (e) {}
-                    }
+                const cached = cachedSnapshot('crypto');
+                const local = normalizeCryptoData(cached?.data);
+                if (!cryptoCoins.length && local.length) {
+                    cryptoCoins = local; cryptoUpdatedAt = dataTimestamp(cached?.updatedAt);
+                    cryptoDataMap = Object.fromEntries(local.map(c => [c.symbol,c]));
+                    renderCryptoCards();
                 }
-
-                if (normalized.length === 0) throw new Error('Empty crypto data');
-
-                cryptoDataMap = {};
-                cryptoCoins = normalized.map(c => {
-                    cryptoDataMap[c.symbol] = c;
-                    return c;
-                });
+                const feeds = await fetchFeedCandidates('crypto');
+                const best = chooseNewest(feeds.map(raw => ({raw, updatedAt:dataTimestamp(raw.updatedAt), normalized:normalizeCryptoData(raw)})).filter(x => x.normalized.length));
+                if (best && (!cryptoCoins.length || best.updatedAt >= cryptoUpdatedAt)) {
+                    cryptoCoins = best.normalized; cryptoUpdatedAt = best.updatedAt;
+                    saveLiveCache('crypto', best.raw.data || best.raw, best.updatedAt);
+                } else if (!cryptoCoins.length) {
+                    // Preserve the existing public crypto fallback only when the repository and local cache are unavailable.
+                    const res = await fetchWithTimeout(COINGECKO_FALLBACK, REQUEST_TIMEOUT, 0);
+                    if (res.ok) cryptoCoins = normalizeCryptoData(await res.json());
+                }
+                if (!cryptoCoins.length) throw new Error('Empty crypto data');
+                cryptoDataMap = Object.fromEntries(cryptoCoins.map(c => [c.symbol,c]));
+                if (activeCryptoCoin && cryptoDataMap[activeCryptoCoin.symbol]) activeCryptoCoin = cryptoDataMap[activeCryptoCoin.symbol];
                 renderCryptoCards();
+                if ($('#crypto-chart-modal')?.classList.contains('visible')) renderCryptoModalChart();
                 fxUpdateMulti(); fxDrawSpread();
             } catch (e) {
                 console.warn('[Crypto]', e);
-                grid.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('load_error')}</p>`;
+                if (!cryptoCoins.length) grid.innerHTML = `<p style="color:var(--negative);grid-column:1/-1;text-align:center;padding:20px;">${t('load_error')}</p>`;
             }
         }
 
@@ -4466,7 +4540,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 const formatted=(v,best)=>v==null?'—':(v===best?`<span class="fx-best" title="${fxT('best')}">${fxNum(v,4)} ★</span>`:fxNum(v,4));
                 return `<tr><td><span class="fx-bank-ident"><span class="fx-bank-mark"><span aria-hidden="true">${r.bank.letter || 'Б'}</span><img src="${r.bank.logo}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'" /></span><span class="fx-bank-name">${bn}</span></span></td><td>${formatted(r.buy,maxBuy)}</td><td>${formatted(r.sell,minSell)}</td></tr>`;
             }).join('')}</tbody></table>`;
-            $('#fx-bank-count').textContent=`${fxT('statusBank')}: ${rows.length}` + ($('#fx-bank-count').dataset.cachedAt ? ` · ${currentLang==='en'?'Cached':'З кешу'}: ${$('#fx-bank-count').dataset.cachedAt}` : '');
+            $('#fx-bank-count').textContent=`${fxT('statusBank')}: ${rows.length}` + (Number($('#fx-bank-count').dataset.cachedCount) > 0 ? ` · ${currentLang==='en'?'Cached':'З кешу'}: ${$('#fx-bank-count').dataset.cachedCount}` : '');
             fxBankSelect();fxBankCalc();fxDrawSpread();
         }
         function fxBankSelect() {
@@ -4569,16 +4643,21 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 try {new Notification('Курс НБУ',{body:`${fxAlert.curr}/UAH: ${fxNum(value,4)} ₴ · ${fxT('alertCrossed')}`,icon:'favicon.ico',tag:'nbu-rate-threshold'});}catch(_){}
             }
         }
-        async function fxPollRates() {
-            // Refresh from the existing cached NBU feed at modest intervals while this page is open.
-            if(document.hidden || !navigator.onLine || !fxAlert) return;
-            try {
-                safeLS.removeItem(cacheKey('nbu'));
-                await loadLiveRates('nbu');
-                await refreshRecentHistoryIfNeeded();
-                fxCheckAlert();
-                renderCards(liveRates);convert();fxRefreshAll();
-            } catch (_) {}
+        async function fxPollRates(force = false) {
+            if (document.hidden || !navigator.onLine || initialLoadPromise) return;
+            if (pollPromise) return pollPromise;
+            pollPromise = (async () => {
+                const secondary = [loadCrypto()];
+                if (force || Date.now() - lastBankPoll >= BANK_POLL_INTERVAL) secondary.push(initBankCarousel());
+                try {
+                    await loadLiveRates('nbu');
+                    await refreshRecentHistoryIfNeeded();
+                    renderCards(liveRates); convert(); fxRefreshAll(); renderChart(); updateLiveStatus();
+                    if (!liveFromCache) fxCheckAlert();
+                } catch (e) { console.warn('NBU sync:', e.message); }
+                await Promise.allSettled(secondary);
+            })();
+            try { return await pollPromise; } finally { pollPromise = null; }
         }
 
         // PWA install prompt is supported on Chromium (including Android Chrome).
@@ -4752,8 +4831,9 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             fxTranslate();
             fxPwaInit();
             // This is a foreground-tab monitor, not background push messaging.
-            setInterval(fxPollRates,5*60*1000);
-            document.addEventListener('visibilitychange',()=>{if(!document.hidden)fxPollRates();});
+            setInterval(() => fxPollRates(), 5 * 60 * 1000);
+            document.addEventListener('visibilitychange', () => { if (!document.hidden) fxPollRates(); });
+            window.addEventListener('online', () => fxPollRates(true));
         }
         // Visual annotations remain chart-native and adapt to existing theme and zoom.
         const historicEventsPlugin = {
@@ -4878,11 +4958,9 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             get latestDate()       { return latestDate; },
             get liveDate()         { return liveDate; },
             get historyLoading()   { return historyLoading; },
-            refreshLiveRates: () => {
-                safeLS.removeItem(cacheKey('nbu'));
-                safeLS.removeItem(HISTORY_CACHE_KEY);
-                loadAll();
-            }
+            get liveUpdatedAt() { return liveUpdatedAt; },
+            get liveSyncedAt() { return liveSyncedAt; },
+            refreshLiveRates: () => fxPollRates(true)
         };
     })();
     </script>
