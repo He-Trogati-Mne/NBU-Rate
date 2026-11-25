@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v24-11-07';
+const CACHE_NAME = 'nbu-rate-v25-11-26';
 
 const FILES = [
   './',
@@ -37,7 +37,7 @@ self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(keys.filter(key =>
-      (key.startsWith('nbu-rate-pwa-') || key.startsWith('nbu-rate-shell-')) && key !== CACHE_NAME
+      key.startsWith('nbu-rate-') && key !== CACHE_NAME
     ).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
@@ -50,14 +50,15 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin || !url.href.startsWith(self.registration.scope)) return;
   event.respondWith((async () => {
     try {
-      const response = await fetch(request);
+      const response = await fetch(request, {cache: 'no-cache'});
       if (response.ok) {
         const copy = response.clone();
         event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(OFFLINE_URL, copy)).catch(() => {}));
       }
       return response;
     } catch (_) {
-      return (await caches.match(OFFLINE_URL)) || Response.error();
+      const cache = await caches.open(CACHE_NAME);
+      return (await cache.match(OFFLINE_URL)) || Response.error();
     }
   })());
 });
