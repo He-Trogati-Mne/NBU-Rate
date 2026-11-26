@@ -107,11 +107,11 @@
 
 | Світла | Налаштування | Темна |
 |:---:|:---:|:---:|
-| ![Світла](screenshots/popup-light.png) | ![Налаштування](screenshots/options.png) | ![Темна](screenshots/popup-dark.png) |
+| ![Світла](screenshots/white.png) | ![Налаштування](screenshots/options.png) | ![Темна](screenshots/dark.png) |
 
 | Джерела курсу | Власна тема | Доступність |
 |:---:|:---:|:---:|
-| ![Джерела](screenshots/sources.png) | ![Власна](screenshots/custom-theme.png) | ![Доступність](screenshots/accessibility.png) |
+| ![Джерела](screenshots/sources.png) | ![Власна](screenshots/custom.png) | ![Доступність](screenshots/accessibility.png) |
 
 ---
 
