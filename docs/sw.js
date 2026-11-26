@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v43';
+const CACHE_NAME = 'nbu-rate-v44';
 
 const MARKET_LOGOS = [
   './crypto-stocks/whitebit.svg',
