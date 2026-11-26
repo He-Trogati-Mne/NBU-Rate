@@ -1,0 +1,45 @@
+[hidden] { display: none !important; }
+.daily-nav { display:grid;grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; padding:0 14px 8px;flex-shrink:0; }
+.daily-nav button,.daily-panel button,.daily-panel select,.daily-panel input { font:inherit;color:var(--text); }
+.daily-nav button,.daily-panel button { cursor:pointer;border:1px solid var(--border);background:var(--surface-1);border-radius:9px;padding:8px 6px;font-size:calc(12px * var(--a11y-font-scale));font-weight:650; }
+.daily-nav button { color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:5px;min-height:38px; }
+.daily-nav button[aria-selected=true] { background:var(--bg-elev);border-color:var(--accent);color:var(--accent); }
+.daily-nav svg { width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round; }
+.daily-panel { overflow-y:auto;min-height:0;flex:1;padding:5px 14px 14px; }
+.daily-card { background:var(--bg-elev);border:1px solid var(--border);border-radius:13px;padding:12px;margin-bottom:9px; }
+.daily-heading { font-size:calc(13px * var(--a11y-font-scale));font-weight:750;margin:0 0 7px; }
+.daily-label { font-size:calc(11px * var(--a11y-font-scale));color:var(--text-muted);display:block;margin-bottom:4px; }
+.daily-inputrow { display:grid;grid-template-columns:minmax(0,1fr) 86px;gap:7px; }
+.daily-panel input,.daily-panel select { border:1px solid var(--border);background:var(--surface-1);border-radius:8px;padding:8px;min-width:0;width:100%;font-size:calc(14px * var(--a11y-font-scale)); }
+.daily-panel input:focus,.daily-panel select:focus,.daily-panel button:focus-visible,.daily-nav button:focus-visible { outline:2px solid var(--accent);outline-offset:1px; }
+.daily-panel button:hover,.daily-nav button:hover { border-color:var(--accent); }
+.daily-result { display:grid;grid-template-columns:minmax(0,1fr) 86px;gap:8px;align-items:center;margin-top:7px; }
+.daily-value { font-size:calc(24px * var(--a11y-font-scale));font-weight:750;letter-spacing:-.04em;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;line-height:1.25; }
+.daily-chips { display:flex;flex-wrap:wrap;gap:5px;margin-top:8px; }
+.daily-chips button { flex:1;white-space:nowrap; }
+.daily-actions { display:flex;gap:6px;margin-top:9px; }
+.daily-actions button { flex:1; }
+.daily-panel .daily-primary { background:var(--accent);color:var(--accent-text);border-color:var(--accent); }
+.daily-note { font-size:calc(11px * var(--a11y-font-scale));color:var(--text-muted);line-height:1.45;margin:6px 0 0;overflow-wrap:anywhere; }
+.daily-row { display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:calc(13px * var(--a11y-font-scale)); }
+.daily-row:last-child { border-bottom:0;padding-bottom:0; }
+.daily-row strong { font-variant-numeric:tabular-nums;text-align:right;overflow-wrap:anywhere;min-width:0; }
+.daily-cc { display:flex;align-items:center;gap:7px; }
+.daily-cc img { width:23px;height:15px;object-fit:cover;border-radius:3px; }
+.daily-banktop { display:flex;justify-content:space-between;gap:8px;align-items:baseline; }
+.daily-banktop strong { overflow-wrap:anywhere;min-width:0;text-align:right;font-variant-numeric:tabular-nums; }
+.daily-bankrow { padding:9px 0;border-bottom:1px solid var(--border); }
+.daily-bankrow:last-child { border:0;padding-bottom:0; }
+.daily-best { color:var(--positive);font-weight:700;font-size:11px; }
+.daily-link { display:block;text-align:center;color:var(--accent);font-size:12px;padding:5px;text-decoration:none; }
+.daily-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px; }
+.daily-panel .daily-direction { display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:9px; }
+.daily-direction button[aria-pressed=true] { border-color:var(--accent);color:var(--accent);background:var(--surface-2); }
+
+.daily-grid-banks { grid-template-columns:minmax(0,1.6fr) minmax(96px,1fr); align-items:start; }
+.daily-fee-wrap { min-width:0; }
+.daily-fee-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+.daily-fee-value { border:1px solid var(--border); background:var(--surface-1); color:var(--accent); border-radius:999px; padding:5px 8px; font-size:calc(12px * var(--a11y-font-scale)); font-weight:700; min-width:62px; text-align:center; }
+.daily-fee-controls { display:grid; grid-template-columns:minmax(0,1fr) 84px; gap:8px; align-items:center; }
+.daily-panel input[type=range] { width:100%; margin:0; padding:0; min-width:0; accent-color:var(--accent); }
+.daily-fee-scale { display:flex; justify-content:space-between; gap:8px; margin-top:4px; color:var(--text-muted); font-size:calc(10px * var(--a11y-font-scale)); }
