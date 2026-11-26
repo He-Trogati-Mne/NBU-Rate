@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v44';
+const CACHE_NAME = 'nbu-rate-v45';
 
 const MARKET_LOGOS = [
   './crypto-stocks/whitebit.svg',
@@ -15,6 +15,8 @@ const FILES = [
   ...MARKET_LOGOS,
   './',
   './index.html',
+  './company-profiles.js?v=53',
+  './company-profiles.css?v=53',
   './favicon/site.webmanifest',
   './favicon/web-app-manifest-192x192.png',
   './favicon/web-app-manifest-512x512.png',
@@ -83,6 +85,9 @@ self.addEventListener('fetch', event => {
       }
     })());
     return;
+  }
+  if (request.mode !== 'navigate' && ['company-profiles.js','company-profiles.css'].some(name => url.pathname === new URL(name,self.registration.scope).pathname)) {
+    event.respondWith((async()=>{const cache=await caches.open(CACHE_NAME);try{const r=await fetch(request);if(r.ok)await cache.put(request,r.clone());return r;}catch(_){return (await cache.match(request))||Response.error();}})());return;
   }
   if (request.mode !== 'navigate') return;
   const root = new URL('./', self.registration.scope);
