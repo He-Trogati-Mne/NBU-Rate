@@ -2467,6 +2467,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 <button class="period-btn" data-period="MAX">Макс.</button>
             </div>
             <div id="crypto-chart-stats" style="display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);font-family:ui-monospace,monospace;margin-bottom:12px;"></div>
+            <p id="crypto-history-coverage" style="text-align:center;color:var(--text-muted);font-size:12px;margin:0 0 12px;line-height:1.5" aria-live="polite"></p>
             <div class="chart-container crypto-chart-stage">
                 <canvas id="cryptoChart" role="img" aria-label="Графік зміни вартості криптовалюти в доларах США"></canvas>
             </div>
@@ -4094,7 +4095,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 if (c.history && typeof c.history === 'object') {
                     Object.entries(c.history).forEach(([k, v]) => {
                         const numVal = Number(v);
-                        if (!isNaN(numVal)) hist[k] = numVal;
+                        if (/^\d{4}-\d{2}-\d{2}$/.test(k) && Number.isFinite(numVal) && numVal > 0) hist[k] = numVal;
                     });
                 }
                 return {
@@ -4124,10 +4125,29 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                     renderCryptoCards();
                 }
                 const feeds = await fetchFeedCandidates('crypto');
-                const best = chooseNewest(feeds.map(raw => ({raw, updatedAt:dataTimestamp(raw.updatedAt), normalized:normalizeCryptoData(raw)})).filter(x => x.normalized.length));
-                if (best && (!cryptoCoins.length || best.updatedAt >= cryptoUpdatedAt)) {
-                    cryptoCoins = best.normalized; cryptoUpdatedAt = best.updatedAt;
-                    saveLiveCache('crypto', best.raw.data || best.raw, best.updatedAt);
+                const candidates = feeds.map(raw => ({raw, updatedAt:dataTimestamp(raw.updatedAt), historyAt:dataTimestamp(raw.historyCheckedAt), normalized:normalizeCryptoData(raw)})).filter(x => x.normalized.length);
+                const best = chooseNewest(candidates);
+                if (best) {
+                    // Quotes and backfill are independent. A mirror with a newer
+                    // quote can have older history; never discard missing dates.
+                    const previous = cryptoCoins.length ? cryptoCoins : local;
+                    const historyBySymbol = new Map();
+                    const addHistory = coins => coins.forEach(c => {
+                        const prior = historyBySymbol.get(c.symbol) || {};
+                        historyBySymbol.set(c.symbol, {...prior, ...c.history});
+                    });
+                    addHistory(previous);
+                    [...candidates].sort((a,b)=>(a.historyAt || a.updatedAt)-(b.historyAt || b.updatedAt)).forEach(x=>addHistory(x.normalized));
+                    const quoteBase = !cryptoCoins.length || best.updatedAt >= cryptoUpdatedAt ? best.normalized : cryptoCoins;
+                    const quoteDate = new Date(Math.max(cryptoUpdatedAt || 0,best.updatedAt || 0)).toISOString().slice(0,10);
+                    cryptoCoins = quoteBase.map(c=>{
+                        const history = {...historyBySymbol.get(c.symbol)};
+                        // The newest quote owns its current-day observation.
+                        if (c.history?.[quoteDate] > 0) history[quoteDate] = c.history[quoteDate];
+                        return {...c,history};
+                    });
+                    cryptoUpdatedAt = Math.max(cryptoUpdatedAt || 0,best.updatedAt);
+                    saveLiveCache('crypto', {coins:cryptoCoins}, cryptoUpdatedAt);
                 } else if (!cryptoCoins.length) {
                     // Preserve the existing public crypto fallback only when the repository and local cache are unavailable.
                     const res = await fetchWithTimeout(COINGECKO_FALLBACK, REQUEST_TIMEOUT, 0);
@@ -4166,7 +4186,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             }
             const startStr = start.toISOString().slice(0, 10); const filtered = {};
             dates.forEach(d => { if (d >= startStr) filtered[d] = full[d]; });
-            return Object.keys(filtered).length >= 2 ? filtered : full;
+            return filtered;
         }
 
         function renderCryptoCards() {
@@ -4244,6 +4264,14 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             const history = getCryptoHistoryForPeriod(coin, activeCryptoModalPeriod);
             const dates = Object.keys(history).sort();
             const values = dates.map(d => history[d]);
+            const coverage = $('#crypto-history-coverage');
+            if (coverage) {
+                const allDates = Object.keys(coin.history || {}).sort();
+                const en = document.documentElement.lang === 'en';
+                coverage.textContent = allDates.length
+                    ? (en ? 'Available USD history: ' : 'Доступна історія USD: ') + formatDate(allDates[0]) + ' — ' + formatDate(allDates[allDates.length - 1]) + ' · ' + allDates.length.toLocaleString(en?'en-US':'uk-UA') + (en?' daily points':' денних точок') + (dates.length < 2 ? (en?' · Not enough data for this period':' · Недостатньо даних за цей період'):'')
+                    : (en ? 'USD history unavailable' : 'Історія USD недоступна');
+            }
 
             if (values.length >= 2 && values[0] > 0) {
                 const first = values[0], last = values[values.length - 1];
@@ -5181,6 +5209,10 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
     {symbol:'AMZN',name:'Amazon',group:'world',exchange:'NASDAQ'}
  ];
  const brandLogos={"KYIV": ["https://upload.wikimedia.org/wikipedia/commons/7/7d/Kyivstar_2015_logo_-_Brandmark.svg", "https://kyivstar.ua/favicon.ico"], "MHPC.L": ["https://api.next.mhp.com.ua/images/3d944/72d18/095b5b6e.png", "https://upload.wikimedia.org/wikipedia/commons/6/69/MHP_logo_English.png"], "FXPO.L": ["https://upload.wikimedia.org/wikipedia/commons/d/d2/Ferrexpo.svg", "https://www.ferrexpo.com/favicon.ico"], "AAPL": ["https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"], "MSFT": ["https://upload.wikimedia.org/wikipedia/commons/2/25/Microsoft_icon.svg"], "NVDA": ["https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/nvidia.svg", "https://cdn.jsdelivr.net/npm/simple-icons@16/icons/nvidia.svg", "https://icons.iconarchive.com/icons/simpleicons-team/simple/128/nvidia-icon.png"], "GOOGL": ["https://upload.wikimedia.org/wikipedia/commons/3/3c/Google_Favicon_2025.svg"], "TSLA": ["https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/tesla.svg", "https://cdn.jsdelivr.net/npm/simple-icons@16/icons/tesla.svg", "https://upload.wikimedia.org/wikipedia/commons/b/bb/Tesla_T_symbol.svg"], "AMZN": ["https://upload.wikimedia.org/wikipedia/commons/4/4a/Amazon_icon.svg"], "AST.WA": ["https://astartaholding.com/favicon.ico", "https://cdn.freebiesupply.com/logos/large/2x/astarta-logo-png-transparent.png"]};
+ const stockDomains={"KYIV":"kyivstar.ua","MHPC.L":"mhp.com.ua","FXPO.L":"ferrexpo.com","AST.WA":"astartaholding.com","KER.WA":"kernel.ua","IMC.WA":"imcagro.com.ua","KSG.WA":"ksgagro.com","AAPL":"apple.com","MSFT":"microsoft.com","NVDA":"nvidia.com","AMD":"amd.com","INTC":"intel.com","AVGO":"broadcom.com","IBM":"ibm.com","ORCL":"oracle.com","META":"meta.com","GOOGL":"google.com","AMZN":"amazon.com","NFLX":"netflix.com","UBER":"uber.com","ADBE":"adobe.com","CRM":"salesforce.com","PLTR":"palantir.com","ASML":"asml.com","TSM":"tsmc.com","QCOM":"qualcomm.com","MU":"micron.com","TSLA":"tesla.com","RACE":"ferrari.com","JPM":"jpmorganchase.com","BAC":"bankofamerica.com","V":"visa.com","MA":"mastercard.com","BRK-B":"berkshirehathaway.com","XOM":"exxonmobil.com","CVX":"chevron.com","SHEL":"shell.com","JNJ":"jnj.com","LLY":"lilly.com","NVO":"novonordisk.com","KO":"coca-colacompany.com","PEP":"pepsico.com","MCD":"mcdonalds.com","WMT":"walmart.com","COST":"costco.com","DIS":"thewaltdisneycompany.com","SONY":"sony.com","SAP":"sap.com","CAT":"caterpillar.com","CSCO":"cisco.com"};
+ const ukraineStocks=new Set(['KYIV','MHPC.L','FXPO.L','AST.WA','KER.WA','IMC.WA','KSG.WA']);
+ const failedBrandUrls=new Set();
+ let localStockLogos={};
  const brokerSearch='https://www.interactivebrokers.com/';
  const t=(uk,en)=>document.documentElement.lang==='en'?en:uk;
  const locale=()=>t('uk-UA','en-US');
@@ -5199,21 +5231,23 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
  let region='ua', symbol='KYIV', period='365', quotes={}, checked=0, online=false, busy=false, attempted=false, chartPoints=[];
  const cacheKey='nbu_stocks_quotes_v1';
  try{const c=JSON.parse(safeLS.getItem(cacheKey)||'null');if(c&&typeof c.data==='object'&&c.data)quotes=c.data;}catch(_){}
- function discover(data){for(const [ticker,q] of Object.entries(data||{})){if(!/^[A-Z0-9][A-Z0-9.=-]{0,23}$/.test(ticker)||options.some(o=>o.symbol===ticker)||!q||typeof q!=='object'||!(num(q.price)>0)||!cash(q)||!timestamp(q.asOf))continue;const name=[q.name,q.companyName,q.shortName,q.longName].find(v=>typeof v==='string'&&v.trim())||ticker;const exchange=[q.exchange,q.exchangeName,q.fullExchangeName].find(v=>typeof v==='string'&&v.trim())||'—';const ua=q.group==='ua'||['UA','UKRAINE','УКРАЇНА'].includes(String(q.country||'').toUpperCase());options.push({symbol:ticker,name:name.trim().slice(0,100),exchange:exchange.trim().slice(0,40),group:ua?'ua':'world'});}}
+ function discover(data){for(const [ticker,q] of Object.entries(data||{})){if(!/^[A-Z0-9][A-Z0-9.=-]{0,23}$/.test(ticker)||options.some(o=>o.symbol===ticker)||!q||typeof q!=='object'||!(num(q.price)>0)||!cash(q)||!timestamp(q.asOf))continue;const name=[q.name,q.companyName,q.shortName,q.longName].find(v=>typeof v==='string'&&v.trim())||ticker;const exchange=[q.exchange,q.exchangeName,q.fullExchangeName].find(v=>typeof v==='string'&&v.trim())||'—';const ua=ukraineStocks.has(ticker)||q.group==='ua'||['UA','UKRAINE','УКРАЇНА'].includes(String(q.country||'').toUpperCase());options.push({symbol:ticker,name:name.trim().slice(0,100),exchange:exchange.trim().slice(0,40),group:ua?'ua':'world'});}}
  discover(quotes);
- function merge(data){discover(data);for(const o of options){const q=data?.[o.symbol];if(!q||typeof q!=='object'||!(num(q.price)>0)||!cash(q)||!timestamp(q.asOf))continue;const old=quotes[o.symbol];if(!old||timestamp(q.asOf)>=timestamp(old.asOf)){quotes[o.symbol]={...q,history:{...(old&&cash(old)===cash(q)?old.history:{}),...(q.history||{})}};}}}
+ function merge(data){discover(data);for(const o of options){const q=data?.[o.symbol];if(!q||typeof q!=='object'||!(num(q.price)>0)||!cash(q)||!timestamp(q.asOf))continue;const old=quotes[o.symbol];if(!old||timestamp(q.asOf)>=timestamp(old.asOf)){quotes[o.symbol]={...q,history:{...(old&&cash(old)===cash(q)?old.history:{}),...(q.history||{})}};}else if(cash(old)===cash(q)){quotes[o.symbol]={...old,history:{...(q.history||{}),...(old.history||{})}};}}}
  function make(tag,cls,txt){const x=document.createElement(tag);if(cls)x.className=cls;if(txt!==undefined)x.textContent=txt;return x;}
  function brand(o){
   const el=make('span','market-stock-symbol');
   const fallback=make('span','market-brand-fallback',o.symbol.split('.')[0].slice(0,4));
   el.append(fallback);
   el.setAttribute('aria-hidden','true');el.dataset.brand=o.symbol;
-  const sources=Object.hasOwn(brandLogos,o.symbol)?brandLogos[o.symbol]:[];let i=0;
-  function next(){if(i>=sources.length)return;const src=sources[i++],im=make('img','market-brand-img');im.alt='';im.referrerPolicy='no-referrer';im.decoding='async';
+  const local=Object.hasOwn(localStockLogos,o.symbol)?localStockLogos[o.symbol]:null;
+  const domain=Object.hasOwn(stockDomains,o.symbol)?stockDomains[o.symbol]:null;
+  const sources=[...(local?[local]:[]),...(Object.hasOwn(brandLogos,o.symbol)?brandLogos[o.symbol]:[]),...(domain?['https://www.google.com/s2/favicons?domain='+encodeURIComponent(domain)+'&sz=128']:[])];let i=0;
+  function next(){while(i<sources.length&&failedBrandUrls.has(sources[i]))i++;if(i>=sources.length)return;const src=sources[i++],im=make('img','market-brand-img');im.alt='';im.referrerPolicy='no-referrer';im.decoding='async';
    if((o.symbol==='NVDA'||o.symbol==='TSLA')&&(src.includes('simple-icons')||src.includes('simpleicons-team')))im.classList.add('brand-monochrome');
    if(o.symbol==='FXPO.L'&&src.endsWith('Ferrexpo.svg'))im.classList.add('brand-wide');
-   im.addEventListener('load',()=>{if(im.naturalWidth>0){fallback.remove();im.classList.add('is-loaded');}else{im.remove();next();}},{once:true});
-   im.addEventListener('error',()=>{im.remove();next();},{once:true});el.append(im);im.src=src;
+   im.addEventListener('load',()=>{if(im.naturalWidth>0&&(!src.includes('google.com/s2/favicons')||im.naturalWidth>=32)){fallback.remove();im.classList.add('is-loaded');}else{failedBrandUrls.add(src);im.remove();next();}},{once:true});
+   im.addEventListener('error',()=>{failedBrandUrls.add(src);im.remove();next();},{once:true});el.append(im);im.src=src;
   }next();return el;
  }
  function externalIcon(){const svg=sv('svg',{viewBox:'0 0 24 24','aria-hidden':'true'});svg.append(sv('path',{d:'M13 5h6v6m0-6-9 9M19 13v6H5V5h6'}));return svg;}
@@ -5236,6 +5270,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
  $('#market-chart').addEventListener('pointermove',e=>{if(!chartPoints.length)return;const svg=$('#market-chart'),r=svg.getBoundingClientRect(),x=(e.clientX-r.left)*svg.viewBox.baseVal.width/r.width;const p=chartPoints.reduce((a,b)=>Math.abs(b.x-x)<Math.abs(a.x-x)?b:a);const g=$('#market-crosshair');if(!g)return;g.replaceChildren(sv('line',{x1:p.x,y1:16,x2:p.x,y2:svg.viewBox.baseVal.height-29,stroke:'var(--text-muted)','stroke-dasharray':'3 4'}),sv('circle',{cx:p.x,cy:p.y,r:4,fill:'var(--accent)',stroke:'var(--bg-elev)','stroke-width':2}));g.setAttribute('visibility','visible');const tip=$('#market-chart-tip');tip.textContent=date(p.d)+' · '+fmt(p.v,cash(quotes[symbol]));tip.hidden=false;});
  $('#market-chart').addEventListener('pointerleave',()=>{const g=$('#market-crosshair');if(g)g.setAttribute('visibility','hidden');$('#market-chart-tip').hidden=true;});
  function render(){status();cards();plot();}
+ fetch('./stock-logos.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(m=>{if(!m||typeof m!=='object'||Array.isArray(m))return;for(const [k,v] of Object.entries(m)){if(/^[A-Z0-9][A-Z0-9.=-]{0,23}$/.test(k)&&typeof v==='string'&&/^stock-logos\/[a-zA-Z0-9._-]+\.(svg|png|webp|ico)$/i.test(v))localStockLogos[k]='./'+v;}if(Object.keys(localStockLogos).length){delete $('#market-chart-brand').dataset.symbol;render();}}).catch(()=>{});
  async function get(url){const c=new AbortController(),tm=setTimeout(()=>c.abort(),10000);try{const r=await fetch(url+'?v='+Math.floor(Date.now()/300000),{cache:'no-store',signal:c.signal});if(!r.ok)throw Error('HTTP '+r.status);const j=await r.json();if(!j?.data||typeof j.data!=='object'||Array.isArray(j.data))throw Error('Invalid feed');return j;}finally{clearTimeout(tm);}}
  async function load(){if(busy)return;attempted=true;if(navigator.onLine===false){online=false;status();return;}busy=true;$('#market-reload').disabled=true;status();try{const urls=['https://raw.githubusercontent.com/He-Trogati-Mne/nbu-rate-data/main/data/stocks.json','https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@main/data/stocks.json'];const res=await Promise.allSettled(urls.map(get));const valid=res.filter(x=>x.status==='fulfilled').map(x=>x.value).sort((a,b)=>timestamp(a.updatedAt)-timestamp(b.updatedAt));online=valid.length>0;if(online){for(const j of valid)merge(j.data);checked=Date.now();try{safeLS.setItem(cacheKey,JSON.stringify({data:quotes}));}catch(_){}}}finally{busy=false;$('#market-reload').disabled=false;render();}}
  $$('.market-segments button').forEach(b=>b.addEventListener('click',()=>{region=b.dataset.marketRegion;symbol=options.find(o=>o.group===region).symbol;press('[data-market-region]','marketRegion',region);render();}));
