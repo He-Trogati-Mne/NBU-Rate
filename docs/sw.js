@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v45';
+const CACHE_NAME = 'nbu-rate-v46';
 
 const MARKET_LOGOS = [
   './crypto-stocks/whitebit.svg',
@@ -15,8 +15,8 @@ const FILES = [
   ...MARKET_LOGOS,
   './',
   './index.html',
-  './company-profiles.js?v=53',
-  './company-profiles.css?v=53',
+  './company-profiles.js?v=57',
+  './company-profiles.css?v=57',
   './favicon/site.webmanifest',
   './favicon/web-app-manifest-192x192.png',
   './favicon/web-app-manifest-512x512.png',
