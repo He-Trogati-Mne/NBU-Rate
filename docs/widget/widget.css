@@ -1,6 +1,4 @@
 
-
-  /* Палитра из options.html (dark theme) */
   :root {
     --bg-elev: #181b1f;
     --surface-1: #1c2025;
@@ -15,7 +13,6 @@
   html, body {
     margin: 0;
     padding: 0;
-    /* ПРОЗРАЧНЫЙ фон — критично для Twitch-оверлея */
     background: transparent !important;
     display: flex;
     justify-content: center;
@@ -38,7 +35,6 @@
     width: 100%;
     height: 100%;
     box-sizing: border-box;
-    /* Тёмные карточки — читаются на любом фоне стрима */
     background: linear-gradient(145deg, var(--bg-elev) 0%, var(--surface-1) 100%);
     border-radius: 18px;
     border: 1.5px solid var(--border);
@@ -79,7 +75,6 @@
     z-index: 1;
   }
 
-  /* Световой блик — приглушённый для тёмной темы */
   .face::after {
     content: "";
     position: absolute;
@@ -102,7 +97,6 @@
     left: 160%;
   }
 
-  /* Контейнер под PNG-иконку */
   .icon-box {
     width: 62px;
     height: 62px;
@@ -229,5 +223,15 @@
 
 :root{--card-shadow:0 8px 24px #0005}html,body{width:100%;height:100%;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}body{display:grid;place-items:center}html[data-background=solid],html[data-background=solid] body{background:var(--bg-elev)!important}.scene{width:min(390px,calc(100vw - 20px));height:126px;flex:none}.face{padding:10px 13px 8px;flex-direction:column;align-items:stretch;justify-content:space-between;box-shadow:var(--card-shadow);gap:5px}.face .content{display:flex;align-items:center;flex:1;min-height:0;min-width:0}.face .info-full{min-width:0}.face .rates-header{gap:4px;margin-bottom:5px}.face .badge{font-size:9px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.face .date{font-size:10px;color:var(--text-muted);white-space:nowrap}.face .rates-grid{gap:6px}.face .rate-card{min-width:0;padding:6px 7px;box-shadow:none}.face .curr-code{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.face .curr-val{font-size:13px;white-space:nowrap;font-variant-numeric:tabular-nums}.face .bank-sub{font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}.face .icon-box{width:55px;height:55px;background:none;box-shadow:none}.face .icon-box img{object-fit:contain}.face .info{margin-left:10px;min-width:0}.face .main-title{font-size:18px}.face .sub-link{font-size:11px}.widget-footer{display:flex;align-items:center;justify-content:center;gap:5px;border-top:1px solid var(--border);padding-top:4px;line-height:1.2}.widget-footer a{display:inline-flex;align-items:center;gap:4px;color:var(--text-muted);text-decoration:none;font-size:10px;font-weight:650}.widget-footer img{width:13px;height:13px;object-fit:contain}.widget-footer strong{color:var(--accent);font-weight:800}.widget-footer a:hover{color:var(--accent)}.change{font-size:9px;display:block;line-height:1.1;margin-top:2px}.rate-card:has(.change){padding-block:4px}.face .content,.face .info-full{overflow:hidden}.face .rate-card .curr-val{overflow:hidden;text-overflow:ellipsis}html[data-theme=light]{--bg-elev:#f7f9fc;--surface-1:#fff;--text:#142337;--text-muted:#5b687a;--accent:#155fc7;--positive:#087c43;--negative:#b92737;--border:#dce3ec;--card-shadow:0 8px 24px #15202b22}html[data-theme=light] .badge{background:#155fc714}html[data-theme=light] .face{box-shadow:var(--card-shadow)}@media(max-width:340px){.scene{width:calc(100vw - 12px)}.face{padding-inline:8px}.face .rates-grid{gap:4px}.face .curr-val{font-size:11px}.face .curr-code{font-size:10px}.face .bank-sub{font-size:10px}.face .main-title{font-size:16px}.face .date{font-size:9px}}
 
-/* Explicit iframe color scheme avoids opaque UA canvas in dark parent pages. */
 html,body{color-scheme:light!important;background:transparent!important}html[data-background=transparent],html[data-background=transparent] body{background-color:transparent!important;background-image:none!important}html[data-animation=off] .face,html[data-animation=off] .face::after{transition:none!important;animation:none!important}html[data-animation=off] .face::after{display:none}html[data-animation=off] .face:not(.active){visibility:hidden}html[data-animation=on] .face.active-glare::after{left:160%}
+
+:root[data-a11y-cvd=true]{--positive:#0072b2;--negative:#b44e00}
+:root[data-theme=dark][data-a11y-cvd=true]{--positive:#56b4e9;--negative:#e69f00}
+:root[data-a11y-cvd=true][data-a11y-palette=red-green]{--positive:#004488;--negative:#a33d50}
+:root[data-theme=dark][data-a11y-cvd=true][data-a11y-palette=red-green]{--positive:#8ab4f8;--negative:#f098ac}
+:root[data-a11y-cvd=true][data-a11y-palette=blue-yellow]{--positive:#9f4d7d;--negative:#007d59}
+:root[data-theme=dark][data-a11y-cvd=true][data-a11y-palette=blue-yellow]{--positive:#e8a6c0;--negative:#4dd4ac}
+:root[data-a11y-cvd=true][data-a11y-palette=mono]{--positive:#1a1a1a;--negative:#666}
+:root[data-theme=dark][data-a11y-cvd=true][data-a11y-palette=mono]{--positive:#fff;--negative:#aaa}
+
+:root[data-a11y-cvd=true] .change.up::before{content:"▲ "}:root[data-a11y-cvd=true] .change.down::before{content:"▼ "}
