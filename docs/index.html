@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="google-site-verification" content="LfPlSooILG8H12Ov4mCh2Dq8bAOYDjIMN8NFanQzM6A" />
     <meta name="google-site-verification" content="jF2ltnXgf51Xf9Us-q-rr-dhLOuYV3kdF21LpPn9xF4" />
-
     <link rel="icon" type="image/x-icon" href="favicon.ico" id="favicon-link" />
     <meta name="theme-color" content="#0e1012" />
     <script>
@@ -3777,8 +3776,8 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                         if (item.currencyCodeB !== 980) return;
                         const cc = ISO[item.currencyCodeA];
                         if (!cc) return;
-                        const buy = item.rateBuy ?? item.rateCross;
-                        const sell = item.rateSell ?? item.rateCross;
+                        const buy = item.rateBuy;
+                        const sell = item.rateSell;
                         if (buy != null || sell != null) {
                             out[cc] = { buy: Number(buy), sell: Number(sell) };
                         }
@@ -3834,23 +3833,33 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             return new Set(BANKS_CONFIG.map(b => b.id));
         }
 
-        async function fetchBankData(bank, previous = null, previousMeta = {}) {
+        async function fetchBankData(bank, previous = null, previousMeta = {}, health = null) {
+            const h=health?.data?.[bank.id];
+            const rejected=at=>dataTimestamp(h?.updatedAt)>0 && dataTimestamp(h.updatedAt)===dataTimestamp(at) && (h.officialSource===false || h.status==='suspicious');
+            if (rejected(previousMeta.updatedAt)) previous=null;
             const feeds = await fetchFeedCandidates(bank.id, 8000);
             const candidates = feeds.map(json => {
+                if (/(^|[./])minfin\.com\.ua(?:[/:]|$)/i.test(json.source || '') || rejected(json.updatedAt)) return null;
                 const data = normalizeBankData(bank.id, json.data || json);
                 if (!data || !CARD_RATE_ORDER.some(c => Number(data[c]?.buy) > 0 && Number(data[c]?.sell) > 0)) return null;
-                return {data, updatedAt:dataTimestamp(json.updatedAt), rateType:json.rateType || null};
+                return {data, updatedAt:dataTimestamp(json.updatedAt), rateType:json.rateType || null, source:json.source || null};
             }).filter(Boolean);
             const best = chooseNewest(candidates);
             const oldStamp = dataTimestamp(previousMeta.updatedAt);
             if (best && (!previous || best.updatedAt >= oldStamp)) {
-                bankMeta[bank.id] = {updatedAt:best.updatedAt, rateType:best.rateType, cached:false};
+                bankMeta[bank.id] = {updatedAt:best.updatedAt, rateType:best.rateType, source:best.source, cached:false};
                 return best.data;
             }
             if (previous) bankMeta[bank.id] = {...previousMeta, updatedAt:oldStamp, cached:true};
             return previous;
         }
 
+        function bankSyncLabel(id) {
+            const m=bankMeta[id]||{}, at=dataTimestamp(m.updatedAt), en=currentLang==='en';
+            const saved=m.cached || !at || Date.now()-at>7200000;
+            const label=saved?(en?'Saved data':'Збережені дані'):(en?'Last collection':'Останній збір');
+            return label+' · '+(at?new Date(at).toLocaleString(en?'en-GB':'uk-UA',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit',timeZone:'Europe/Kyiv'}):'—');
+        }
         function renderBankSlide(bank, data) {
             const name = bankDisplayName(bank);
             const valid = value => value != null && value !== '' && Number.isFinite(Number(value)) && Number(value) > 0;
@@ -3889,7 +3898,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                                      onload="window.__checkBankLogo(this)"
                                      onerror="this.style.display='none';if(this.previousElementSibling)this.previousElementSibling.style.display='flex';">
                             </div>
-                            <span class="bank-slide-name">${name}</span>
+                            <div style="min-width:0;text-align:center"><span class="bank-slide-name">${name}</span><small class="bank-slide-sync" style="display:block;font-size:11px;font-weight:400;color:var(--text-muted)">${bankSyncLabel(bank.id)}</small></div>
                         </div>
                         <div class="bank-slide-rates">${cardsHtml}</div>
                     </div>
@@ -3907,20 +3916,21 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 
             if (!bankCarouselState.total) track.innerHTML = `<div class="bank-slide active"><div class="bank-slide-inner"><div class="bank-slide-header"><div class="skeleton-shape" style="width:54px;height:54px;border-radius:14px;"></div><div class="skeleton-shape" style="width:140px;height:18px;"></div></div><div class="bank-slide-rates"><div class="skeleton-shape" style="height:82px;"></div><div class="skeleton-shape" style="height:82px;"></div></div></div></div>`;
 
-            const availableIds = await getAvailableBankIds();
+            const [availableIds, healthFeeds] = await Promise.all([getAvailableBankIds(),fetchFeedCandidates('bank-health',8000)]);
+            const health=healthFeeds.filter(x=>dataTimestamp(x.checkedAt)).sort((a,b)=>dataTimestamp(b.checkedAt)-dataTimestamp(a.checkedAt))[0]||null;
             let bankCache = null;
-            try { bankCache = JSON.parse(safeLS.getItem('nbu_site_banks_cache_v1') || 'null'); } catch (_) {}
+            try { bankCache = JSON.parse(safeLS.getItem('nbu_site_banks_cache_v2') || 'null'); } catch (_) {}
             const activeBanks = BANKS_CONFIG.filter(b => availableIds.has(b.id) || bankCache?.banks?.[b.id] || fxBankData[b.id]);
             const results = [];
             await loadWithConcurrency(activeBanks, 6, async bank => {
                 const previous = fxBankData[bank.id] || bankCache?.banks?.[bank.id] || null;
                 const meta = bankMeta[bank.id] || bankCache?.meta?.[bank.id] || {};
-                const data = await fetchBankData(bank, previous, meta);
+                const data = await fetchBankData(bank, previous, meta, health);
                 if (data) results.push({bank,data});
             });
             const visible = activeBanks.map(bank => results.find(r => r.bank.id === bank.id)).filter(r => r && CARD_RATE_ORDER.some(c => r.data[c]));
             fxBankData = Object.fromEntries(visible.map(r => [r.bank.id, r.data]));
-            if (visible.length) safeLS.setItem('nbu_site_banks_cache_v1', JSON.stringify({timestamp:Date.now(), banks:fxBankData, meta:bankMeta}));
+            if (visible.length) safeLS.setItem('nbu_site_banks_cache_v2', JSON.stringify({timestamp:Date.now(), banks:fxBankData, meta:bankMeta}));
             const count = $('#fx-bank-count');
             if (count) {
                 delete count.dataset.cachedAt;
@@ -4053,6 +4063,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 const bank = BANKS_CONFIG.find(b => b.id === slide.dataset.bankId);
                 const nameEl = slide.querySelector('.bank-slide-name');
                 if (nameEl && bank) nameEl.textContent = bankDisplayName(bank);
+                const syncEl=slide.querySelector('.bank-slide-sync'); if(syncEl&&bank)syncEl.textContent=bankSyncLabel(bank.id);
             });
         }
 
@@ -5228,9 +5239,9 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
  const delta=q=>{const a=history(q);return a.length>=2?(a[a.length-1][1]/a[a.length-2][1]-1)*100:null;};
  const stale=q=>!timestamp(q?.asOf)||Date.now()-timestamp(q.asOf)>5*86400000||timestamp(q.asOf)>Date.now()+86400000;
  const color=(el,v)=>{el.classList.toggle('up',v!==null&&v>0);el.classList.toggle('down',v!==null&&v<0);el.classList.add('market-change');};
- let region='ua', symbol='KYIV', period='365', quotes={}, checked=0, online=false, busy=false, attempted=false, chartPoints=[];
+ let region='ua', symbol='KYIV', period='365', quotes={}, checked=0, sourceChecked=0, online=false, busy=false, attempted=false, chartPoints=[];
  const cacheKey='nbu_stocks_quotes_v1';
- try{const c=JSON.parse(safeLS.getItem(cacheKey)||'null');if(c&&typeof c.data==='object'&&c.data)quotes=c.data;}catch(_){}
+ try{const c=JSON.parse(safeLS.getItem(cacheKey)||'null');if(c&&typeof c.data==='object'&&c.data){quotes=c.data;sourceChecked=Number(c.sourceChecked)||0;}}catch(_){}
  function discover(data){for(const [ticker,q] of Object.entries(data||{})){if(!/^[A-Z0-9][A-Z0-9.=-]{0,23}$/.test(ticker)||options.some(o=>o.symbol===ticker)||!q||typeof q!=='object'||!(num(q.price)>0)||!cash(q)||!timestamp(q.asOf))continue;const name=[q.name,q.companyName,q.shortName,q.longName].find(v=>typeof v==='string'&&v.trim())||ticker;const exchange=[q.exchange,q.exchangeName,q.fullExchangeName].find(v=>typeof v==='string'&&v.trim())||'—';const ua=ukraineStocks.has(ticker)||q.group==='ua'||['UA','UKRAINE','УКРАЇНА'].includes(String(q.country||'').toUpperCase());options.push({symbol:ticker,name:name.trim().slice(0,100),exchange:exchange.trim().slice(0,40),group:ua?'ua':'world'});}}
  discover(quotes);
  function merge(data){discover(data);for(const o of options){const q=data?.[o.symbol];if(!q||typeof q!=='object'||!(num(q.price)>0)||!cash(q)||!timestamp(q.asOf))continue;const old=quotes[o.symbol];if(!old||timestamp(q.asOf)>=timestamp(old.asOf)){quotes[o.symbol]={...q,history:{...(old&&cash(old)===cash(q)?old.history:{}),...(q.history||{})}};}else if(cash(old)===cash(q)){quotes[o.symbol]={...old,history:{...(q.history||{}),...(old.history||{})}};}}}
@@ -5254,13 +5265,13 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
  function externalIcon(){const svg=sv('svg',{viewBox:'0 0 24 24','aria-hidden':'true'});svg.append(sv('path',{d:'M13 5h6v6m0-6-9 9M19 13v6H5V5h6'}));return svg;}
  function buyLink(o){const a=make('a','market-stock-link');a.href=brokerSearch;a.target='_blank';a.rel='noopener noreferrer';const ticker=o.symbol.split('.')[0];a.title=t('Перейти до Interactive Brokers — '+ticker,'Visit Interactive Brokers — '+ticker);a.setAttribute('aria-label',a.title);a.append(make('span','',t('Купити у брокера','Buy at broker')),externalIcon());return a;}
  function press(sel,key,value){$$(sel).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset[key]===value)));}
- function status(){const el=$('#market-status');if(!el)return;const available=options.filter(o=>quotes[o.symbol]).length;el.dataset.state=attempted&&!online&&!busy?'error':'ok';el.textContent=busy?t('Перевіряємо котирування…','Checking quotes…'):online?t(`Дані: ${available}/${options.length} · Перевірено ${clock(checked)}`,`Quotes: ${available}/${options.length} · Checked ${clock(checked)}`):attempted?t(available?'Не синхронізовано · збережені котирування':'Котирування недоступні',available?'Not synchronized · saved quotes':'Quotes unavailable'):t('Завантаження котирувань…','Loading quotes…');}
- function cards(){const grid=$('#market-grid');grid.replaceChildren();for(const o of options.filter(o=>o.group===region)){const q=quotes[o.symbol],price=num(q?.price),ch=delta(q);const b=make('button','market-stock');b.type='button';b.setAttribute('aria-pressed',String(symbol===o.symbol));const top=make('span','market-stock-top');top.append(brand(o));const meta=make('span');meta.style.minWidth='0';meta.append(make('span','market-stock-ticker',o.symbol),make('span','market-stock-exchange',o.exchange));top.append(meta);b.append(top,make('span','market-stock-company',o.name),make('span','market-stock-price',fmt(price,cash(q))));const sub=make('span','market-stock-meta');const c=make('span','market-change',pct(ch));color(c,ch);sub.append(c,make('span','',q?(stale(q)?t('Застарілі · ','Stale · '):'')+date(q.asOf,true):t('Немає даних','No data')));b.append(sub);b.addEventListener('click',()=>{symbol=o.symbol;grid.querySelectorAll('.market-stock').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));plot();});const shell=make('div','market-stock-shell');const info=make('button','company-info-button',t('Про компанію','About company'));info.type='button';info.addEventListener('click',()=>window.NbuCompany?.open(o.symbol,o.name,top.querySelector('img.is-loaded')?.src,fmt(price,cash(q))));shell.append(b,info,buyLink(o));grid.append(shell);}}
+ function status(){const el=$('#market-status');if(!el)return;const available=options.filter(o=>quotes[o.symbol]).length;el.dataset.state=attempted&&!online&&!busy?'error':'ok';el.textContent=busy?t('Перевіряємо котирування…','Checking quotes…'):online?t(`Дані: ${available}/${options.length} · Перевірка джерела: ${sourceChecked?clock(sourceChecked):'—'}${sourceChecked&&Date.now()-sourceChecked>7200000?' · давно не перевірялись':''}`,`Quotes: ${available}/${options.length} · Source checked: ${sourceChecked?clock(sourceChecked):'—'}${sourceChecked&&Date.now()-sourceChecked>7200000?' · check overdue':''}`):attempted?t(available?'Не синхронізовано · збережені котирування':'Котирування недоступні',available?'Not synchronized · saved quotes':'Quotes unavailable'):t('Завантаження котирувань…','Loading quotes…');}
+ function cards(){const grid=$('#market-grid');grid.replaceChildren();for(const o of options.filter(o=>o.group===region)){const q=quotes[o.symbol],price=num(q?.price),ch=delta(q);const b=make('button','market-stock');b.type='button';b.setAttribute('aria-pressed',String(symbol===o.symbol));const top=make('span','market-stock-top');top.append(brand(o));const meta=make('span');meta.style.minWidth='0';meta.append(make('span','market-stock-ticker',o.symbol),make('span','market-stock-exchange',o.exchange));top.append(meta);b.append(top,make('span','market-stock-company',o.name),make('span','market-stock-price',fmt(price,cash(q))));const sub=make('span','market-stock-meta');const c=make('span','market-change',pct(ch));color(c,ch);sub.append(c,make('span','',q?(stale(q)?t('Застарілі · ','Stale · '):'')+clock(q.asOf):t('Немає даних','No data')));b.append(sub);b.addEventListener('click',()=>{symbol=o.symbol;grid.querySelectorAll('.market-stock').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));plot();});const shell=make('div','market-stock-shell');const info=make('button','company-info-button',t('Про компанію','About company'));info.type='button';info.addEventListener('click',()=>window.NbuCompany?.open(o.symbol,o.name,top.querySelector('img.is-loaded')?.src,fmt(price,cash(q))));shell.append(b,info,buyLink(o));grid.append(shell);}}
  const ns='http://www.w3.org/2000/svg';
  function sv(tag,attrs={},txt){const el=document.createElementNS(ns,tag);for(const [k,v] of Object.entries(attrs))el.setAttribute(k,String(v));if(txt!==undefined)el.textContent=txt;return el;}
  function plot(){const o=options.find(x=>x.symbol===symbol),q=quotes[symbol],cc=cash(q),a=history(q),last=a[a.length-1],cut=period==='all'?-Infinity:(last?timestamp(last[0]):0)-(Number(period)-1)*86400000;const series=a.filter(([d])=>timestamp(d)>=cut),first=series[0],end=series[series.length-1],p=num(q?.price),d=delta(q),pd=first&&end&&series.length>1?(end[1]/first[1]-1)*100:null;
  const logo=$('#market-chart-brand');if(o&&logo.dataset.symbol!==symbol){logo.replaceChildren(brand(o));logo.dataset.symbol=symbol;}if(o){const ticker=o.symbol.split('.')[0];text('market-broker-symbol',t('Шукайте '+ticker+' · '+o.exchange+(ticker==='MHPC'?' · GDR':'')+'. Перехід на сайт брокера, без автоматичної купівлі.','Search '+ticker+' · '+o.exchange+(ticker==='MHPC'?' · GDR':'')+'. External broker site; no automatic purchase.'));}
- text('market-chart-name',symbol+' · '+(o?.name||''));const info=$('#market-company-info');info.textContent=t('Про компанію','About company');info.onclick=()=>window.NbuCompany?.open(symbol,o?.name,$('#market-chart-brand img.is-loaded')?.src,fmt(p,cc));text('market-chart-caption',q?t('Ціна закриття · ','Closing price · ')+date(q.asOf)+(stale(q)?t(' · застарілі дані',' · stale'):''):t('Котирування недоступне','Quote unavailable'));text('market-chart-price',fmt(p,cc));text('market-chart-delta',pct(d));color($('#market-chart-delta'),d);const svg=$('#market-chart'),empty=$('#market-empty');svg.replaceChildren();$('#market-chart-tip').hidden=true;chartPoints=[];
+ text('market-chart-name',symbol+' · '+(o?.name||''));const info=$('#market-company-info');info.textContent=t('Про компанію','About company');info.onclick=()=>window.NbuCompany?.open(symbol,o?.name,$('#market-chart-brand img.is-loaded')?.src,fmt(p,cc));text('market-chart-caption',q?t('Останнє котирування · ','Last quote · ')+clock(q.asOf)+(stale(q)?t(' · застарілі дані',' · stale'):''):t('Котирування недоступне','Quote unavailable'));text('market-chart-price',fmt(p,cc));text('market-chart-delta',pct(d));color($('#market-chart-delta'),d);const svg=$('#market-chart'),empty=$('#market-empty');svg.replaceChildren();$('#market-chart-tip').hidden=true;chartPoints=[];
  const vals=series.map(x=>x[1]);text('market-min',fmt(vals.length?Math.min(...vals):null,cc));text('market-max',fmt(vals.length?Math.max(...vals):null,cc));text('market-period-delta',pct(pd));color($('#market-period-delta'),pd);text('market-history-note',series.length?t(`${date(first[0])} — ${date(end[0])} · ${series.length} торгових днів`,`${date(first[0])} — ${date(end[0])} · ${series.length} trading days`):'');
  empty.hidden=series.length>=2;empty.textContent=t('Недостатньо історії за цей період','Not enough history for this period');if(series.length<2)return;
  const w=Math.max(240,Math.round(svg.clientWidth||700)),h=Math.max(180,Math.round(svg.clientHeight||300)),left=8,right=w-57,top=16,bottom=h-29;svg.setAttribute('viewBox',`0 0 ${w} ${h}`);let lo=Math.min(...vals),hi=Math.max(...vals);const pad=Math.max((hi-lo)*.10,hi*.005,.0001);lo-=pad;hi+=pad;const from=timestamp(first[0]),to=timestamp(end[0]);const x=d=>left+(timestamp(d)-from)/(to-from||1)*(right-left),y=v=>top+(hi-v)/(hi-lo)*(bottom-top);const lineColor=pd===null?'var(--accent)':pd>=0?'var(--positive)':'var(--negative)';const defs=sv('defs');const grad=sv('linearGradient',{id:'market-fill',x1:'0',x2:'0',y1:'0',y2:'1'});grad.append(sv('stop',{offset:'0%','stop-color':lineColor,'stop-opacity':.18}),sv('stop',{offset:'100%','stop-color':lineColor,'stop-opacity':0}));defs.append(grad);svg.append(defs);
@@ -5273,7 +5284,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
  function render(){status();cards();plot();}
  fetch('./stock-logos.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(m=>{if(!m||typeof m!=='object'||Array.isArray(m))return;for(const [k,v] of Object.entries(m)){if(/^[A-Z0-9][A-Z0-9.=-]{0,23}$/.test(k)&&typeof v==='string'&&/^stock-logos\/[a-zA-Z0-9._-]+\.(svg|png|webp|ico)$/i.test(v))localStockLogos[k]='./'+v;}if(Object.keys(localStockLogos).length){delete $('#market-chart-brand').dataset.symbol;render();}}).catch(()=>{});
  async function get(url){const c=new AbortController(),tm=setTimeout(()=>c.abort(),10000);try{const r=await fetch(url+'?v='+Math.floor(Date.now()/300000),{cache:'no-store',signal:c.signal});if(!r.ok)throw Error('HTTP '+r.status);const j=await r.json();if(!j?.data||typeof j.data!=='object'||Array.isArray(j.data))throw Error('Invalid feed');return j;}finally{clearTimeout(tm);}}
- async function load(){if(busy)return;attempted=true;if(navigator.onLine===false){online=false;status();return;}busy=true;$('#market-reload').disabled=true;status();try{const urls=['https://raw.githubusercontent.com/He-Trogati-Mne/nbu-rate-data/main/data/stocks.json','https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@main/data/stocks.json'];const res=await Promise.allSettled(urls.map(get));const valid=res.filter(x=>x.status==='fulfilled').map(x=>x.value).sort((a,b)=>timestamp(a.updatedAt)-timestamp(b.updatedAt));online=valid.length>0;if(online){for(const j of valid)merge(j.data);checked=Date.now();try{safeLS.setItem(cacheKey,JSON.stringify({data:quotes}));}catch(_){}}}finally{busy=false;$('#market-reload').disabled=false;render();}}
+ async function load(){if(busy)return;attempted=true;if(navigator.onLine===false){online=false;status();return;}busy=true;$('#market-reload').disabled=true;status();try{const urls=['https://raw.githubusercontent.com/He-Trogati-Mne/nbu-rate-data/main/data/stocks.json','https://cdn.jsdelivr.net/gh/He-Trogati-Mne/nbu-rate-data@main/data/stocks.json'];const res=await Promise.allSettled(urls.map(get));const valid=res.filter(x=>x.status==='fulfilled').map(x=>x.value).sort((a,b)=>timestamp(a.updatedAt)-timestamp(b.updatedAt));online=valid.length>0;if(online){for(const j of valid)merge(j.data);sourceChecked=Math.max(sourceChecked,...valid.map(j=>timestamp(j.checkedAt)||timestamp(j.updatedAt)));checked=Date.now();try{safeLS.setItem(cacheKey,JSON.stringify({data:quotes,sourceChecked}));}catch(_){}}}finally{busy=false;$('#market-reload').disabled=false;render();}}
  $$('.market-segments button').forEach(b=>b.addEventListener('click',()=>{region=b.dataset.marketRegion;symbol=options.find(o=>o.group===region).symbol;press('[data-market-region]','marketRegion',region);render();}));
  $$('.market-periods button').forEach(b=>b.addEventListener('click',()=>{period=b.dataset.marketPeriod;press('[data-market-period]','marketPeriod',period);plot();}));$('#market-reload').addEventListener('click',load);
  const tabs=$$('[data-market-nav]');function navSelect(b){tabs.forEach(x=>{x.classList.toggle('is-current',x===b);if(x===b)x.setAttribute('aria-current','location');else x.removeAttribute('aria-current');});}tabs.forEach(b=>b.addEventListener('click',()=>{navSelect(b);document.getElementById(b.dataset.marketNav)?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});}));
