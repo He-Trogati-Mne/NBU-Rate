@@ -482,6 +482,12 @@
         .change-label { display:none; }
 
         :root[data-a11y-symbols="false"] .rate-change > span:first-child { display: none; }
+        :root[data-a11y-cvd="true"] .rate-change > span:first-child { display:inline; }
+        :root[data-a11y-cvd="true"] .market-change.up::before {content:"▲ ";}
+        :root[data-a11y-cvd="true"] .market-change.down::before {content:"▼ ";}
+        :root[data-a11y-cvd="true"] .hero-status.error .status-dot {border-radius:2px;}
+        :root[data-a11y-cvd="true"] .rate-change.down {border-bottom:1px dashed var(--negative);}
+        :root[data-a11y-cvd="true"] .rate-change.up {border-bottom:1px solid var(--positive);}
         :root[data-a11y-underline="true"] .rate-change > span:first-child {
             text-decoration: underline;
             text-underline-offset: 3px;
@@ -866,14 +872,14 @@
         .palette-swatch { width:22px; height:22px; border-radius:6px; border:1px solid rgba(0,0,0,0.15); }
 
         :root[data-a11y-cvd="true"] { --positive:var(--a11y-up) !important; --negative:var(--a11y-down) !important; }
-        :root[data-a11y-cvd="true"][data-a11y-palette="universal"] { --a11y-up:#0072B2; --a11y-down:#D55E00; }
-        :root[data-theme="dark"][data-a11y-cvd="true"][data-a11y-palette="universal"] { --a11y-up:#56B4E9; --a11y-down:#E69F00; }
-        :root[data-a11y-cvd="true"][data-a11y-palette="red-green"] { --a11y-up:#004488; --a11y-down:#BB5566; }
-        :root[data-theme="dark"][data-a11y-cvd="true"][data-a11y-palette="red-green"] { --a11y-up:#6699CC; --a11y-down:#DD7788; }
-        :root[data-a11y-cvd="true"][data-a11y-palette="blue-yellow"] { --a11y-up:#CC79A7; --a11y-down:#009E73; }
-        :root[data-theme="dark"][data-a11y-cvd="true"][data-a11y-palette="blue-yellow"] { --a11y-up:#E8A6C0; --a11y-down:#4DD4AC; }
-        :root[data-a11y-cvd="true"][data-a11y-palette="mono"] { --a11y-up:#1a1a1a; --a11y-down:#888888; }
-        :root[data-theme="dark"][data-a11y-cvd="true"][data-a11y-palette="mono"] { --a11y-up:#ffffff; --a11y-down:#888888; }
+        :root[data-a11y-cvd="true"][data-a11y-palette="universal"] { --a11y-up:#0072B2; --a11y-down:#B44E00; }
+        :root[data-scheme="dark"][data-a11y-cvd="true"][data-a11y-palette="universal"] { --a11y-up:#56B4E9; --a11y-down:#E69F00; }
+        :root[data-a11y-cvd="true"][data-a11y-palette="red-green"] { --a11y-up:#004488; --a11y-down:#A33D50; }
+        :root[data-scheme="dark"][data-a11y-cvd="true"][data-a11y-palette="red-green"] { --a11y-up:#8AB4F8; --a11y-down:#F098AC; }
+        :root[data-a11y-cvd="true"][data-a11y-palette="blue-yellow"] { --a11y-up:#9F4D7D; --a11y-down:#007D59; }
+        :root[data-scheme="dark"][data-a11y-cvd="true"][data-a11y-palette="blue-yellow"] { --a11y-up:#E8A6C0; --a11y-down:#4DD4AC; }
+        :root[data-a11y-cvd="true"][data-a11y-palette="mono"] { --a11y-up:#1a1a1a; --a11y-down:#666666; }
+        :root[data-scheme="dark"][data-a11y-cvd="true"][data-a11y-palette="mono"] { --a11y-up:#ffffff; --a11y-down:#AAAAAA; }
 
         @media (max-width:700px) {
             .hero { padding:40px 0 32px; }
@@ -1872,15 +1878,15 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 .settings-widget-link{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius);text-decoration:none;text-align:left;color:var(--text);transition:background .2s,border-color .2s}.settings-widget-link:hover{border-color:var(--accent);background:var(--hover)}.settings-widget-icon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border-radius:11px;background:color-mix(in srgb,var(--accent) 12%,var(--surface-1));color:var(--accent)}.settings-widget-icon svg,.settings-widget-chevron{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.settings-widget-chevron{flex-shrink:0;color:var(--text-muted)}.settings-widget-link .toggle-text{gap:4px}.settings-widget-link .toggle-desc{font-weight:400}.settings-widget-link:focus-visible,.nbu-donate:focus-visible,.market-context-links a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .market-context-links{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:5px 13px;margin:16px 0 0;font-size:12px;color:var(--text-muted);line-height:1.6}.market-context-links a{color:var(--text-muted);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--border-strong)}.market-context-links a:hover{color:var(--accent);text-decoration-color:var(--accent)}
 </style>
-<style>.hero-logo,.fx-footer-sign,.fx-widget-brand-mark{background:transparent!important;box-shadow:none!important;border:0!important;overflow:visible}.hero-logo img,.fx-footer-sign img,.fx-widget-brand-mark img{width:100%;height:100%;object-fit:contain;display:block;filter:none!important}</style><link rel="stylesheet" href="./company-profiles.css?v=58"><script src="./company-profiles.js?v=58" defer></script></head>
+<style>.hero-logo,.fx-footer-sign,.fx-widget-brand-mark{background:transparent!important;box-shadow:none!important;border:0!important;overflow:visible}.hero-logo img,.fx-footer-sign img,.fx-widget-brand-mark img{width:100%;height:100%;object-fit:contain;display:block;filter:none!important}</style><link rel="stylesheet" href="./company-profiles.css?v=371-release"><script src="./company-profiles.js?v=371-release" defer></script><link rel="stylesheet" href="./portal.css?v=371-release"><script defer src="./portal.js?v=371-release"></script></head>
 <body>
 
 
     <header class="hero">
         <div class="container">
             <div class="hero-content">
-                <div class="hero-logo"><img src="./favicon/web-app-manifest-192x192.png" alt="" width="192" height="192"></div>
-                <h1 data-i18n="hero_title">Курс НБУ</h1>
+                <div class="hero-brand"><div class="hero-logo"><img src="./favicon/web-app-manifest-192x192.png" alt="" width="192" height="192"></div>
+                <div class="hero-brand-copy"><h1 data-i18n="hero_title">Курс НБУ</h1></div></div>
                 <p class="hero-subtitle" data-i18n="hero_subtitle">Офіційні курси валют, конвертер та історія з 2003 року</p>
                 <div class="hero-status loading" id="hero-status" role="status" aria-live="polite">
                     <span class="hero-status-main"><span class="status-dot" aria-hidden="true"></span><span id="status-text">Завантаження...</span></span>
@@ -1896,10 +1902,12 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
         </div>
     </header>
 
-    <main class="container">
+    <main class="container portal-main">
 
-<nav class="market-nav" aria-label="Розділи сайту"><div class="market-nav-inner"><button class="market-nav-btn is-current" type="button" data-market-nav="nbu-converter-pane" aria-current="location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16m-4-4 4 4 4-4M17 20V4m-4 4 4-4 4 4"/></svg><span data-market-uk="Конвертер" data-market-en="Converter">Конвертер</span></button><button class="market-nav-btn" type="button" data-market-nav="analytics-card" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5m0 14h16M7 14l4-4 3 3 6-7"/></svg><span data-market-uk="Курси" data-market-en="Rates">Курси</span></button><button class="market-nav-btn" type="button" data-market-nav="card-rates-card" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 8 9-5 9 5H3Zm2 3v6m5-6v6m4-6v6m5-6v6M3 21h18M3 18h18"/></svg><span data-market-uk="Банки" data-market-en="Banks">Банки</span></button><button class="market-nav-btn" type="button" data-market-nav="crypto-card" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 9 9-9 9-9-9 9-9Z"/><path d="m3 12 9 3 9-3M12 3v18"/></svg><span data-market-uk="Крипто" data-market-en="Crypto">Крипто</span></button><button class="market-nav-btn" type="button" data-market-nav="nbu-stocks" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5v15h16M8 15l4-4 3 3 5-7m-4 0h4v4"/></svg><span data-market-uk="Акції" data-market-en="Stocks">Акції</span></button><button class="market-nav-btn" type="button" data-market-nav="fx-tools" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span data-market-uk="Інше" data-market-en="Tools">Інше</span></button></div></nav>
+<nav class="market-nav" aria-label="Розділи сайту"><div class="market-nav-inner"><button class="market-nav-btn is-current" type="button" data-market-nav="nbu-converter-pane" aria-current="location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16m-4-4 4 4 4-4M17 20V4m-4 4 4-4 4 4"/></svg><span data-market-uk="Конвертер" data-market-en="Converter">Конвертер</span></button><button class="market-nav-btn" type="button" data-market-nav="analytics-card" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5m0 14h16M7 14l4-4 3 3 6-7"/></svg><span data-market-uk="Курси" data-market-en="Rates">Курси</span></button><button class="market-nav-btn" type="button" data-market-nav="card-rates-card" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 8 9-5 9 5H3Zm2 3v6m5-6v6m4-6v6m5-6v6M3 21h18M3 18h18"/></svg><span data-market-uk="Банки" data-market-en="Banks">Банки</span></button><button class="market-nav-btn" type="button" data-market-nav="crypto-card" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 7v10m0-9h4a2 2 0 0 1 0 4H9m0 0h5a2 2 0 0 1 0 4H9m2-10v2m3-2v2m-3 8v2m3-2v2"/></svg><span data-market-uk="Крипто" data-market-en="Crypto">Крипто</span></button><button class="market-nav-btn" type="button" data-market-nav="nbu-stocks" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5v15h16M8 15l4-4 3 3 5-7m-4 0h4v4"/></svg><span data-market-uk="Акції" data-market-en="Stocks">Акції</span></button><button class="market-nav-btn" type="button" data-market-nav="fx-tools" ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span data-market-uk="Інше" data-market-en="Tools">Інше</span></button><a class="market-nav-btn portal-nav-link" href="./cities/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Міста" data-market-en="Cities">Міста</span></a><a class="market-nav-btn portal-nav-link" href="./graphics/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M6 16l4-5 3 3 5-6"/></svg><span data-market-uk="Графіка" data-market-en="Graphics">Графіка</span></a></div></nav>
 
+
+<section class="portal-overview" aria-labelledby="portal-overview-title"><div class="portal-section-head"><div><p class="portal-eyebrow" data-market-uk="NBU RATE / ОГЛЯД РИНКУ" data-market-en="NBU RATE / MARKET OVERVIEW">NBU RATE / ОГЛЯД РИНКУ</p><h2 id="portal-overview-title" data-market-uk="Курси валют сьогодні" data-market-en="Exchange rates today">Курси валют сьогодні</h2></div><a href="#analytics-card" data-market-uk="Усі валюти та графіки" data-market-en="All currencies and charts">Усі валюти та графіки</a></div><div class="portal-summary" id="portal-summary"><button type="button" class="portal-quote" data-portal-currency="USD"><span class="portal-quote-head"><span class="portal-code"><img src="./flags/us.png" alt="" width="25" height="17">USD</span><span class="portal-source">НБУ</span></span><span class="portal-quote-value">—</span><span class="portal-quote-bottom"><span data-market-uk="Долар США" data-market-en="US dollar">Долар США</span><span class="portal-quote-change"></span></span></button><button type="button" class="portal-quote" data-portal-currency="EUR"><span class="portal-quote-head"><span class="portal-code"><img src="./flags/eu.png" alt="" width="25" height="17">EUR</span><span class="portal-source">НБУ</span></span><span class="portal-quote-value">—</span><span class="portal-quote-bottom"><span data-market-uk="Євро" data-market-en="Euro">Євро</span><span class="portal-quote-change"></span></span></button><button type="button" class="portal-quote" data-portal-currency="PLN"><span class="portal-quote-head"><span class="portal-code"><img src="./flags/pl.png" alt="" width="25" height="17">PLN</span><span class="portal-source">НБУ</span></span><span class="portal-quote-value">—</span><span class="portal-quote-bottom"><span data-market-uk="Польський злотий" data-market-en="Polish zloty">Польський злотий</span><span class="portal-quote-change"></span></span></button><button type="button" class="portal-quote" data-portal-currency="GBP"><span class="portal-quote-head"><span class="portal-code"><img src="./flags/gb.png" alt="" width="25" height="17">GBP</span><span class="portal-source">НБУ</span></span><span class="portal-quote-value">—</span><span class="portal-quote-bottom"><span data-market-uk="Фунт стерлінгів" data-market-en="British pound">Фунт стерлінгів</span><span class="portal-quote-change"></span></span></button></div></section>
         <section class="card" id="nbu-converter-pane">
             <div class="section-head">
                 <h2 class="section-title">
@@ -1977,7 +1985,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                     <span data-i18n="section_analytics">Аналітика</span>
                 </h2>
             </div>
-            <div class="rate-grid" id="current-rates">
+            <p class="portal-rate-hint" data-market-uk="Оберіть валюту для графіка · прокручуйте список" data-market-en="Select a currency for the chart · scroll the list">Оберіть валюту для графіка · прокручуйте список</p><div class="rate-grid" id="current-rates" tabindex="0" role="region" aria-label="Курси валют НБУ / NBU currency rates">
                 <div class="rate-card skeleton"><div class="skeleton-shape sk-head"></div><div class="skeleton-shape sk-name"></div><div class="skeleton-shape sk-value"></div></div>
                 <div class="rate-card skeleton"><div class="skeleton-shape sk-head"></div><div class="skeleton-shape sk-name"></div><div class="skeleton-shape sk-value"></div></div>
                 <div class="rate-card skeleton"><div class="skeleton-shape sk-head"></div><div class="skeleton-shape sk-name"></div><div class="skeleton-shape sk-value"></div></div>
@@ -1997,7 +2005,10 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 <canvas id="rateChart"></canvas>
             </div>
 
-            <div class="fx-section" id="fx-history-panel">
+            <nav class="market-context-links" aria-label="Детальні курси / Detailed rates"><span data-market-uk="Докладніше:" data-market-en="More details:">Докладніше:</span><a href="./kurs-dolara/" data-market-uk="Долар" data-market-en="Dollar">Долар</a><a href="./kurs-yevro/" data-market-uk="Євро" data-market-en="Euro">Євро</a><a href="./kurs-zlotoho/" data-market-uk="Злотий" data-market-en="Zloty">Злотий</a><a href="./kurs-funta/" data-market-uk="Фунт" data-market-en="Pound">Фунт</a></nav>
+        </section>
+
+<section class="card portal-history" aria-label="Історичний розрахунок / Historical calculation"><div class="fx-section" id="fx-history-panel">
                 <div class="fx-row"><div><h3 class="fx-h3" data-fx="whatif">А що, якби купили тоді?</h3><p class="fx-help" data-fx="whatifhelp">Виберіть дату або натисніть на точку графіка. Розрахунок за курсами НБУ, без комісій та інфляції.</p></div></div>
                 <div class="fx-events" id="fx-events" aria-label="Економічні події"></div>
                 <div class="fx-whatif">
@@ -2007,11 +2018,8 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 </div>
                 <div class="fx-result-panel" id="fx-history-result" aria-live="polite"><span class="fx-help">Історія завантажується…</span></div>
                 <p class="fx-inline-note" id="fx-history-note"></p>
-            </div>
-        
-            <nav class="market-context-links" aria-label="Детальні курси / Detailed rates"><span data-market-uk="Докладніше:" data-market-en="More details:">Докладніше:</span><a href="./kurs-dolara/" data-market-uk="Курс долара (USD/UAH)" data-market-en="US dollar rate (USD/UAH)">Курс долара (USD/UAH)</a><a href="./kurs-yevro/" data-market-uk="Курс євро (EUR/UAH)" data-market-en="Euro rate (EUR/UAH)">Курс євро (EUR/UAH)</a><a href="./kurs-zlotoho/" data-market-uk="PLN" data-market-en="PLN">PLN</a><a href="./kurs-funta/" data-market-uk="GBP" data-market-en="GBP">GBP</a></nav>
-        </section>
-
+            </div></section>
+<section class="portal-discover portal-regions" aria-labelledby="portal-regions-title"><div class="portal-discover-copy"><p class="portal-eyebrow" data-market-uk="NBU RATE / РЕГІОНИ" data-market-en="NBU RATE / REGIONS">NBU RATE / РЕГІОНИ</p><h2 id="portal-regions-title" data-market-uk="Курси в обласних центрах" data-market-en="Regional exchange rates">Курси в обласних центрах</h2><p data-market-uk="Місцеві курси поки недоступні. Переглядайте офіційні курси НБУ та загальні банківські котирування." data-market-en="Local quotes are not yet available. Explore official NBU rates and nationwide bank quotes.">Місцеві курси поки недоступні. Переглядайте офіційні курси НБУ та загальні банківські котирування.</p></div><div class="portal-city-picker"><div class="portal-city-toolbar"><label class="portal-city-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="portal-city-search" autocomplete="off" placeholder="Знайти місто…" aria-label="Знайти місто"></label><a class="portal-action" href="./cities/" data-market-uk="Усі міста" data-market-en="All cities">Усі міста</a></div><div class="portal-city-shortcuts" id="portal-city-results"><a href="./cities/?city=kyiv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Київ" data-market-en="Kyiv">Київ</span></a><a href="./cities/?city=poltava"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Полтава" data-market-en="Poltava">Полтава</span></a><a href="./cities/?city=lviv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Львів" data-market-en="Lviv">Львів</span></a><a href="./cities/?city=kharkiv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Харків" data-market-en="Kharkiv">Харків</span></a><a href="./cities/?city=dnipro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Дніпро" data-market-en="Dnipro">Дніпро</span></a><a href="./cities/?city=odesa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Одеса" data-market-en="Odesa">Одеса</span></a><a href="./cities/?city=vinnytsia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Вінниця" data-market-en="Vinnytsia">Вінниця</span></a><a href="./cities/?city=cherkasy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Черкаси" data-market-en="Cherkasy">Черкаси</span></a><a href="./cities/?city=zaporizhzhia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Запоріжжя" data-market-en="Zaporizhzhia">Запоріжжя</span></a><a href="./cities/?city=lutsk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Луцьк" data-market-en="Lutsk">Луцьк</span></a><a href="./cities/?city=rivne"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Рівне" data-market-en="Rivne">Рівне</span></a><a href="./cities/?city=ternopil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span data-market-uk="Тернопіль" data-market-en="Ternopil">Тернопіль</span></a></div><p class="portal-city-message" id="portal-city-message" role="status" hidden></p></div></section><section class="portal-discover portal-graphics"><div class="portal-discover-copy"><p class="portal-eyebrow" data-market-uk="NBU RATE / ГРАФІКА" data-market-en="NBU RATE / GRAPHICS">NBU RATE / ГРАФІКА</p><h2 data-market-uk="Графіка та банери" data-market-en="Charts and banners">Графіка та банери</h2><p data-market-uk="Готові банери з офіційними курсами НБУ. Посилання та код для вставки на сайт." data-market-en="Live banners with official NBU rates. Share a link or embed on a website.">Готові банери з офіційними курсами НБУ. Посилання та код для вставки на сайт.</p><a class="portal-action" href="./graphics/" data-market-uk="Відкрити графіку" data-market-en="Explore graphics">Відкрити графіку</a></div><div class="portal-graphic-preview" aria-hidden="true"><div class="portal-preview-brand"><img src="./favicon/web-app-manifest-192x192.png" alt="" width="26" height="26"> NBU Rate</div><div class="portal-preview-rates"><div>USD<strong data-portal-preview="USD">—</strong></div><div>EUR<strong data-portal-preview="EUR">—</strong></div></div><small>nbu-rate.info · НБУ</small></div></section>
         <!-- CAROUSEL SECTION -->
         <section class="card" id="card-rates-card">
             <div class="section-head">
@@ -2074,13 +2082,13 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 </div>
             </div>
         
-            <nav class="market-context-links" aria-label="Детальні курси / Detailed rates"><span data-market-uk="Докладніше:" data-market-en="More details:">Докладніше:</span><a href="./banks/" data-market-uk="Курси всіх банків" data-market-en="All bank rates">Курси всіх банків</a></nav>
+            <nav class="market-context-links" aria-label="Детальні курси / Detailed rates"><span data-market-uk="Докладніше:" data-market-en="More details:">Докладніше:</span><a href="./banks/" data-market-uk="Курси всіх банків" data-market-en="All bank rates">Курси всіх банків</a><a href="./cities/" data-market-uk="В обласних центрах" data-market-en="Rates by city">В обласних центрах</a><a href="./graphics/" data-market-uk="Графіка курсів" data-market-en="Rate graphics">Графіка курсів</a></nav>
         </section>
 
         <section class="card" id="crypto-card">
             <div class="section-head">
                 <h2 class="section-title">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 8h4a3 3 0 0 1 0 6H9V8zM9 14h5a3 3 0 0 1 0 6H9v-6z"/></svg>
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 7v10m0-9h4a2 2 0 0 1 0 4H9m0 0h5a2 2 0 0 1 0 4H9m2-10v2m3-2v2m-3 8v2m3-2v2"/></svg>
                     <span data-i18n="section_crypto">Криптовалюта</span>
                 </h2>
             </div>
@@ -2187,7 +2195,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 <p><span data-market-uk="NBU Rate — незалежний український фінансовий сервіс для зручного перегляду офіційних курсів НБУ, порівняння курсів банків, конвертації валют і відстеження криптовалют та акцій." data-market-en="NBU Rate is an independent Ukrainian financial service for viewing official NBU rates, comparing bank rates, converting currencies, and tracking crypto assets and stocks.">NBU Rate — незалежний український фінансовий сервіс для зручного перегляду офіційних курсів НБУ, порівняння курсів банків, конвертації валют і відстеження криптовалют та акцій.</span></p>
                 <p><span data-market-uk="Історичні графіки, калькулятори та відкриті JSON-дані допомагають аналізувати зміни курсів. Дані автоматично оновлюються через GitHub Actions; доступність і свіжість залежать від джерела. Сайт можна встановити як PWA." data-market-en="Historical charts, calculators and open JSON data help track rate changes. Data is automatically updated through GitHub Actions; availability and freshness depend on the source. The website can be installed as a PWA.">Історичні графіки, калькулятори та відкриті JSON-дані допомагають аналізувати зміни курсів. Дані автоматично оновлюються через GitHub Actions; доступність і свіжість залежать від джерела. Сайт можна встановити як PWA.</span></p>
                 <p><span data-market-uk="Проєкт не є банком, брокером чи криптобіржею та не проводить фінансових операцій. Інформація має довідковий характер." data-market-en="The project is not a bank, broker or crypto exchange and does not execute financial transactions. Information is provided for reference.">Проєкт не є банком, брокером чи криптобіржею та не проводить фінансових операцій. Інформація має довідковий характер.</span></p>
-                <div class="about-links"><a href="https://github.com/He-Trogati-Mne/NBU-Rate" target="_blank" rel="noopener noreferrer"><span data-market-uk="Код сайту" data-market-en="Website code">Код сайту</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a><a href="https://github.com/He-Trogati-Mne/nbu-rate-data" target="_blank" rel="noopener noreferrer"><span data-market-uk="Відкриті дані" data-market-en="Open data">Відкриті дані</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a></div>
+                <p data-market-uk="Регіональні котирування та повне покриття банків поки не підтримуються: це потребує окремих інтеграцій, перевірки джерел і додаткових ресурсів. Ми розширюватимемо покриття за наявності можливостей." data-market-en="Regional quotes and complete bank coverage are not supported yet: they require individual integrations, source verification and additional resources. Coverage may expand when resources allow.">Регіональні котирування та повне покриття банків поки не підтримуються: це потребує окремих інтеграцій, перевірки джерел і додаткових ресурсів. Ми розширюватимемо покриття за наявності можливостей.</p><div class="about-links"><a href="https://github.com/He-Trogati-Mne/NBU-Rate" target="_blank" rel="noopener noreferrer"><span data-market-uk="Код сайту" data-market-en="Website code">Код сайту</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a><a href="https://github.com/He-Trogati-Mne/nbu-rate-data" target="_blank" rel="noopener noreferrer"><span data-market-uk="Відкриті дані" data-market-en="Open data">Відкриті дані</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5h6v6m0-6-9 9M19 13v6H5V5h6"/></svg></a></div>
             </div>
         </details>
         <details class="card privacy-card" id="privacy">
@@ -2590,7 +2598,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             this._onClick = event => {
                 if (typeof this.options.onClick !== 'function') return;
                 const bounds = this.canvas.getBoundingClientRect();
-                this.options.onClick({ x: event.clientX-bounds.left, y:event.clientY-bounds.top },[],this);
+                this.options.onClick({ x: (event.clientX-bounds.left)*(this.logicalWidth||bounds.width)/bounds.width, y:(event.clientY-bounds.top)*(this.logicalHeight||bounds.height)/bounds.height },[],this);
             };
             this.canvas.addEventListener('pointermove',this._onMove);
             this.canvas.addEventListener('pointerleave',this._onLeave);
@@ -2616,6 +2624,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             const dpr=Math.min(window.devicePixelRatio||1,2);
             const width=Math.min(parent.clientWidth, this.canvas.clientWidth || parent.clientWidth);
             const height=Math.min(parent.clientHeight, this.canvas.clientHeight || parent.clientHeight);
+            this.logicalWidth=width;this.logicalHeight=height;
             const targetW=Math.round(width*dpr), targetH=Math.round(height*dpr);
             if(this.canvas.width!==targetW || this.canvas.height!==targetH){this.canvas.width=targetW;this.canvas.height=targetH;}
             const ctx=this.ctx;
@@ -2696,7 +2705,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
         }
         handleMove(event){
             const box=this.canvas.getBoundingClientRect();
-            const x=event.clientX-box.left,y=event.clientY-box.top;
+            const x=(event.clientX-box.left)*(this.logicalWidth||box.width)/box.width,y=(event.clientY-box.top)*(this.logicalHeight||box.height)/box.height;
             if(x<this.chartArea.left || x>this.chartArea.right || y<this.chartArea.top-5 || y>this.chartArea.bottom+10){this.tooltip.style.opacity='0';return;}
             const idx=Math.max(0,Math.min(this.points.length-1,Math.round(this.scales.x.getValueForPixel(x))));
             const value=this.points[idx]?.value;
@@ -3225,7 +3234,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
         function applyA11y(a) {
             const root = document.documentElement; const v = { ...DEFAULT_A11Y, ...a };
             root.setAttribute('data-a11y-cvd', v.cvd ? 'true' : 'false'); root.setAttribute('data-a11y-palette', v.palette);
-            root.setAttribute('data-a11y-symbols', v.symbols ? 'true' : 'false'); root.setAttribute('data-a11y-underline', v.underline ? 'true' : 'false');
+            root.setAttribute('data-a11y-symbols', (v.cvd || v.symbols) ? 'true' : 'false'); root.setAttribute('data-a11y-underline', v.underline ? 'true' : 'false');
             const fontSize = parseInt(v.font, 10) || 100;
             root.style.setProperty('--a11y-font-scale', (fontSize / 100).toFixed(2));
             const cvd = $('#a11y-cvd-toggle'); if (cvd) cvd.checked = v.cvd;
@@ -3247,7 +3256,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                     symbols: $('#a11y-symbols-toggle')?.checked || false,
                     underline: $('#a11y-underline-toggle')?.checked || false
                 };
-                safeLS.setItem(A11Y_KEY, JSON.stringify(v)); applyA11y(v);
+                safeLS.setItem(A11Y_KEY, JSON.stringify(v)); applyA11y(v); renderChart(); renderCryptoCards(); if ($('#crypto-chart-modal').classList.contains('visible')) renderCryptoModalChart();
             }
             ['a11y-cvd-toggle','a11y-symbols-toggle','a11y-underline-toggle'].forEach(id => { const el = $('#' + id); if (el) el.addEventListener('change', save); });
             const slider = $('#a11y-font-slider');
@@ -4208,7 +4217,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 const ch = Number(c.change24h) || 0;
                 const changeClass = ch > 0 ? 'up' : ch < 0 ? 'down' : '';
                 const symbol = ch > 0 ? '▲' : ch < 0 ? '▼' : '●';
-                const color = CRYPTO_COLORS[c.symbol] || '#F7931A';
+                const color = chartAccessibleColor(CRYPTO_COLORS[c.symbol] || '#F7931A');
                 const history = getCryptoHistoryForPeriod(c, currentCryptoPeriod);
                 const spark = sparklineSvg(history, color);
                 html += `<div class="crypto-market-shell"><div class="rate-card crypto-card" tabindex="0" role="button" data-crypto="${c.symbol}">
@@ -4306,7 +4315,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 
             if (cryptoChartInstance) cryptoChartInstance.destroy();
 
-            const color = CRYPTO_COLORS[coin.symbol] || '#1a73e8';
+            const color = chartAccessibleColor(CRYPTO_COLORS[coin.symbol] || '#1a73e8');
             const styles = getComputedStyle(document.documentElement);
             const textMuted = styles.getPropertyValue('--text-muted').trim() || '#5a6472';
             const borderCol = styles.getPropertyValue('--border').trim() || '#e1e5ea';
@@ -4328,7 +4337,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             const cryptoXAxisFont = cryptoPlotWidth < 460 ? (cryptoLargeText ? 13 : 12) : cryptoTickSize;
 
             cryptoChartInstance = new Chart(ctx, {
-                type: 'line',
+                type: 'line', plugins: [nbuPointerPlugin],
                 data: {
                     labels,
                     datasets: [{
@@ -4350,7 +4359,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                     responsive: true,
                     maintainAspectRatio: false,
                     animation: { duration: 350, easing: 'easeOutQuart' },
-                    interaction: { mode: 'index', intersect: false },
+                    interaction: { mode: 'index', axis: 'x', intersect: false },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -4409,6 +4418,21 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
             const startStr = start.toISOString().slice(0, 10);
             return dates.filter(d => d >= startStr);
         }
+        function chartAccessibleColor(original) {
+            const root=document.documentElement;
+            return root.dataset.a11yCvd==='true' ? (getComputedStyle(root).getPropertyValue('--a11y-up').trim() || original) : original;
+        }
+        // Use real canvas bounds, not stale CSS/flex dimensions, for pointer coordinates.
+        const nbuPointerPlugin={id:'nbuPointerCoordinates',beforeEvent(chart,args){
+            const ev=args.event, native=ev.native, r=chart.canvas.getBoundingClientRect();
+            if(!native||!r.width||!r.height||ev.type==='mouseout')return;
+            const p=native.touches?.[0]||native.changedTouches?.[0]||native;
+            if(!Number.isFinite(p.clientX)||!Number.isFinite(p.clientY))return;
+            ev.x=(p.clientX-r.left)*chart.width/r.width;
+            ev.y=(p.clientY-r.top)*chart.height/r.height;
+            const a=chart.chartArea;
+            args.inChartArea=!!a&&ev.x>=a.left&&ev.x<=a.right&&ev.y>=a.top&&ev.y<=a.bottom;
+        }};
         function renderChart() {
             const container = $('#chart-container'); if (!container) return;
             fxUpdateHistoric();
@@ -4449,7 +4473,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 return `${day}.${m}`;
             });
             const data = points.map(p => p.value);
-            const color = CHART_COLORS[currentCurrency] || '#1a73e8';
+            const color = chartAccessibleColor(CHART_COLORS[currentCurrency] || '#1a73e8');
             const gradient = ctx.createLinearGradient(0, 0, 0, cv.height);
             gradient.addColorStop(0, hexToRgba(color, 0.28)); gradient.addColorStop(1, hexToRgba(color, 0));
             const dec = currentDecimals();
@@ -4460,6 +4484,8 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 chartInstance.data.datasets[0].label = `${currentCurrency} / UAH`;
                 chartInstance.data.datasets[0].borderColor = color;
                 chartInstance.data.datasets[0].backgroundColor = gradient;
+                chartInstance.data.datasets[0].pointHoverBackgroundColor = color;
+                chartInstance.options.plugins.tooltip.callbacks.title = items => formatDate(points[items[0]?.dataIndex]?.date);
                 chartInstance.options.scales.y.ticks.callback = (v) => v.toFixed(dec) + ' ' + window.nbuUAHText;
                 chartInstance.options.plugins.tooltip.callbacks.label = (c) => `${c.parsed.y.toFixed(dec)} ${window.nbuUAHText}`;
                 chartInstance.update('none');
@@ -4468,8 +4494,9 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
+                plugins: [nbuPointerPlugin],
                 data: { labels, datasets: [{ label: `${currentCurrency} / UAH`, data, borderColor: color, backgroundColor: gradient, tension: 0.35, fill: true, pointRadius: 0, pointHoverRadius: 6, pointHoverBackgroundColor: color, pointHoverBorderColor: '#fff', pointHoverBorderWidth: 3, borderWidth: 2.5 }] },
-                options: { responsive: true, maintainAspectRatio: false, onClick: fxChartSelect, animation: { duration: 500, easing: 'easeOutQuart' }, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', padding: 12, cornerRadius: 10, displayColors: false, callbacks: { label: (c) => `${c.parsed.y.toFixed(dec)} ${window.nbuUAHText}` } } }, scales: { y: { beginAtZero: false, grid: { color: borderCol, drawTicks: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 11 }, padding: 8, callback: (v) => v.toFixed(dec) + ' ' + window.nbuUAHText } }, x: { grid: { display: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 11 }, maxTicksLimit: 8, padding: 6 } } } }
+                options: { responsive: true, maintainAspectRatio: false, onClick: fxChartSelect, animation: { duration: 500, easing: 'easeOutQuart' }, interaction: { mode: 'index', axis: 'x', intersect: false }, plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(0,0,0,0.85)', padding: 12, cornerRadius: 10, displayColors: false, callbacks: { title: items => formatDate(points[items[0]?.dataIndex]?.date), label: (c) => `${c.parsed.y.toFixed(dec)} ${window.nbuUAHText}` } } }, scales: { y: { beginAtZero: false, grid: { color: borderCol, drawTicks: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 11 }, padding: 8, callback: (v) => v.toFixed(dec) + ' ' + window.nbuUAHText } }, x: { grid: { display: false }, border: { display: false }, ticks: { color: textMuted, font: { size: 11 }, maxTicksLimit: 8, padding: 6 } } } }
             });
         }
 
@@ -5065,6 +5092,7 @@ main.container > section.card:last-of-type { margin-bottom:26px; }
                 ctx.restore();
             }
         };
+
         function fxChartSelect(event, elements, chart){
             if(!chart?.scales?.x)return;
             const dates=getFilteredData(currentPeriod).filter(d=>Number(historicalRates[d]?.[currentCurrency])>0);
