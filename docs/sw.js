@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v46';
+const CACHE_NAME = 'nbu-rate-v47';
 
 const MARKET_LOGOS = [
   './crypto-stocks/whitebit.svg',
@@ -15,8 +15,8 @@ const FILES = [
   ...MARKET_LOGOS,
   './',
   './index.html',
-  './company-profiles.js?v=46',
-  './company-profiles.css?v=46',
+  './company-profiles.js?v=47',
+  './company-profiles.css?v=47',
   './favicon/site.webmanifest',
   './favicon/web-app-manifest-192x192.png',
   './favicon/web-app-manifest-512x512.png',
@@ -106,3 +106,4 @@ self.addEventListener('fetch', event => {
     }
   })());
 });
+
