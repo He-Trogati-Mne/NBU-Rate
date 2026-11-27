@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v47';
+const CACHE_NAME = 'nbu-rate-v48';
 
 const MARKET_LOGOS = [
   './crypto-stocks/whitebit.svg',
@@ -15,8 +15,13 @@ const FILES = [
   ...MARKET_LOGOS,
   './',
   './index.html',
-  './company-profiles.js?v=47',
-  './company-profiles.css?v=47',
+  './portal.css?v=371-release',
+  './portal.js?v=371-release',
+  './regional.css?v=371-release',
+  './regional.js?v=371-release',
+  './market-pages.css?v=371-release',
+  './company-profiles.js?v=371-release',
+  './company-profiles.css?v=371-release',
   './favicon/site.webmanifest',
   './favicon/web-app-manifest-192x192.png',
   './favicon/web-app-manifest-512x512.png',
@@ -86,7 +91,7 @@ self.addEventListener('fetch', event => {
     })());
     return;
   }
-  if (request.mode !== 'navigate' && ['company-profiles.js','company-profiles.css'].some(name => url.pathname === new URL(name,self.registration.scope).pathname)) {
+  if (request.mode !== 'navigate' && ['company-profiles.js','company-profiles.css','portal.css','portal.js','regional.css','regional.js','market-pages.css'].some(name => url.pathname === new URL(name,self.registration.scope).pathname)) {
     event.respondWith((async()=>{const cache=await caches.open(CACHE_NAME);try{const r=await fetch(request);if(r.ok)await cache.put(request,r.clone());return r;}catch(_){return (await cache.match(request))||Response.error();}})());return;
   }
   if (request.mode !== 'navigate') return;
