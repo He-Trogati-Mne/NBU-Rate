@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v48';
+const CACHE_NAME = 'nbu-rate-v49';
 
 const MARKET_LOGOS = [
   './crypto-stocks/whitebit.svg',
@@ -15,13 +15,14 @@ const FILES = [
   ...MARKET_LOGOS,
   './',
   './index.html',
-  './portal.css?v=371-release',
-  './portal.js?v=371-release',
-  './regional.css?v=371-release',
-  './regional.js?v=371-release',
-  './market-pages.css?v=371-release',
-  './company-profiles.js?v=371-release',
-  './company-profiles.css?v=371-release',
+  './uah-compat.js?v=380-perf',
+  './chart-fallback.js?v=380-perf',
+  './nbu-app.js?v=380-perf',
+  './select-ui.js?v=380-perf',
+  './stocks-home.js?v=380-perf',
+  './portal.js?v=380-perf',
+  './company-profiles.js?v=380-perf',
+  './company-profiles.css?v=380-perf',
   './favicon/site.webmanifest',
   './favicon/web-app-manifest-192x192.png',
   './favicon/web-app-manifest-512x512.png',
@@ -34,8 +35,10 @@ const FILES = [
   './favicon/browserconfig.xml',
   './manifest.webmanifest',
   './manifest-android.webmanifest',
-  './chart.umd.min.js',
-  './chart.min.js'
+  './stock-logos.json',
+  './crypto-logos.json',
+  './404.html',
+  './offline.html'
 ];
 
 const OFFLINE_URL = new URL('./index.html', self.registration.scope).href;
@@ -50,7 +53,7 @@ self.addEventListener('install', event => {
     await cache.put(OFFLINE_URL, shell);
     await Promise.allSettled(FILES.filter(file => file !== './' && file !== './index.html').map(async file => {
       const url = new URL(file, self.registration.scope);
-      const response = await fetch(url, {cache: 'reload'});
+      const response = await fetch(url, {cache: 'default'});
       if (response.ok) await cache.put(url.href, response);
     }));
     await self.skipWaiting();
@@ -91,12 +94,14 @@ self.addEventListener('fetch', event => {
     })());
     return;
   }
-  if (request.mode !== 'navigate' && ['company-profiles.js','company-profiles.css','portal.css','portal.js','regional.css','regional.js','market-pages.css'].some(name => url.pathname === new URL(name,self.registration.scope).pathname)) {
-    event.respondWith((async()=>{const cache=await caches.open(CACHE_NAME);try{const r=await fetch(request);if(r.ok)await cache.put(request,r.clone());return r;}catch(_){return (await cache.match(request))||Response.error();}})());return;
+  if (request.mode !== 'navigate' && (/\/(?:bank|flags|stock-logos|crypto-logos)\//.test(url.pathname)||url.pathname.endsWith('/chart.umd.min.js')||['cities/settlements.js','cities/settlements.css','stocks/mobile.css','market-page.js','company-profiles.js','company-profiles.css','portal.css','portal.js','regional.css','regional.js','market-pages.css','uah-compat.js','chart-fallback.js','nbu-app.js','select-ui.js','stocks-home.js'].some(name => url.pathname === new URL(name,self.registration.scope).pathname))) {
+    event.respondWith((async()=>{const cache=await caches.open(CACHE_NAME);const immutable=['380-perf','390'].includes(url.searchParams.get('v'))||/\/(?:bank\/optimized|flags)\//.test(url.pathname)||url.pathname.endsWith('/chart.umd.min.js');if(immutable){const hit=await cache.match(request);if(hit)return hit;}try{const r=await fetch(request);if(r.ok)await cache.put(request,r.clone());return r;}catch(_){return (await cache.match(request))||Response.error();}})());return;
   }
   if (request.mode !== 'navigate') return;
   const root = new URL('./', self.registration.scope);
-  if (url.pathname !== root.pathname && url.pathname !== new URL(OFFLINE_URL).pathname) return;
+  if (url.pathname !== root.pathname && url.pathname !== new URL(OFFLINE_URL).pathname) {
+    event.respondWith((async()=>{try{return await fetch(request)}catch(_){const cache=await caches.open(CACHE_NAME);return (await cache.match(new URL('./offline.html',self.registration.scope).href))||Response.error()}})());return;
+  }
   event.respondWith((async () => {
     try {
       const response = await fetch(request, {cache: 'no-cache'});
@@ -111,4 +116,3 @@ self.addEventListener('fetch', event => {
     }
   })());
 });
-
