@@ -4,6 +4,73 @@ let prev=null,busy=false,status={type:'loading'},bankResults=new Map(),bankFailu
 function table(host,head,rows){const wrap=document.createElement('div');wrap.className='table-wrap';const table=document.createElement('table'),thead=table.createTHead(),h=thead.insertRow();for(const x of head){const el=document.createElement('th');el.scope='col';el.textContent=x;h.append(el);}const tbody=table.createTBody();for(const r of rows){const tr=tbody.insertRow();for(const [i,x] of r.entries()){const cell=tr.insertCell();if(kind==='stocks'){cell.dataset.label=head[i]||'';cell.setAttribute('role','cell')}if(x instanceof Node)cell.append(x);else cell.textContent=x;}}if(kind==='stocks'){table.classList.add('stocks-responsive');table.setAttribute('role','table');thead.setAttribute('role','rowgroup');tbody.setAttribute('role','rowgroup');for(const row of table.rows)row.setAttribute('role','row');for(const th of thead.querySelectorAll('th'))th.setAttribute('role','columnheader');}wrap.append(table);host.replaceChildren(wrap);}
 const locale=()=>lang()==='en'?'en-US':'uk-UA',time=v=>D.time(v,lang());
 
+
+function stockIcon(symbol){
+  const wrap=document.createElement('span');wrap.className='stock-table-cell';wrap.dataset.symbol=symbol;
+  const box=document.createElement('span');box.className='stock-table-logo';box.setAttribute('aria-hidden','true');
+  const fallback=document.createElement('span');fallback.className='stock-table-fallback';fallback.textContent=symbol.split('.')[0].slice(0,4);box.append(fallback);
+  const label=document.createElement('span');label.textContent=symbol;wrap.append(box,label);
+  const sources=window.NbuLogos?.candidates('stock',symbol)||[];let i=0;
+  function next(){if(i>=sources.length)return;const src=sources[i++];const img=document.createElement('img');img.alt='';img.width=32;img.height=32;img.loading='lazy';img.decoding='async';img.className='stock-table-img';
+    img.addEventListener('load',()=>{if(img.naturalWidth){fallback.hidden=true;img.classList.add('is-loaded');}else{img.remove();next();}},{once:true});
+    img.addEventListener('error',()=>{window.NbuLogos?.fail(src);img.remove();next();},{once:true});box.append(img);img.src=src;
+  }next();return wrap;
+}
+function bankIcon(id,name){
+  const wrap=document.createElement('span');
+  wrap.className='bank-table-cell';
+  const img=document.createElement('img');
+  img.className='bank-table-icon';
+  img.alt='';
+  img.loading='lazy';
+  img.decoding='async';
+  img.src='../bank/'+id+'.png';
+  img.onerror=()=>{
+    const fb=document.createElement('span');
+    fb.className='bank-table-fallback';
+    fb.textContent=(name||id).replace(/[^A-Za-zА-Яа-яІіЇїЄє0-9]+/g,' ').trim().split(/\s+/).slice(0,2).map(s=>s[0]||'').join('').toUpperCase().slice(0,2)||id.slice(0,2).toUpperCase();
+    img.replaceWith(fb);
+  };
+  wrap.append(img);
+  const label=document.createElement('span');
+  label.className='bank-table-name';
+  label.textContent=name;
+  wrap.append(label);
+  return wrap;
+}
+function cryptoIcon(symbol, meta){
+  const wrap=document.createElement('span');
+  wrap.className='crypto-ticker-cell';
+  const [uk,en,glyph,color]=(meta||[]);
+  const imgPath=(window.NbuOriginalCrypto&&window.NbuOriginalCrypto[symbol])?('../'+window.NbuOriginalCrypto[symbol]):'';
+  if(imgPath){
+    const img=document.createElement('img');
+    img.className='crypto-table-icon';
+    img.alt='';
+    img.loading='lazy';
+    img.decoding='async';
+    img.src=imgPath;
+    img.onerror=()=>{const fb=document.createElement('span');fb.className='crypto-table-fallback';fb.textContent=(glyph||symbol).slice(0,1);fb.style.background=color||'#77b7ff';img.replaceWith(fb);};
+    wrap.append(img);
+  } else {
+    const fb=document.createElement('span');
+    fb.className='crypto-table-fallback';
+    fb.textContent=(glyph||symbol).slice(0,1);
+    fb.style.background=color||'#77b7ff';
+    wrap.append(fb);
+  }
+  const textWrap=document.createElement('span');
+  textWrap.className='crypto-table-name';
+  const strong=document.createElement('strong');
+  strong.className='crypto-table-ticker';
+  strong.textContent=symbol;
+  const small=document.createElement('small');
+  small.textContent=lang()==='en' ? (en||symbol) : (uk||symbol);
+  textWrap.append(strong,small);
+  wrap.append(textWrap);
+  return wrap;
+}
+
 function bankVisualChoice(){
     const select=$('bank-currency');
     if(!select||select.dataset.visualReady==='1')return;
@@ -34,10 +101,10 @@ function bankVisualChoice(){
     sync();
 }
 
-function render(feed){if(kind==='nbu'){const r=feed.items.find(x=>x.symbol===code);if(!r)throw Error('No currency');$('quote').textContent='1 '+code+' = '+D.fmt(r.price,'nbu',lang(),'₴');$('quote-date').textContent=tr('Офіційний курс на ','Official rate on ')+time(r.asOf);const f=(v,d)=>new Intl.NumberFormat(locale(),{maximumFractionDigits:d,minimumFractionDigits:d}).format(v);table($('forward'),[code,'UAH'],[1,10,50,100,500,1000].map(v=>[v,f(v*r.price,2)]));table($('reverse'),['UAH',code],[100,500,1000,5000,10000].map(v=>[v,f(v/r.price,4)]));}else {const name=r=>(r.meta||D.catalog[kind][r.symbol]||[r.symbol,r.symbol])[lang()==='en'?1:0];const headings=[tr('Тікер','Ticker'),tr('Назва','Name'),tr('Ціна','Price'),tr('Дата спостереження','Quote date')];if(kind==='stocks')headings.push(tr('Історія компанії','Company history'));const rows=feed.items.map(r=>{const price=D.fmt(r.price,kind,lang(),r.currency),row=[r.symbol,name(r),price,time(r.asOf)];if(kind==='stocks'&&window.NbuCompany)row.push(window.NbuCompany.button(r.symbol,name(r),null,price));return row;});table($('quotes'),headings,rows);if(kind==='crypto'){const count=$('crypto-count');if(count)count.textContent=tr('Доступно криптовалют: ','Cryptocurrencies available: ')+feed.items.length;}}}
+function render(feed){if(kind==='nbu'){const r=feed.items.find(x=>x.symbol===code);if(!r)throw Error('No currency');$('quote').textContent='1 '+code+' = '+D.fmt(r.price,'nbu',lang(),'₴');$('quote-date').textContent=tr('Офіційний курс на ','Official rate on ')+time(r.asOf);const f=(v,d)=>new Intl.NumberFormat(locale(),{maximumFractionDigits:d,minimumFractionDigits:d}).format(v);table($('forward'),[code,'UAH'],[1,10,50,100,500,1000].map(v=>[v,f(v*r.price,2)]));table($('reverse'),['UAH',code],[100,500,1000,5000,10000].map(v=>[v,f(v/r.price,4)]));}else {const fallbackMeta=s=>D.catalog[kind]?.[s]||[s,s,s.slice(0,1),'#77b7ff'];const name=r=>(r.meta||fallbackMeta(r.symbol))[lang()==='en'?1:0];const headings=kind==='crypto'?[tr('Криптовалюта','Cryptocurrency'),tr('Ціна','Price'),tr('Дата спостереження','Quote date')]:[tr('Тікер','Ticker'),tr('Назва','Name'),tr('Ціна','Price'),tr('Дата спостереження','Quote date')];if(kind==='stocks')headings.push(tr('Історія компанії','Company history'));const rows=feed.items.map(r=>{const price=D.fmt(r.price,kind,lang(),r.currency);if(kind==='crypto'){const meta=r.meta||fallbackMeta(r.symbol);return [cryptoIcon(r.symbol,meta),price,time(r.asOf)];}const identity=kind==='stocks'?stockIcon(r.symbol):r.symbol;const row=[identity,name(r),price,time(r.asOf)];if(kind==='stocks'&&window.NbuCompany)row.push(window.NbuCompany.button(r.symbol,name(r),()=>identity.querySelector('img.is-loaded')?.src,price));return row;});table($('quotes'),headings,rows);if(kind==='crypto'){const count=$('crypto-count');if(count)count.textContent=tr('Доступно криптовалют: ','Cryptocurrencies available: ')+feed.items.length;}}}
 const bankLabels={updated:['Оновлено','Updated'],available:['Дані доступні','Data available'],saved:['Збережені дані','Saved data'],missing:['Немає даних','No data'],unverified:['Непідтверджене джерело','Unverified source'],suspicious:['Потребує перевірки','Needs verification']};
 function bankState(id){return D.bankState(id,bankResults.get(id),bankReports,bankFailures.has(id));}
-function bankRender(){const c=$('bank-currency').value;const ids=Object.keys(NbuBankNames);const rows=ids.map(id=>{const r=bankResults.get(id),v=r?.items.find(x=>x.symbol===c),state=bankState(id),show=v&&!['unverified','suspicious'].includes(state);const name=lang()==='en'?NbuBankNamesEn[id]||NbuBankNames[id]:NbuBankNames[id];const badge=document.createElement('span');badge.className='bank-feed-state';badge.dataset.state=state;badge.textContent=tr(...bankLabels[state]);if(r&&!v)badge.textContent+=' · '+tr('немає '+c,'no '+c);return [name,show?D.fmt(v.buy,'nbu',lang()):'—',show?D.fmt(v.sell,'nbu',lang()):'—',({cash:tr('Готівковий','Cash'),card:tr('Картковий','Card'),online:tr('Онлайн','Online')})[r?.rateType]||'—',time(r?.rateDate),time(r?.updatedAt),badge];}).sort((a,b)=>a[0].localeCompare(b[0],locale()));table($('quotes'),[tr('Банк','Bank'),tr('Купівля, UAH','Buy, UAH'),tr('Продаж, UAH','Sell, UAH'),tr('Тип','Type'),tr('Дата курсу','Rate date'),tr('Збір даних','Collected'),tr('Стан','Status')],rows);}
+function bankRender(){const c=$('bank-currency').value;const ids=Object.keys(NbuBankNames);const rows=ids.map(id=>{const r=bankResults.get(id),v=r?.items.find(x=>x.symbol===c),state=bankState(id),show=v&&!['unverified','suspicious'].includes(state);const name=lang()==='en'?NbuBankNamesEn[id]||NbuBankNames[id]:NbuBankNames[id];const badge=document.createElement('span');badge.className='bank-feed-state';badge.dataset.state=state;badge.textContent=tr(...bankLabels[state]);if(r&&!v)badge.textContent+=' · '+tr('немає '+c,'no '+c);return {sortName:name,row:[bankIcon(id,name),show?D.fmt(v.buy,'nbu',lang()):'—',show?D.fmt(v.sell,'nbu',lang()):'—',({cash:tr('Готівковий','Cash'),card:tr('Картковий','Card'),online:tr('Онлайн','Online')})[r?.rateType]||'—',time(r?.rateDate),time(r?.updatedAt),badge]};}).sort((a,b)=>a.sortName.localeCompare(b.sortName,locale())).map(x=>x.row);table($('quotes'),[tr('Банк','Bank'),tr('Купівля, UAH','Buy, UAH'),tr('Продаж, UAH','Sell, UAH'),tr('Тип','Type'),tr('Дата курсу','Rate date'),tr('Збір даних','Collected'),tr('Стан','Status')],rows);}
 function showStatus(){const s=status;switch(s.type){case 'loading':stat.textContent=tr('Завантаження даних…','Loading data…');break;case 'bankProgress':stat.textContent=tr('Перевірено ','Checked ')+s.done+' / '+s.total;break;case 'bankDone':{const ids=Object.keys(NbuBankNames),counts={updated:0,available:0,saved:0,missing:0,unverified:0,suspicious:0};for(const id of ids)counts[bankState(id)]++;const c=$('bank-currency').value,usable=ids.filter(id=>!['unverified','suspicious'].includes(bankState(id))&&bankResults.get(id)?.items.some(x=>x.symbol===c)).length;const report=bankReports?.collection;stat.textContent=tr('Джерел: ','Sources: ')+ids.length+' · '+c+': '+usable+' · '+tr('оновлено: ','updated: ')+counts.updated+' · '+tr('збережені: ','saved: ')+counts.saved+' · '+tr('без даних: ','missing: ')+counts.missing+' · '+tr('потребують перевірки: ','need verification: ')+(counts.unverified+counts.suspicious)+(counts.available?' · '+tr('без підтвердження збору: ','collection unconfirmed: ')+counts.available:'')+(report?' · '+tr('звіт: ','report: ')+time(report.checkedAt):'');break;}case 'ready':stat.textContent=(kind==='stocks'?tr('Перевірка джерела: ','Source checked: '):tr('Дані від ','Data as of '))+time(kind==='stocks'?prev.checkedAt:prev.updatedAt)+tr(' · Київ',' · Kyiv')+(Date.now()-D.stamp(kind==='stocks'?prev.checkedAt:prev.updatedAt)>7200000?tr(' · давно не перевірялись',' · check overdue'):'')+(kind==='stocks'?tr(' · час котирування наведено окремо; у неробочі дні ціна не змінюється',' · quote time is shown separately; prices may not change on non-trading days'):'');break;case 'error':stat.textContent=prev?tr('Не синхронізовано · збережені дані від ','Not synchronized · saved data from ')+time(prev.updatedAt):tr('Дані поки недоступні','Data currently unavailable');}}
 async function refresh(){if(busy)return;busy=true;try{if(kind==='banks'){const ids=Object.keys(NbuBankNames);let pos=0,done=0;bankFailures=new Set();const reportsPromise=D.bankReports();await Promise.all(Array.from({length:6},async()=>{while(pos<ids.length){const id=ids[pos++];try{const r=await D.bank(id),old=bankResults.get(id);if(!old||(!r.unverified&&old.unverified)||r.unverified===old.unverified&&D.stamp(r.updatedAt)>=D.stamp(old.updatedAt))bankResults.set(id,r);else bankFailures.add(id);}catch(_){bankFailures.add(id);}done++;status={type:'bankProgress',done,total:ids.length};showStatus();}}));const reports=await reportsPromise;bankReports=reports;bankRender();status={type:'bankDone',total:ids.length};}else{const f=await D.load(kind);if(prev&&(String(f.date||'')<String(prev.date||'')||(f.date===prev.date&&D.stamp(f.updatedAt)<D.stamp(prev.updatedAt))))throw Error('Older data');if(kind==='stocks'&&prev){const items=new Map(prev.items.map(r=>[r.symbol,r]));for(const r of f.items){if(!items.has(r.symbol)||D.stamp(r.asOf)>=D.stamp(items.get(r.symbol).asOf))items.set(r.symbol,r);}f.items=[...items.values()];}render(f);prev=f;status={type:'ready'};}}catch(_){status={type:'error'};}finally{busy=false;showStatus();}}
 addEventListener('nbu-language-change',()=>{if(kind==='banks')bankRender();else if(prev)render(prev);showStatus()}); if(kind==='banks') bankVisualChoice();if(kind==='banks')$('bank-currency').addEventListener('change',()=>{bankRender();showStatus();});showStatus();refresh();setInterval(refresh,300000);addEventListener('online',refresh);
