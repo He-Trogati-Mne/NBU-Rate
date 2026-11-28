@@ -264,8 +264,9 @@
             if (sym === 'USDT') return `<svg class="crypto-icon" viewBox="0 0 32 32" role="img" aria-label="USDT" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="16" fill="#26a17b"/><path d="M6.5 9.5h19v4h-7.2v3.1c4.7.2 7.2.9 7.2 1.8 0 1.1-4.1 2-9.5 2s-9.5-.9-9.5-2c0-.9 2.5-1.6 7.2-1.8v-3.1H6.5z" fill="#fff"/><path d="M13.7 17.8v5.6h4.6v-5.6" fill="#fff"/></svg>`;
             const safe=/^[A-Z0-9]{1,16}$/.test(sym)?sym:'?';
             const fallbackColor=CRYPTO_COLORS[safe]||'#666';
-            const local=cryptoLogoMap[safe];
-            if(local)return `<img class="crypto-icon" src="${local}" alt="${safe}" width="24" height="24" loading="lazy" decoding="async" onerror="var x=document.createElement('span');x.className='crypto-icon-fallback';x.textContent='${safe.charAt(0)}';x.style.background='${fallbackColor}';this.replaceWith(x)">`;
+            const local=cryptoLogoMap[safe]||'';
+            const candidates=window.NbuLogos.candidates('crypto',safe,local);
+            if(candidates.length)return `<img class="crypto-icon" src="${candidates[0]}" data-symbol="${safe}" data-local="${local}" data-color="${fallbackColor}" alt="${safe}" width="24" height="24" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="window.NbuLogos.cryptoError(this)">`;
             return `<span class="crypto-icon-fallback" style="background:${fallbackColor}" aria-label="${safe}">${safe.charAt(0)}</span>`;
         }
 
