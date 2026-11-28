@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v52';
+const CACHE_NAME = 'nbu-rate-v53';
 
 const MARKET_LOGOS = [
   './crypto-stocks/whitebit.svg',
@@ -17,9 +17,9 @@ const FILES = [
   './index.html',
   './uah-compat.js?v=403-release',
   './chart-fallback.js?v=403-release',
-  './original-crypto-map.js?v=403-release',
-  './local-stock-map.js?v=403-release',
-  './logo-catalog-394.js?v=403-release',
+  './original-crypto-map.js?v=404-logos',
+  './local-stock-map.js?v=404-logos',
+  './logo-catalog-394.js?v=404-logos',
   './nbu-app.js?v=403-release',
   './select-ui.js?v=403-release',
   './stocks-home.js?v=403-release',
@@ -98,7 +98,7 @@ self.addEventListener('fetch', event => {
     return;
   }
   if (request.mode !== 'navigate' && (/\/(?:bank|flags|stock-logos|crypto-logos)\//.test(url.pathname)||url.pathname.endsWith('/chart.umd.min.js')||['cities/settlements.js','cities/settlements.css','stocks/mobile.css','market-page.js','company-profiles.js','company-profiles.css','portal.css','portal.js','regional.css','regional.js','market-pages.css','uah-compat.js','chart-fallback.js','nbu-app.js','select-ui.js','stocks-home.js','logo-catalog.js','logo-catalog-394.js','original-crypto-map.js','local-stock-map.js'].some(name => url.pathname === new URL(name,self.registration.scope).pathname))) {
-    event.respondWith((async()=>{const cache=await caches.open(CACHE_NAME);const immutable=url.searchParams.get('v') === '403-release'||/\/(?:bank\/optimized|flags)\//.test(url.pathname)||url.pathname.endsWith('/chart.umd.min.js');if(immutable){const hit=await cache.match(request);if(hit)return hit;}try{const r=await fetch(request);if(r.ok)await cache.put(request,r.clone());return r;}catch(_){return (await cache.match(request))||Response.error();}})());return;
+    event.respondWith((async()=>{const cache=await caches.open(CACHE_NAME);const immutable=(url.searchParams.get('v') === '403-release' && !/(?:original-crypto-map|local-stock-map|logo-catalog(?:-394)?)\.js$/.test(url.pathname))||/\/(?:bank\/optimized|flags)\//.test(url.pathname)||url.pathname.endsWith('/chart.umd.min.js');if(immutable){const hit=await cache.match(request);if(hit)return hit;}try{const r=await fetch(request, {cache:'no-cache'});if(r.ok)await cache.put(request,r.clone());return r;}catch(_){return (await cache.match(request))||Response.error();}})());return;
   }
   if (request.mode !== 'navigate') return;
   const root = new URL('./', self.registration.scope);
