@@ -109,3 +109,5 @@
 @media(min-width:981px){.company-timeline-list{max-height:min(55vh,480px);overflow:auto;overscroll-behavior:contain;padding-right:5px;scrollbar-width:thin;scrollbar-color:var(--border-strong,var(--border,var(--line,#30353c))) transparent}}
 
 .company-dialog .company-close{display:grid;place-items:center;width:40px;height:40px;min-width:40px;min-height:40px;padding:0;line-height:1;margin:0;flex:0 0 40px;border-radius:11px}.company-close svg{display:block;width:18px;height:18px;pointer-events:none}
+
+.company-banner[data-brand="CAT"]{background:#fff}.company-banner[data-brand="CAT"] .company-banner-logo{padding:12px;object-fit:contain}
