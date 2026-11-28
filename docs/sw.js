@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nbu-rate-v49';
+const CACHE_NAME = 'nbu-rate-v50';
 
 const MARKET_LOGOS = [
   './crypto-stocks/whitebit.svg',
@@ -17,11 +17,12 @@ const FILES = [
   './index.html',
   './uah-compat.js?v=380-perf',
   './chart-fallback.js?v=380-perf',
-  './nbu-app.js?v=380-perf',
+  './logo-catalog.js?v=393',
+  './nbu-app.js?v=393',
   './select-ui.js?v=380-perf',
-  './stocks-home.js?v=380-perf',
+  './stocks-home.js?v=393',
   './portal.js?v=380-perf',
-  './company-profiles.js?v=380-perf',
+  './company-profiles.js?v=393',
   './company-profiles.css?v=380-perf',
   './favicon/site.webmanifest',
   './favicon/web-app-manifest-192x192.png',
@@ -94,8 +95,8 @@ self.addEventListener('fetch', event => {
     })());
     return;
   }
-  if (request.mode !== 'navigate' && (/\/(?:bank|flags|stock-logos|crypto-logos)\//.test(url.pathname)||url.pathname.endsWith('/chart.umd.min.js')||['cities/settlements.js','cities/settlements.css','stocks/mobile.css','market-page.js','company-profiles.js','company-profiles.css','portal.css','portal.js','regional.css','regional.js','market-pages.css','uah-compat.js','chart-fallback.js','nbu-app.js','select-ui.js','stocks-home.js'].some(name => url.pathname === new URL(name,self.registration.scope).pathname))) {
-    event.respondWith((async()=>{const cache=await caches.open(CACHE_NAME);const immutable=['380-perf','390'].includes(url.searchParams.get('v'))||/\/(?:bank\/optimized|flags)\//.test(url.pathname)||url.pathname.endsWith('/chart.umd.min.js');if(immutable){const hit=await cache.match(request);if(hit)return hit;}try{const r=await fetch(request);if(r.ok)await cache.put(request,r.clone());return r;}catch(_){return (await cache.match(request))||Response.error();}})());return;
+  if (request.mode !== 'navigate' && (/\/(?:bank|flags|stock-logos|crypto-logos)\//.test(url.pathname)||url.pathname.endsWith('/chart.umd.min.js')||['cities/settlements.js','cities/settlements.css','stocks/mobile.css','market-page.js','company-profiles.js','company-profiles.css','portal.css','portal.js','regional.css','regional.js','market-pages.css','uah-compat.js','chart-fallback.js','nbu-app.js','select-ui.js','stocks-home.js','logo-catalog.js'].some(name => url.pathname === new URL(name,self.registration.scope).pathname))) {
+    event.respondWith((async()=>{const cache=await caches.open(CACHE_NAME);const immutable=['380-perf','390','393'].includes(url.searchParams.get('v'))||/\/(?:bank\/optimized|flags)\//.test(url.pathname)||url.pathname.endsWith('/chart.umd.min.js');if(immutable){const hit=await cache.match(request);if(hit)return hit;}try{const r=await fetch(request);if(r.ok)await cache.put(request,r.clone());return r;}catch(_){return (await cache.match(request))||Response.error();}})());return;
   }
   if (request.mode !== 'navigate') return;
   const root = new URL('./', self.registration.scope);
