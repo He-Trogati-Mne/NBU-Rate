@@ -24,6 +24,8 @@
   "WMT": "stock-logos/builtin-WMT.svg",
   "SONY": "stock-logos/builtin-SONY.svg",
   "SAP": "stock-logos/builtin-SAP.svg",
-  "CAT": "stock-logos/builtin-CAT.svg",
-  "CSCO": "stock-logos/builtin-CSCO.svg"
+  "CAT": "stock-logos/CAT-wordmark.png",
+  "CSCO": "stock-logos/builtin-CSCO.svg",
+  "TSM": "stock-logos/builtin-TSM.svg",
+  "JPM": "stock-logos/builtin-JPM.svg"
 }
