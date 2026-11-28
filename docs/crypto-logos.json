@@ -1,1 +1,17 @@
-{}
+{
+  "BTC": "crypto-logos/builtin-BTC.svg",
+  "ETH": "crypto-logos/builtin-ETH.svg",
+  "BNB": "crypto-logos/builtin-BNB.svg",
+  "SOL": "crypto-logos/builtin-SOL.svg",
+  "XRP": "crypto-logos/builtin-XRP.svg",
+  "ADA": "crypto-logos/builtin-ADA.svg",
+  "DOGE": "crypto-logos/builtin-DOGE.svg",
+  "LINK": "crypto-logos/builtin-LINK.svg",
+  "DOT": "crypto-logos/builtin-DOT.svg",
+  "LTC": "crypto-logos/builtin-LTC.svg",
+  "NEAR": "crypto-logos/builtin-NEAR.svg",
+  "OP": "crypto-logos/builtin-OP.svg",
+  "SUI": "crypto-logos/builtin-SUI.svg",
+  "XLM": "crypto-logos/builtin-XLM.svg",
+  "USDT": "crypto-logos/builtin-USDT.svg"
+}
