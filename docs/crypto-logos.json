@@ -1,4 +1,26 @@
 {
+  "ADA": "crypto-logos/original-ADA.png",
+  "APT": "crypto-logos/original-APT.png",
+  "ARB": "crypto-logos/original-ARB.jpg",
+  "AVAX": "crypto-logos/original-AVAX.png",
+  "BNB": "crypto-logos/original-BNB.png",
+  "BTC": "crypto-logos/original-BTC.png",
+  "DAI": "crypto-logos/original-DAI.png",
   "DOGE": "crypto-logos/original-DOGE.svg",
-  "XLM": "crypto-logos/original-XLM.svg"
+  "DOT": "crypto-logos/original-DOT.jpg",
+  "ETH": "crypto-logos/original-ETH.png",
+  "GRAM": "crypto-logos/original-GRAM.png",
+  "LINK": "crypto-logos/original-LINK.png",
+  "LTC": "crypto-logos/original-LTC.png",
+  "NEAR": "crypto-logos/original-NEAR.jpg",
+  "OP": "crypto-logos/original-OP.png",
+  "SOL": "crypto-logos/original-SOL.png",
+  "SUI": "crypto-logos/original-SUI.png",
+  "TRX": "crypto-logos/original-TRX.png",
+  "UNI": "crypto-logos/original-UNI.png",
+  "USDC": "crypto-logos/original-USDC.png",
+  "USDT": "crypto-logos/original-USDT.png",
+  "WBTC": "crypto-logos/original-WBTC.png",
+  "XLM": "crypto-logos/original-XLM.svg",
+  "XRP": "crypto-logos/original-XRP.svg"
 }
