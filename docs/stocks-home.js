@@ -48,6 +48,7 @@
   function next(){while(i<sources.length&&failedBrandUrls.has(sources[i]))i++;if(i>=sources.length)return;const src=sources[i++],im=make('img','market-brand-img');im.alt='';im.width=40;im.height=40;im.loading='lazy';im.decoding='async';im.referrerPolicy='no-referrer';
    if((o.symbol==='NVDA'||o.symbol==='TSLA')&&(src.includes('simple-icons')||src.includes('simpleicons-team')))im.classList.add('brand-monochrome');
    if(o.symbol==='FXPO.L'&&src.endsWith('Ferrexpo.svg'))im.classList.add('brand-wide');
+   if(o.symbol==='MSFT'||o.symbol==='GOOGL'||o.symbol==='TSM'||o.symbol==='JPM')im.classList.add('brand-refined');
    im.addEventListener('load',()=>{if(im.naturalWidth>0&&(!src.includes('google.com/s2/favicons')||im.naturalWidth>=32)){fallback.remove();im.classList.add('is-loaded');}else{failedBrandUrls.add(src);window.NbuLogos.fail(src);im.remove();next();}},{once:true});
    im.addEventListener('error',()=>{failedBrandUrls.add(src);window.NbuLogos.fail(src);im.remove();next();},{once:true});el.append(im);im.src=src;
   }next();return el;
