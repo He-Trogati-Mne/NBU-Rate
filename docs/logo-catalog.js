@@ -4,7 +4,7 @@ const built={"AAPL":"stock-logos/builtin-AAPL.svg","MSFT":"stock-logos/builtin-M
 function candidates(kind,sym,local){
  if(!/^[A-Z0-9][A-Z0-9.=-]{0,23}$/.test(sym))return [];
  if(kind!=='crypto'&&kind!=='stock')return [];
- const paths=kind==='crypto'?[window.NbuOriginalCrypto?.[sym]]:[window.NbuLocalStocks?.[sym],local,built[sym]];
+ const paths=kind==='crypto'?[window.NbuOriginalCrypto?.[sym],local]:[window.NbuLocalStocks?.[sym],local,built[sym]];
  return [...new Set(paths.filter(x=>typeof x==='string'&&new RegExp('^(?:\\./)?'+kind+'-logos/[A-Za-z0-9._-]+\\.(?:svg|png|jpg|webp|ico)$','i').test(x)).map(x=>new URL(x,base).href))].filter(x=>!bad.has(x));
 }
 function cryptoError(img){bad.add(img.src);const list=candidates('crypto',img.dataset.symbol,img.dataset.local||'');if(list.length){img.src=list[0];return;}const x=document.createElement('span');x.className='crypto-icon-fallback';x.textContent=img.dataset.symbol.charAt(0);x.style.background=img.dataset.color;x.setAttribute('aria-label',img.dataset.symbol);img.replaceWith(x);}
